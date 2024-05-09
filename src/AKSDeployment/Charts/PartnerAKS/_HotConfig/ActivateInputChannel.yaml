@@ -1,0 +1,51 @@
+# Usage: 
+# set RESOURCE_GROUP "DataLabsabcRG-eastus"
+# set AKS_NAME "abcinteusaks"
+# Invoke-AzAksRunCommand -ResourceGroupName ${RESOURCE_GROUP} -Name ${AKS_NAME} -Force -Command "kubectl patch configmap solution-io-config -n solution-namespace --type merge --patch-file ActivateInputChannel.yaml" -CommandContextAttachment "ActivateInputChannel.yaml"
+# To stop Input Channel in case of disaster InputChannelActive should be false, offset values are disregarded
+# To start Input Channel in case of disaster InputChannelActive should be true, offset values, if any, are respected.
+# Config accepts offset values, in case of no value provided,starts with the latest timestamp.
+
+# allowalltenants and stopalltenants cannot be both false for any traffic tuner rule unless Included subscriptions, excluded subscriptions or included regions list is filled
+# allowalltenants is first priority, stopalltenants is second priority
+
+# to stop reading data from input channel
+data:
+    InputChannelActive: "false/00:15:00"
+    PartnerTrafficTunerRule:
+         "allowalltenants: true;
+        stopalltenants: true;
+        includedregions:;
+        includedsubscriptions:;
+        excludedsubscriptions:;
+        excludedresourcetypes:;
+        messageretrycutoffcount: 12"
+    TrafficTunerRule:
+        "allowalltenants: true;
+        stopalltenants: true;
+        includedregions:;
+        includedsubscriptions:;
+        excludedsubscriptions:;
+        excludedresourcetypes:;
+        messageretrycutoffcount: 12"
+
+# to start reading data from input channel
+# PartnerTrafficTunerRule is not changed due to cache refill repair item needed. Wait for cache to fill before updating PartnerTrafficTunerRule
+# data:
+#     InputChannelActive: "true/00:15:00"
+#     PartnerTrafficTunerRule:
+#          "allowalltenants: true;
+#         stopalltenants: true; 
+#         includedregions:;
+#         includedsubscriptions:;
+#         excludedsubscriptions:;
+#         excludedresourcetypes:;
+#         messageretrycutoffcount: 12"
+#     TrafficTunerRule:
+#         "allowalltenants: true;
+#         stopalltenants: false;
+#         includedregions:;
+#         includedsubscriptions:;
+#         excludedsubscriptions:;
+#         excludedresourcetypes:;
+#         messageretrycutoffcount: 12"

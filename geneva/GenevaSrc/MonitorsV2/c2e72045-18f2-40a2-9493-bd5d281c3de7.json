@@ -1,0 +1,240 @@
+{
+  "advancedConfiguration": {
+    "debug": false
+  },
+  "alertConditions": [
+    {
+      "alertOutletIds": [],
+      "conditions": [
+        {
+          "comparator": 4,
+          "expressionId": "18b2580e-657d-4bb9-886e-47536ed81bb8",
+          "id": "cac6e68f-677d-4f10-aeac-37026582b618",
+          "type": 0,
+          "value": "30"
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 2,
+      "id": "c469bfbe-0b12-4cce-8fa5-36982d08196c",
+      "metadata": {},
+      "name": "AvailableConcurrencyLow",
+      "severity": 3
+    },
+    {
+      "alertOutletIds": [],
+      "conditions": [
+        {
+          "comparator": 4,
+          "expressionId": "18b2580e-657d-4bb9-886e-47536ed81bb8",
+          "id": "cac6e68f-677d-4f10-aeac-37026582b618",
+          "type": 0,
+          "value": "10"
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 1,
+      "id": "e01ee198-a1f0-4bc2-8f67-1350919ed7bb",
+      "metadata": {},
+      "name": "AvailableConcurrency Super Low",
+      "severity": 3
+    }
+  ],
+  "alertEnrichmentConfiguration": {
+    "customLinks": [
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "scaleUnit",
+          "region",
+          "service"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "1.00:00:00",
+        "path": [
+          "IOService",
+          "TaskChannelConcurrency"
+        ],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "TaskChannelConcurrency"
+      }
+    ]
+  },
+  "autoMitigationConfiguration": {
+    "healthyCountToMitigateIncident": 10,
+    "shouldMitigateIncident": false
+  },
+  "customMetadata": {
+    "Title": "[Data Labs] {Monitor.DisplayName} for SU: {Monitor.Dimension.scaleUnit}, Region: {Monitor.Dimension.region}, Pod: {Monitor.Dimension.POD_NAME}"
+  },
+  "description": "GlobalConcurrencyAvailable Threads are significantly low for processing messages.",
+  "ev2MetadataInLastDeployment": null,
+  "expressions": [
+    {
+      "endTimeShift": null,
+      "id": "18b2580e-657d-4bb9-886e-47536ed81bb8",
+      "lookback": "",
+      "name": "AvailableConcurrency",
+      "percentages": [
+        {
+          "denominator": [],
+          "multiplier": 1,
+          "numerator": [
+            {
+              "conditions": [
+                {
+                  "dimensionName": "NODE_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "POD_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "buildVersion",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "region",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scaleUnit",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "service",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                }
+              ],
+              "dataBlockType": 0,
+              "endTimeShift": null,
+              "expressionId": "",
+              "isNegative": false,
+              "lookback": null,
+              "lookbackAggregation": 0,
+              "multiTimeSeriesAggregation": 0,
+              "timeSeriesId": "be94770a-fadd-4012-ac09-392a7d29bd5e",
+              "timeSeriesType": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "frequency": "00:03:00",
+  "id": "c2e72045-18f2-40a2-9493-bd5d281c3de7",
+  "lastModifiedBy": "dylanhartono",
+  "lastModifiedTime": "2024-01-27T00:44:30.8147554Z",
+  "lookback": "00:05:00",
+  "name": "[IOService] Low GlobalConcurrencyAvailable",
+  "outlets": [],
+  "recoveryRules": [],
+  "resourceType": "ServiceHealthTemp",
+  "schemaVersion": 0,
+  "state": 2,
+  "tags": [
+    "IOService"
+  ],
+  "targetDimensions": [
+    {
+      "dimensionName": "scaleUnit",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "region",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "service",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    }
+  ],
+  "tenant": "ARGDataLabs",
+  "timeSeries": [
+    {
+      "dimensions": [
+        "NODE_NAME",
+        "POD_NAME",
+        "buildVersion",
+        "region",
+        "scaleUnit",
+        "service"
+      ],
+      "id": "be94770a-fadd-4012-ac09-392a7d29bd5e",
+      "metric": "GlobalConcurrencyAvailable",
+      "name": "AvailableConcurrency",
+      "namespace": "ARGDataLabs",
+      "samplingType": "Average",
+      "tenant": "ARGDataLabs",
+      "timeSeriesType": 0
+    }
+  ]
+}

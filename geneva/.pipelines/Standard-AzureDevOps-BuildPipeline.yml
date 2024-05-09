@@ -1,0 +1,93 @@
+# GitOps Variables or Parameters
+#
+# The convention for folders used by the GitOps Ev2 flow are:
+# - /GenevaSrc
+#   - Location of your account configuration files/folders such as Logs/, Metrics/, AccountConfig, Monitors/, MonitorsV2/, etc.
+# - /ServiceGroupRoot
+#   - Location of Ev2 artifacts used by the Ev2 extension to process changes to your account configurations
+#
+# It's recommended you stay with the convention, but you may override paths as needed. This may prevent the update from working.
+# Sample variables are provided for convenience using the default values when the cmdlet parameters are not specified
+# when called.
+#
+# GENEVA_GITOPS_SOURCEROOT: $(Build.SourcesDirectory)\GenevaSrc\
+# GENEVA_GITOPS_SERVICEGROUPROOT: $(Build.SourcesDirectory)\ServiceGroupRoot\
+# GENEVA_GITOPS_PACKAGEROOT: $(Build.SourcesDirectory)\ServiceGroupRoot\Package\
+#
+# If you wish to use parameters instead of variables you may enable your pipeline to use
+# pipeline callee provided parameters to override folder paths and any future
+# options for functions from the powershell module.
+#
+# For example:
+# - name: 'genevaGitOpsSourceRoot'
+#   displayName: 'Geneva GitOps Source Root Path'
+#   type: filePath
+#   default: $(Build.SourcesDirectory)\GenevaSrc\
+trigger:
+  branches:
+    include: [main, master]
+  # NOTE: If you cohost your configuration with service source code, you should strongly consider
+  # adding a filter, like below, to only trigger this pipeline for changes to the configuration files/folders.
+  paths:
+    include:
+      - geneva/*
+
+variables:
+  # If your ADO project is not under the MSAzure organization, you will need to create a new ADO Artifact feed,
+  # add azure-feed://msazure/GenevaGitOps@Local as an Upstream Source, search for and install the Upstream package
+  # Geneva.GitOps.PSModule. Then, update the PackageFeedEndpoint variable to point to your new feed.
+  PackageFeedEndpoint: https://pkgs.dev.azure.com/msazure/_packaging/GenevaGitOps/nuget/v2
+
+stages:
+  - stage: build
+    jobs:
+      - job: main
+        pool: 'Azure Pipelines' # SET THIS TO AN AGENT POOL THAT YOUR ORG REQUIRES YOU TO USE
+
+        steps:
+          # Geneva GitOps tasks
+          # comment out the write tasks if you do not wish to use those features
+          - task: PowerShell@2
+            displayName: 'Register, Install and Execute Geneva GitOps actions from ADO Artifacts Feed'
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+              ENDPOINT: $(PackageFeedEndpoint)
+            inputs:
+              targetType: 'inline'
+              script: |
+                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+                $token = $env:SYSTEM_ACCESSTOKEN | ConvertTo-SecureString -AsPlainText -Force
+                $credential = New-Object System.Management.Automation.PSCredential($env:SYSTEM_ACCESSTOKEN, $token)
+                $sourceName = "GenevaGitOpsArtifacts"
+                $feedUri = $env:ENDPOINT
+                $source = Get-PackageSource -Name $sourceName -ErrorAction SilentlyContinue
+                if ($null -eq $source) { Register-PackageSource -Name $sourceName -ProviderName PowerShellGet -Location $feedUri -Trusted -Credential $credential }
+                $moduleName = "Geneva.GitOps.PSModule"
+                Install-Module -Name $moduleName -Repository $sourceName -Force -Credential $credential -AllowClobber
+                new-item -path .\GenevaSrc -ItemType Directory -Name Logs
+                new-item -path .\GenevaSrc -ItemType Directory -Name Monitors
+                Write-LogsArtifacts
+                Write-MetricsArtifacts
+                Write-HealthArtifacts
+                Write-DashboardArtifacts
+              pwsh: true
+              workingDirectory: 'geneva/'
+
+
+          # /Geneva GitOps tasks
+
+          # With the artifacts created for the extension to use, copy and publish them for consumption
+          - task: PowerShell@2
+            displayName: 'Copy artifacts to output'
+            inputs:
+              targetType: 'inline'
+              script: |
+                $DESTINATION = "$(Build.SourcesDirectory)\out"
+                Get-ChildItem -Path "$(Build.SourcesDirectory)\geneva\ServiceGroupRoot\" -Force | foreach { copy-item -Path $_.FullName -Recurse -Destination $DESTINATION\$_  }
+
+          # This task may not be needed depending on your project settings (would be auto injected by OneBranch, for example)
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.SourcesDirectory)\out'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'

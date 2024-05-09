@@ -1,0 +1,38 @@
+{  
+
+    "$schema": "https://ev2schema.azure.net/schemas/2020-01-01/rolloutParameters.json",  
+    "contentVersion": "1.0.0.0",  
+    "extensions": [  
+      {  
+        "name": "ValidateAndSaveSloDefinition",  
+        "type": "Microsoft.SLO/AddOrUpdateYaml",  
+        "version": "1.0",  
+        "connectionProperties": {  
+          "maxExecutionTime": "PT5M",  
+          "authentication": {  
+            "type": "CertificateAuthentication",  
+            "reference": {  
+              "provider": "AzureKeyVault",  
+              "parameters": {  
+                "SecretId": "https://datalabsgeneva-gbl-kv.vault.azure.net/secrets/DatalabsGenevaKeyVaultCert"
+              }  
+            }
+          }  
+        },  
+ 
+        "payloadProperties": {  
+          "serviceId": {  
+            "value": "97b913eb-c343-4660-8da3-5e145505fd63"  
+          },  
+
+          "yaml": {  
+            "reference": {  
+              "path": "Package\\SLOConfigs\\GenevaUX.yaml"  
+            }  
+          } 
+
+        }  
+
+      }  
+    ]  
+  } 

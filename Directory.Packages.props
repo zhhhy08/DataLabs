@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This file manages versions of PackageVersion items.  More information is available here:
+  https://github.com/microsoft/MSBuildSdks/blob/master/src/CentralPackageVersions/README.md
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="Package Versions used by this repository">
+    <!--
+        Please keep packages in sorted-order to avoid unnecessary merge conflicts. Make sure
+        all the packages are sorted in each area.
+    -->
+    <PackageVersion Include="Azure.Identity" Version="1.10.4" />
+    <PackageVersion Include="Azure.Messaging.EventHubs" Version="5.11.1" />
+    <PackageVersion Include="Azure.Messaging.EventHubs.Processor" Version="5.11.1" />
+    <PackageVersion Include="Azure.Messaging.ServiceBus" Version="7.17.4" />
+    <PackageVersion Include="Azure.Security.KeyVault.Certificates" Version="4.6.0" />
+    <PackageVersion Include="CommandLineParser" Version="2.9.1" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
+    <PackageVersion Include="docfx.console" Version="2.59.0" />
+    <PackageVersion Include="Google.Protobuf" Version="3.26.1" />
+    <PackageVersion Include="Grpc.AspNetCore" Version="2.62.0" />
+    <PackageVersion Include="Grpc.AspNetCore.HealthChecks" Version="2.62.0" />
+    <PackageVersion Include="Grpc.Core.Testing" Version="2.46.6" />
+    <PackageVersion Include="Grpc.HealthCheck" Version="2.62.0" />
+    <PackageVersion Include="Grpc.Net.Client" Version="2.62.0" />
+    <PackageVersion Include="Grpc.Tools" Version="2.62.0" />
+    <PackageVersion Include="JustEat.StatsD" Version="5.0.0" />
+    <PackageVersion Include="KubernetesClient" Version="13.0.26" />
+    <PackageVersion Include="Microsoft.AspNetCore.HeaderPropagation" Version="8.0.3" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.3" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="8.0.3" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="8.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.KeyPerFile" Version="8.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Paleo" Version="3.1.2651.549" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Polly" Version="8.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Configuration" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.FASTER.Devices.AzureStorage" Version="2.6.4" />
+    <PackageVersion Include="Microsoft.Garnet" Version="1.0.6" />
+    <PackageVersion Include="Microsoft.Identity.Client" Version="4.60.1" />
+    <PackageVersion Include="Microsoft.Identity.Web.TokenCache" Version="2.17.4" />
+    <PackageVersion Include="Microsoft.IdentityModel.Protocols" Version="7.5.0" />
+    <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.0" />
+    <PackageVersion Include="Microsoft.IdentityModel.Tokens.Saml" Version="7.5.0" />
+    <PackageVersion Include="Microsoft.IdentityModel.Validators" Version="7.5.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
+    <PackageVersion Include="Microsoft.WindowsAzure.Arm.Infra.Configuration" Version="1.0.816" />
+    <PackageVersion Include="Microsoft.WindowsAzure.Governance.Notifications.ARNContracts" Version="0.3.3" />
+    <PackageVersion Include="Microsoft.WindowsAzure.ResourceStack.Common.Core" Version="7.0.390" />
+    <PackageVersion Include="Microsoft.Windows.Compatibility" Version="8.0.3" />
+    <PackageVersion Include="Moq" Version="4.20.70" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="3.3.1" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.3.1" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.8.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.Geneva" Version="1.7.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol.Logs" Version="1.5.0-rc.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.8.0-beta.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.8.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.7.0" />
+    <PackageVersion Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
+    <PackageVersion Include="PolicyServiceExecutable.Linux.SelfContained" Version="1.35.2630.206" />
+    <PackageVersion Include="StackExchange.Redis" Version="2.7.33" />
+		<PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
+		<PackageVersion Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.5.0" />
+		<PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
+		<PackageVersion Include="System.Data.SqlClient" Version="4.8.6" />
+    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="8.0.0" />
+    <!-- CVE-2021-24112 -->
+    <PackageVersion Include="System.Drawing.Common" Version="8.0.3" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.5.0" />
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.WindowsAzure.Governance.NotificationsClient" Version="2.0.72" />
+    <!-- ABC Partner Packages -->
+    <PackageVersion Include="Microsoft.AzureBusinessContinuity.PartnerSolution" Version="2024.4.22.2" />
+    <!-- Azores Partner Packages -->
+    <PackageVersion Include="Microsoft.Azores.PartnerSolution" Version="1.0.264816" />
+    <!-- Policy Partner Packages -->
+    <PackageVersion Include="Microsoft.WindowsAzure.Governance.PolicyService.Models.Policy" Version="1.35.2630.206" />
+    <PackageVersion Include="Microsoft.WindowsAzure.Governance.PolicyService.Policy.Evaluation" Version="1.35.2630.206" />
+    <PackageVersion Include="Microsoft.WindowsAzure.Governance.ResourceCapabilities" Version="1.0.34-preview" />
+    <PackageVersion Include="DsmsCredentialsManagement" Version="4.6.2651199" />
+    <PackageVersion Include="DstsAuthentication.master" Version="3.0.2.631" />
+    <PackageVersion Include="DstsAuthentication.NetCore" Version="4.0.3" />
+		<PackageVersion Include="AcisExtensionSDK.Net" Version="1.0.4.2485" />
+		<PackageVersion Include="Microsoft.WindowsAzure.Wapd.Acis.Contracts" Version="1.0.4.2493" />
+  </ItemGroup>
+  <ItemGroup Label="Packages to apply to all projects">
+    <!-- To reference a package in all projects, add it to this list. -->
+    <GlobalPackageReference Include="Microsoft.Build.Telemetry" Version="$(TelemetryLoggerInstallId)" />
+  </ItemGroup>
+</Project>

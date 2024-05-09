@@ -1,0 +1,18 @@
+{{- range $pk, $pv := $.Values.partnerConfig.pods }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $pv.serviceName }}
+  namespace: {{ $.Values.partnerNameSpace }}
+spec:
+  clusterIP: None
+  selector:
+    app: {{ $pv.name }}
+  ports:
+   {{- range $ck, $cv := $pv.containers }}
+   - name: {{ $cv.name }}-port
+     port: {{ $cv.port }} 
+     protocol: TCP
+   {{- end }}
+{{- end }}

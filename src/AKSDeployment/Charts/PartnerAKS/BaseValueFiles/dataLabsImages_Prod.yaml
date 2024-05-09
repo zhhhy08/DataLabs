@@ -1,0 +1,17 @@
+ioImage:
+  repository: datalabsprodacr.azurecr.io/inputoutputservice
+
+resourceProxyImage:
+  repository: datalabsprodacr.azurecr.io/resourcefetcherproxyservice
+
+cacheImage:
+  repository: datalabsprodacr.azurecr.io/garnetserver
+
+partnerCacheImage:
+  repository: datalabsprodacr.azurecr.io/garnetserver
+
+socat:
+  repository: datalabsprodacr.azurecr.io/socat
+
+adminServiceImage:
+  repository: datalabsprodacr.azurecr.io/adminservice

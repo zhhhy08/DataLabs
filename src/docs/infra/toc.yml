@@ -1,0 +1,10 @@
+- name: Deployments
+  href: AllAboutDeployment.md
+- name: Build Pipelines
+  href: BuildPipelines.md
+- name: Ev2 Release Pipelines
+  href: Ev2ReleasePipelines.md
+- name: Monitoring Deployments
+  href: MonitoringDeployments.md
+- name: Deploy DataLabs
+  href: DeployDataLabsServices.md

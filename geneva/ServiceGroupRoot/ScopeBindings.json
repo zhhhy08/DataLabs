@@ -1,0 +1,66 @@
+{
+  "scopeBindings": [
+    {
+      // Using ConfigPath Bindings to deploy to multiple namespaces
+      "scopeTagName": "DataLabsProdAccountScope",
+      "bindings": [
+        {
+          "find": "__EXTENSION_TYPE__",
+          "replaceWith": "Microsoft.Geneva.Logs/ConfigureLogsAccount"
+        },
+        {
+          "find": "__ENDPOINT_NAME__",
+          "replaceWith": "DiagnosticsProd"
+        },
+        {
+          "find": "__ACCOUNT__",
+          "replaceWith": "ARGDataLabs"
+        },
+        {
+          "find": "__NAMESPACE__",
+          "replaceWith": "ARGDataLabs"
+        },
+        // TODO: Replace the output path of the config package created by your build step
+        // If you're using our provided PS Module the package name will be in the format
+        // LogsConfig_${LogsEndpoint}_${LogsAccount}_${LogsNamespace}_${ConfigVer}.zip
+        {
+          "find": "__CONFIGPATH__",
+          "replaceWith": "Package/LogsConfig_Test_SunnyTestAccount_SunnyEv2Account_Ver1v0.zip"
+        } 
+      ]
+    },
+    {
+      "scopeTagName": "DataLabsTestAccountScope",
+      "bindings": [
+        // Specify the Logs Extension for Ev2. For Test, Stage and Canary endpoints use ConfigureLogsTestAccount
+        // For Diagnostic Prod , First Party Prod and other Prod Endpoints use ConfigureLogsAccount
+        // Accepted values: Microsoft.Geneva.Logs/ConfigureLogsAccount, Microsoft.Geneva.Logs/ConfigureLogsTestAccount
+        {
+          "find": "__EXTENSION_TYPE__",
+          "replaceWith": "Microsoft.Geneva.Logs/ConfigureLogsTestAccount"
+        },
+        {
+          "find": "__ENDPOINT_NAME__",
+          "replaceWith": "Test"
+        },
+        //Geneva logs account TODO: Check why account and namespace in INT are different thant PROD.
+        {
+          "find": "__ACCOUNT__",
+          "replaceWith": "DataLabs"
+        },
+        // namespace 
+        {
+          "find": "__NAMESPACE__",
+          "replaceWith": "DataLabs"
+        },
+        // TODO: Replace the output path of the config package created by your build step
+        // If you're using our provided PS Module the package name will be in the format
+        // LogsConfig_${LogsEndpoint}_${LogsAccount}_${LogsNamespace}_${ConfigVer}.zip
+        {
+          "find": "__CONFIGPATH__",
+          "replaceWith": "Package/LogsConfig_Test_SunnyTestAccount_SunnyTestAccount_Ver1v0.zip"
+        } 
+      ]
+    }
+  ]
+}

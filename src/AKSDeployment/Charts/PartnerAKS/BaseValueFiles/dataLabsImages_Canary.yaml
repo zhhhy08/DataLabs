@@ -1,0 +1,19 @@
+dedicatedPartnerAKS: false
+
+ioImage:
+  repository: datalabscanaryacr.azurecr.io/inputoutputservice
+
+resourceProxyImage:
+  repository: datalabscanaryacr.azurecr.io/resourcefetcherproxyservice
+
+cacheImage:
+  repository: datalabscanaryacr.azurecr.io/garnetserver
+
+partnerCacheImage:
+  repository: datalabscanaryacr.azurecr.io/garnetserver
+
+socat:
+  repository: datalabscanaryacr.azurecr.io/socat
+
+adminServiceImage:
+  repository: datalabscanaryacr.azurecr.io/adminservice

@@ -1,0 +1,71 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "paths": [
+        {
+            "parameterReference": "managedIdentityTemplateUri"
+        },
+        {
+            "parameterReference": "containerRegistryTemplateUri"
+        },
+        {
+            "parameterReference": "storageAccountTemplateUri"
+        },
+        {
+            "parameterReference": "keyvaultTemplateUri"
+        },
+        {
+            "parameterReference": "aadAppTemplateUri"
+        },
+        {
+            "parameterReference": "dnsZoneTemplateUri"
+        }
+    ],
+    "parameters": {
+        "cloudName": {
+            "value": "__CLOUD_NAME__"
+        },
+        "location": {
+            "value": "__LOCATION__"
+        },
+        "managedIdentityConfigs": {
+            "value": "__MANAGED_IDENTITY_PREFIX_LIST__"
+        },
+        "containerRegistryRegions": {
+            "value": "__CONTAINER_REGISTRY_REGIONS__"
+        },
+        "availabilityZonesInRegion": {
+            "value": "__AVAILABILITY_ZONE_COUNT__"
+        },
+        "deployRFAADApp": {
+            "value": "__DEPLOY_RF_AAD_APP__"
+        },
+        "publisherDomain": {
+            "value": "__PUBLISHER_DOMAIN__"
+        },
+        "deployDnsZone": {
+            "value": "__DEPLOY_DNS_ZONE__"
+        },
+        "dnsZoneName": {
+            "value": "__DNS_ZONE_NAME__"
+        },
+        "managedIdentityTemplateUri": {
+            "value": "Templates\\Common\\ManagedIdentity.Template.json"
+        },
+        "containerRegistryTemplateUri": {
+            "value": "Templates\\Common\\ContainerRegistry.Template.json"
+        },
+        "storageAccountTemplateUri": {
+            "value": "Templates\\Common\\StorageAccount.Template.json"
+        },
+        "keyvaultTemplateUri": {
+            "value": "Templates\\Common\\KeyVault.Template.json"
+        },
+        "aadAppTemplateUri": {
+            "value": "Templates\\Common\\AADApplication.template.json"
+        },
+        "dnsZoneTemplateUri": {
+            "value": "Templates\\Common\\DnsZone.Template.json"
+        }
+    }
+}

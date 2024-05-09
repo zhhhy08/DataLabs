@@ -1,0 +1,86 @@
+#################################################################################
+#                      OneBranch Pipelines - PR Build                           #
+# This pipeline was created by EasyStart from a sample located at:              #
+#   https://aka.ms/obpipelines/easystart/samples                                #
+# Documentation:  https://aka.ms/obpipelines                                    #
+# Yaml Schema:    https://aka.ms/obpipelines/yaml/schema                        #
+# Retail Tasks:   https://aka.ms/obpipelines/tasks                              #
+# Support:        https://aka.ms/onebranchsup                                   #
+#################################################################################
+
+trigger: none 
+
+name: $(Date:yyyy.MM.dd).$(Rev:rr)
+
+parameters: 
+- name: 'debug'
+  displayName: 'Enable debug output'
+  type: boolean
+  default: false
+- name: CloudBuildQueue
+  type: string
+  default: 'msazure_One_Mgmt-Governance-DataLabs_QuickBuildNoDrops_AutoGen'
+
+variables:
+  - name: IsOfficialBuild
+    value: false
+  
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+extends: 
+  template: v2/OneBranch.NonOfficial.CBWorkflow.yml@templates # https://aka.ms/obpipelines/templates
+  parameters:
+    globalSdl: # https://aka.ms/obpipelines/sdl
+      enableCSV: false
+      enableSDL: false
+      enableTsa: false
+    
+    stages:
+    - stage: OneBranchPipelineComplianceBuildStage
+      displayName: OneBranchPipelineComplianceBuildStage
+      dependsOn: []
+      jobs:
+      - job: CloudBuildJob
+        displayName: CloudBuild Job
+        dependsOn: []
+        pool:
+          type: cloudBuildAgentless
+        variables:
+          queueName: ${{ parameters.CloudBuildQueue }}
+          dropMetadataContainerName: DropMetadata
+          buildRequesterAlias: azbldrun
+          sourceBranchName: $(Build.SourceBranch)
+          
+    # - stage: CloudTestStage
+    #   dependsOn: [OneBranchPipelineComplianceBuildStage]
+    #   displayName: CloudTest
+    #   jobs:
+    #     - job: CloudTestJob
+    #       displayName: CloudTest
+    #       continueOnError: false
+    #       timeoutInMinutes: 150
+    #       pool:
+    #         type: cloudTestAgentless
+    #       steps:
+    #         - task: CloudTestServerBuildTask@1
+    #           inputs:
+    #             displayName: CloudTest
+    #             cacheEnabled: true
+    #             connectedServiceName: 'CloudTest_Prod'
+    #             cloudTestTenant: 'argcloudtest'
+    #             testMapLocation: '[BuildRoot]\Release-x64\CloudTest\TestMap.xml'
+    #             buildDropArtifactName: 'DropMetadata'
+    #             buildType: 'Retail'
+    #             buildArchitecture: 'amd64'
+    #             #builds requested for automated PRs do not have a Build.RequestedForEmail - have to fallback to someone
+    #             scheduleBuildRequesterAlias: $[coalesce(variables['Build.RequestedForEmail'], 'nibostwi@microsoft.com')]
+    #             sessionTimeout: 150
+    #             parserProperties: 'worker:VsTestVersion=V150;QTestIgnoreQTestSkip=true;CodeCoverageType=Dynamic'
+          
+

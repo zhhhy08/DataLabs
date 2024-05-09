@@ -1,0 +1,165 @@
+#################################################################################
+#                         OneBranch Pipelines - Official                        #
+# This pipeline was created by EasyStart from a sample located at:              #
+#   https://aka.ms/obpipelines/easystart/samples                                #
+# Documentation:  https://aka.ms/obpipelines                                    #
+# Yaml Schema:    https://aka.ms/obpipelines/yaml/schema                        #
+# Retail Tasks:   https://aka.ms/obpipelines/tasks                              #
+# Support:        https://aka.ms/onebranchsup                                   #
+#################################################################################
+
+trigger: 
+  branches:
+    include:
+    - refs/heads/main
+  paths: 
+    include:
+    - /src/DataLabs/PartnerCommon/**
+    - /src/DataLabs/nuproj/sdks/PartnerCommonNuget/**
+    - /.pipelines/OneBranch.Nuget.Official.yml
+  batch: true 
+
+name: $(Date:yyyy.MM.dd).$(Rev:rr)
+
+parameters: 
+- name: 'debug'
+  displayName: 'Enable debug output'
+  type: boolean
+  default: false
+
+variables:
+  - name: IsOfficialBuild
+    value: true
+  - name: ROOT
+    value: $(Build.SourcesDirectory)
+  - name: OUTPUTROOT
+    value: $(ROOT)\out
+  - name: CDP_DEFINITION_BUILD_COUNT
+    value: $[counter('', 0)]
+  - name: system.debug
+    value: ${{ parameters.debug }}
+  - name: WindowsContainerImage
+    value: 'onebranch.azurecr.io/windows/ltsc2019/vse2022'
+  - name: MAJOR
+    value: 1
+  - name: MINOR
+    value: $(Date:yy)
+  - name: BUILD
+    value: 1
+  - name: REVISION
+    value: $[counter(format('{0}.{1}.{2}',variables['MAJOR'],variables['MINOR'],variables['BUILD']), 1)]
+  - name: AdditionalMSBuildArgs
+    value: '/flp1:Verbosity=d;LogFile=$(OUTPUTROOT)\logs\msbuild_x64_release.log;Encoding=UTF-8 /flp2:logfile=$(OUTPUTROOT)\logs\msbuild_x64_release.err;errorsonly /bl:$(OUTPUTROOT)\logs\msbuild_x64_release.binlog'
+  - name: AdditionalMSBuildNugetArgs
+    value: '/flp1:Verbosity=d;LogFile=$(OUTPUTROOT)\logs\msbuild_x64_release_nupkg.log;Encoding=UTF-8 /flp2:logfile=$(OUTPUTROOT)\logs\msbuild_x64_release_nupkg.err;errorsonly /bl:$(OUTPUTROOT)\logs\msbuild_x64_release_nupkg.binlog'
+
+
+
+resources:
+  repositories: 
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+extends:
+  template: v2/OneBranch.Official.CrossPlat.yml@templates # https://aka.ms/obpipelines/templates
+  parameters:
+    featureFlags:
+      EnableLegacyCDPxPAT: true
+    nugetPublishing:
+      feeds:
+        - name: Official
+    cloudvault: 
+      enabled: true
+    globalSdl: 
+      tsa:
+        enabled: true 
+        credscan:
+          suppressionsFile: $(Build.SourcesDirectory)\.config\CredScanSuppressions.json
+      binskim:
+        break: true 
+      policheck:
+        break: true 
+        suppression:
+          suppressionFile: $(Build.SourcesDirectory)\.config\PoliCheck.Exclusions.xml
+
+    stages:
+    - stage: build
+      jobs:
+      - job: main
+        pool:
+          type: windows  
+        
+        variables:
+          ob_outputDirectory: '$(OUTPUTROOT)'
+          ob_sdl_binskim_break: true 
+          ob_symbolsPublishing_enabled: true 
+          ob_sdl_suppression_suppressionFile: $(Build.SourcesDirectory)\.config\sdlsuppression.json
+          ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main')}}:
+            ob_nugetPublishing_enabled: true
+
+          buildTarget: $(Build.SourcesDirectory)\src\DataLabs\nuproj\sdks\PartnerCommonNuget\PartnerCommonNuget.csproj
+          buildStagePrefix: 🥼
+
+        steps:
+          - task: UseDotNet@2
+            displayName: '$(buildStagePrefix) Use Dot Net'
+            continueOnError: true
+            inputs:
+              packageType: 'sdk'
+              useGlobalJson: true
+              performMultiLevelLookup: true
+
+          - task: MSBuild@1
+            displayName: '$(buildStagePrefix) msbuild restore'
+            inputs:
+              solution: '$(buildTarget)'
+              msbuildLocationMethod: 'version'
+              msbuildVersion: 'latest'
+              platform: 'x64'
+              configuration: 'release'
+              msbuildArguments: '/t:Restore'
+              maximumCpuCount: true
+              logProjectEvents: true
+              createLogFile: true
+
+          - task: MSBuild@1
+            displayName: '$(buildStagePrefix) msbuild build'
+            inputs:
+              solution: '$(buildTarget)'
+              msbuildLocationMethod: 'version'
+              msbuildVersion: 'latest'
+              platform: 'x64'
+              configuration: 'release'
+              ${{ if eq(variables['system.debug'], true)}}:
+                msbuildArguments: '/v:n /nr:false'
+              ${{ else }}:
+                msbuildArguments: '/v:n /nr:false $(AdditionalMSBuildArgs)'
+              maximumCpuCount: true
+              logProjectEvents: true
+              createLogFile: true
+
+          - task: onebranch.pipeline.signing@1 # https://aka.ms/obpipelines/signing
+            displayName: '$(buildStagePrefix) Sign output'
+            inputs:
+              command: 'sign'
+              signing_environment: 'azure-ado'
+              files_to_sign: '**/*.exe;**/*.dll;**/*.ps1;**/*.psm1'
+              search_root: '$(Build.SourcesDirectory)\out\'
+
+          - task: MSBuild@1
+            displayName: 'Create nupkg'
+            inputs:
+              solution: '$(buildTarget)'
+              msbuildLocationMethod: 'version'
+              msbuildVersion: 'latest'
+              platform: 'x64'
+              configuration: 'release'
+              ${{ if eq(variables['system.debug'], true)}}:
+                msbuildArguments: '-t:pack -p:NoBuild=true /v:n /nr:false'
+              ${{ else }}:
+                msbuildArguments: '-t:pack -p:NoBuild=true /v:n /nr:false $(AdditionalMSBuildNugetArgs)'              
+              maximumCpuCount: true
+              logProjectEvents: true
+              createLogFile: true

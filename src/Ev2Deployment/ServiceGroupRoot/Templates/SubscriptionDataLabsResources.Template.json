@@ -1,0 +1,232 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "cloudName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "managedIdentityConfigs": {
+            "type": "array",
+            "metadata": {
+                "description": "list of prefixes of identities"
+            }
+        },
+        "containerRegistryRegions": {
+            "type": "array"
+        },
+        "availabilityZonesInRegion": {
+            "type": "int"
+        },
+        "deployRFAADApp": {
+            "type": "bool",
+            "metadata": {
+                "description": "true to deploy the AAD app for resource fetcher AAD app. switch is needed as this ARM template resource is not supported in Microsoft Tenant"
+            }
+        },
+        "publisherDomain": {
+            "type": "string"
+        },
+        "deployDnsZone": {
+            "type": "bool"
+        },
+        "dnsZoneName": {
+            "type": "string"
+        },
+        "managedIdentityTemplateUri": {
+            "type": "string"
+        },
+        "containerRegistryTemplateUri": {
+            "type": "string"
+        },
+        "storageAccountTemplateUri": {
+            "type": "string"
+        },
+        "keyvaultTemplateUri": {
+            "type": "string"
+        },
+        "aadAppTemplateUri": {
+            "type": "string"
+        },
+        "dnsZoneTemplateUri": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "metadataSaConfig": {
+            "type": "metadataStorageAccount",
+            "typeAcronym": "md",
+            "createRAForIOConnector": "false",
+            "skuName": "Standard_ZRS",
+            "skuTier": "Standard",
+            "kind": "StorageV2",
+            "count": 1,
+            "useDeleteRetentionPolicy": false,
+            "retentionPolicyPeriod": 30
+        },
+        "aadAppName": // maintaining the naming of the existing apps in INT and Canary
+        "[if(equals(parameters('cloudName'),'int'),
+            'Resource Fetcher Web API INT App',
+            if(equals(parameters('cloudName'),'canary'),
+            'Resource Fetcher Web API Canary App',
+            'resource-fetcher-web-api-prod-app'
+            ))]"
+        },
+        "resources": [
+            {
+                "apiVersion": "2019-10-01",
+                "name": "[tolower(concat('datalabs', parameters('cloudName'), parameters('managedIdentityConfigs')[copyIndex()], 'managedidentity-deployment'))]",
+                "type": "Microsoft.Resources/deployments",
+                "properties": {
+                    "mode": "Incremental",
+                    "templateLink": {
+                        "uri": "[parameters('managedIdentityTemplateUri')]",
+                        "contentVersion": "1.0.0.0"
+                    },
+                    "parameters": {
+                        "identityName": {
+                            "value": "[tolower(concat('datalabs', parameters('cloudName'), parameters('managedIdentityConfigs')[copyIndex()], 'id'))]"
+                        }
+                    }
+                },
+                "copy": {
+                    "name": "managedidentityiterator",
+                    "count": "[length(parameters('managedIdentityConfigs'))]"
+                }
+            },
+            {
+                "apiVersion": "2019-10-01",
+                "name": "[tolower(concat('datalabs', parameters('cloudName'), '-containerregistry-deployment'))]",
+                "type": "Microsoft.Resources/deployments",
+                "dependsOn": [
+                    "managedidentityiterator"
+                ],
+                "properties": {
+                    "mode": "Incremental",
+                    "templateLink": {
+                        "uri": "[parameters('containerRegistryTemplateUri')]",
+                        "contentVersion": "1.0.0.0"
+                    },
+                    "parameters": {
+                        "name": {
+                            "value": "[tolower(concat('datalabs', parameters('cloudName'), 'acr'))]"
+                        },
+                        "location": {
+                            "value": "[parameters('location')]"
+                        },
+                        "AcrPushOids": {
+                            "value": "[createArray(createObject('principalResourceId',resourceId(subscription().subscriptionId, 'DataLabsRG','Microsoft.ManagedIdentity/userAssignedIdentities', concat('datalabs', parameters('cloudName'), 'ev2id'))))]"
+                        },
+                        "geoReplicationRegions": {
+                            "value": "[parameters('containerRegistryRegions')]"
+                        }
+                    }
+                }
+            },
+            {
+                "apiVersion": "2019-10-01",
+                "name": "[tolower(concat('datalabs', parameters('cloudName'),'-metadata-storageaccount-deployment'))]",
+                "type": "Microsoft.Resources/deployments",
+                "properties": {
+                    "mode": "Incremental",
+                    "templateLink": {
+                        "uri": "[parameters('storageAccountTemplateUri')]",
+                        "contentVersion": "1.0.0.0"
+                    },
+                    "parameters": {
+                        "suffix": {
+                            "value": "[tolower(concat('datalabs', parameters('cloudName'), variables('metadataSaConfig').typeAcronym, 'sa'))]"
+                        },
+                        "location": {
+                            "value": "[parameters('location')]"
+                        },
+                        "storageAccountConfigs": {
+                            "value": "[variables('metadataSaConfig')]"
+                        },
+                        "cloudName": {
+                            "value": "[parameters('cloudName')]"
+                        },
+                        "partnerAcronym": {
+                            "value": "datalabs"
+                        },
+                        "availabilityZonesInRegion": {
+                            "value": "[parameters('availabilityZonesInRegion')]"
+                        }
+                    }
+                }
+            },
+            {
+                "apiVersion": "2019-10-01",
+                "name": "[tolower(concat('datalabs', parameters('cloudName'), '-globalkeyvault-deployment'))]",
+                "type": "Microsoft.Resources/deployments",
+                "dependsOn": [
+                    "[resourceId('Microsoft.Resources/deployments', tolower(concat('datalabs', parameters('cloudName'),'-metadata-storageaccount-deployment')))]"
+                ],
+                "properties": {
+                    "mode": "Incremental",
+                    "templateLink": {
+                        "uri": "[parameters('keyvaultTemplateUri')]",
+                        "contentVersion": "1.0.0.0"
+                    },
+                    "parameters": {
+                        "keyVaultName": {
+                            "value": "[tolower(concat('datalabs', parameters('cloudName'), 'gblkv'))]"
+                        },
+                        "location": {
+                            "value": "[parameters('location')]"
+                        },
+                        "metadataSaName": {
+                            "value": "[tolower(concat('0datalabs', parameters('cloudName'), variables('metadataSaConfig').typeAcronym, 'sa'))]"
+                        }
+                    }
+                }
+            },
+            {
+                "apiVersion": "2019-10-01",
+                "condition": "[parameters('deployRFAADApp')]",
+                "name": "[tolower(concat('datalabs', parameters('cloudName'), '-rfaadapp-deployment'))]",
+                "type": "Microsoft.Resources/deployments",
+                "properties": {
+                    "mode": "Incremental",
+                    "templateLink": {
+                        "uri": "[parameters('aadAppTemplateUri')]",
+                        "contentVersion": "1.0.0.0"
+                    },
+                    "parameters": {
+                        "deployAADApp": {
+                            "value": "[parameters('deployRFAADApp')]"
+                        },
+                        "appName": {
+                            "value": "[variables('aadAppName')]"
+                        },
+                        "publisherDomain": {
+                            "value": "[parameters('publisherDomain')]"
+                        },
+                        "identifierUri": {
+                            "value": "[concat('https://resourcefetcherservice-',parameters('cloudName'),'.',parameters('publisherDomain'))]"
+                        }
+                    }
+                }
+            },
+            {
+                "apiVersion": "2019-10-01",
+                "condition": "[parameters('deployDnsZone')]",
+                "name": "[tolower(concat('datalabs', parameters('cloudName'), '-dnszone-deployment'))]",
+                "type": "Microsoft.Resources/deployments",
+                "properties": {
+                    "mode": "Incremental",
+                    "templateLink": {
+                        "uri": "[parameters('dnsZoneTemplateUri')]",
+                        "contentVersion": "1.0.0.0"
+                    },
+                    "parameters": {
+                        "zoneName": {
+                            "value": "[parameters('dnsZoneName')]"
+                        }
+                    }
+                }
+            }
+        ]
+    }

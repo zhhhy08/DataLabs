@@ -1,0 +1,11 @@
+# set RESOURCE_GROUP "DataLabsabcRG-westus3"
+# set AKS_NAME "abcprodwu3aks"
+# Invoke-AzAksRunCommand -ResourceGroupName ${RESOURCE_GROUP} -Name ${AKS_NAME} -Force -Command "kubectl patch configmap solution-io-config -n solution-namespace --type merge --patch-file AddServiceBusQueue.yaml" -CommandContextAttachment "AddServiceBusQueue.yaml" 
+# 
+# Copying from bcdrValues_Prod_wu3.yaml
+# Adding: sbabcprodwu3sb2/2abcprodwu3sbq
+# Adding: mabcprodwu3sb3/3abcprodwu3sbq
+#   Different name for sb's? may be issue based on the prefix
+
+data:
+  ServiceBusNameSpaceAndName: "mabcprodwu3sb3/3abcprodwu3sbq;sbabcprodwu3sb2/2abcprodwu3sbq"

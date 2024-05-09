@@ -1,0 +1,17 @@
+{
+    "codebaseName": "MSAzure_Mgmt-Governance-DataLabs",
+    "notificationAliases": [
+        "cgtm@microsoft.com"
+    ],
+    "codebaseAdmins": [
+        "REDMOND\\johncall",
+        "REDMOND\\chsrini",
+        "REDMOND\\jaeyoungyoon",
+        "REDMOND|\\chgupta"
+    ],
+    "instanceUrl": "https://msazure.visualstudio.com/defaultcollection",
+    "projectName": "One",
+    "areaPath": "One\\Azure Resource Graph\\Azure Resource Builder\\Data Labs",
+    "iterationPath": "One\\Dilithium",
+    "allTools": true
+}

@@ -1,0 +1,298 @@
+{
+  "advancedConfiguration": {
+    "combinationDeltaFetchLookback": null,
+    "combinationFullRefreshInterval": null,
+    "debug": false,
+    "distributionConfiguration": null,
+    "enableCostReporting": null,
+    "enableFullRefreshWhenMetricSourceCombinationsChangeV2": null,
+    "enableKustoLogsMonitorV2": null,
+    "enableMinHintsLookbackAsMonitorLookback": null,
+    "enableMonitorV2InheritOptimization": null,
+    "enableMonitorV2QueryInfoOptimizationToReduceMemoryUsage": null,
+    "enablePreviewBucketOffset": null,
+    "enableThresholdResultTypeChange": null,
+    "enableThrowInvalidSeriesExceptionInMetricFetch": null,
+    "handleNullDataInDTMonitorV2Training": null,
+    "ingestionDelayToSkip": null,
+    "limitsConfiguration": null,
+    "maxCombinationsForHintingRetrieval": null,
+    "monitorV2InheritOptimizationWhenNumberOfCombinations": null,
+    "skipMetricsDataLossValidation": null,
+    "skipMetricsDataQualityCheck": null,
+    "updateTimeSeriesMetadataForCompositeMetric": null,
+    "useExpressionEngineInBaselineAnomalyTraining": null,
+    "useLimitForHintingRetrieval": null
+  },
+  "alertConditions": [
+    {
+      "alertOutletIds": [],
+      "bucket": null,
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 1,
+          "expressionId": "72f75a40-bf7c-43e1-b050-5b9135184249",
+          "id": "87262b19-ce74-49bf-946a-94bcfc5b4770",
+          "type": 0,
+          "value": 10000
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 2,
+      "id": "6e3aea9a-73d7-499c-86cc-22e4a0e3382b",
+      "metadata": {},
+      "name": "HighWaitingMessage",
+      "severity": 3
+    }
+  ],
+  "alertEnrichmentConfiguration": {
+    "customLinks": [
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "scaleUnit",
+          "region"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "01:00:00",
+        "path": [
+          "IOService",
+          "InputEventHub"
+        ],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "EventHub CheckPoint Pending Messages"
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "scaleUnit",
+          "region",
+          "Name",
+          "service"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "1.00:00:00",
+        "path": [
+          "Platform Metrics"
+        ],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "PlatformMetrics"
+      }
+    ]
+  },
+  "autoMitigationConfiguration": {
+    "healthyCountToMitigateIncident": 10,
+    "shouldMitigateIncident": false
+  },
+  "customMetadata": {
+    "Title": "[Data Labs]{Monitor.DisplayName} for SU: {Monitor.Dimension.scaleUnit}, Region: {Monitor.Dimension.region}, EventHubName: {Monitor.Dimension.Name}, PartitionId: {Monitor.Dimension.Id}"
+  },
+  "description": "EventHub checkpoint has more messages ahead of it than expected. Indicates that we have a lot of messages in the EventHub that are pending.",
+  "expressions": [
+    {
+      "endTimeShift": null,
+      "id": "72f75a40-bf7c-43e1-b050-5b9135184249",
+      "lookback": null,
+      "name": "waitingMessage",
+      "nullDataPointsHandling": null,
+      "percentages": [
+        {
+          "denominator": [],
+          "multiplier": 1,
+          "numerator": [
+            {
+              "conditions": [
+                {
+                  "dimensionName": "Id",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "NODE_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "Name",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "POD_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "buildVersion",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "region",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scaleUnit",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "service",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                }
+              ],
+              "dataBlockType": 0,
+              "endTimeShift": null,
+              "isNegative": false,
+              "lookback": null,
+              "lookbackAggregation": 4,
+              "mdmAggregationConfiguration": null,
+              "multiTimeSeriesAggregation": 4,
+              "nullDataPointsHandling": null,
+              "timeSeriesId": "f2db48cb-e99c-4fbf-977d-4a2cb48ee7c5",
+              "timeSeriesType": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "frequency": "00:05:00",
+  "id": "f4ea9999-59cf-42ad-998c-d15618799c4b",
+  "lastModifiedBy": "ponaraya",
+  "lastModifiedTime": "2024-05-03T20:00:13.8539881Z",
+  "lookback": "00:10:00",
+  "name": "[IOService][EventHub] High EventHubCheckPointPendingMessages",
+  "outlets": [],
+  "recoveryRules": [],
+  "resourceType": "ServiceHealthTemp",
+  "schemaVersion": 0,
+  "state": 1,
+  "tags": [
+    "IOService"
+  ],
+  "targetDimensions": [
+    {
+      "dimensionName": "scaleUnit",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "region",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "Name",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "service",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    }
+  ],
+  "tenant": "ARGDataLabs",
+  "timeSeries": [
+    {
+      "dimensions": [
+        "Id",
+        "NODE_NAME",
+        "Name",
+        "POD_NAME",
+        "buildVersion",
+        "region",
+        "scaleUnit",
+        "service"
+      ],
+      "id": "f2db48cb-e99c-4fbf-977d-4a2cb48ee7c5",
+      "metric": "EventHubCheckPointPendingMessages",
+      "name": "EventHubCheckPointPendingMessages",
+      "namespace": "ARGDataLabs",
+      "samplingType": "Average",
+      "tenant": "ARGDataLabs",
+      "timeSeriesType": 0
+    }
+  ]
+}

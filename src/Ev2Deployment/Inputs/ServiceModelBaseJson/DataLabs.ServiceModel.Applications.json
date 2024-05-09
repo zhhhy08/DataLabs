@@ -1,0 +1,72 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-04-01/RegionAgnosticServiceModel.json",
+    "contentVersion": "1.0.0.0",
+    "serviceMetadata": {
+        "serviceGroup": "Microsoft.Azure.DataLabs.Applications.[[COMPONENT]].[[APPNAME]]",
+        "displayName": "Microsoft.Azure.DataLabs.Applications.[[COMPONENT]].[[APPNAME]]",
+        "serviceIdentifier": "00df9fbf-c722-42e4-9acd-bc7125483b22",
+        "serviceSpecificationPath": "ServiceSpec/ServiceSpec.json",
+        "environment": "$config(cloudName)",
+        "tenantId": "$config(cloudTenant)",
+        "buildout": {
+            "dependencies": []
+        }
+    },
+    "serviceResourceGroupDefinitions": [
+        {
+            // Needed to fetch the resource fetcher subscription id via scope bindings in the rollout parameters file to run the shell script 
+            "name": "SubscriptionDataLabsResourceGroup",
+            "subscriptionKey": "[[GLOBALSUBSCRIPTIONKEY]]",
+            "azureResourceGroupName": "DataLabsRG",
+            "serviceResourceDefinitions": [
+                {
+                    "name": "EmptyServiceResource",
+                    "composedOf": {
+                        "arm": {
+                            "parametersPath": "Parameters/Empty.parameters.json",
+                            "templatePath": "Templates/Common/Empty.template.json"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "[[NAME]]",
+            "subscriptionKey": "[[SUBSCRIPTIONKEY]]",
+            "azureResourceGroupName": "[[AZURERESOURCEGROUPNAME]]",
+            "scopeTags": [
+                {
+                    "name": "General"
+                },
+                {
+                    "name": "Ev2ManagedIdentity"
+                },
+                {
+                    "name": "[[APPCONFIGSCOPEBINDINGNAME]]"
+                }
+            ],
+            "stamps": {
+                "count": "$config(countOf[[COMPONENT]])"
+            },
+            "serviceResourceDefinitions": [
+                {
+                    "name": "AppDeploy[[COMPONENT]][[APPNAME]]",
+                    "composedOf": {
+                        "extension": {
+                            "shell": [
+                                {
+                                    "type": "Run",
+                                    "properties": {
+                                        "imageName": "adm-mariner-20-l",
+                                        "imageVersion": "v4"
+                                    }
+                                }
+                            ],
+                            "rolloutParametersPath": "Rollouts/Applications/RolloutParameters/AppDeploy.[[COMPONENT]].[[APPNAME]].Rollout.copied.json" 
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

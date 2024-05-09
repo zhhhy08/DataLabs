@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package Microsoft.WindowsAzure.Governance.DataLabs.Common.Core.PartnerService.V1;
+
+import "google/protobuf/wrappers.proto";
+
+service PartnerService {
+    rpc ProcessMessage (PartnerRequest) returns (PartnerResponse);
+    rpc ProcessStreamMessages (PartnerRequest) returns (stream PartnerResponse);
+}
+
+enum DataFormat {
+    ARN = 0;
+}
+
+message PartnerRequest {
+    string traceId = 1;
+    int32 retry_count = 2;
+    int64 req_epochtime = 3;
+    google.protobuf.StringValue correlationid = 4;
+    DataFormat format = 5;
+    google.protobuf.BytesValue input_data = 6;
+    map<string, string> req_attributes = 7;
+    string regionName = 8;
+}
+
+message PartnerResponse {
+    int64 resp_epochtime = 1;
+    int64 partner_response_epochTime = 2;
+    string correlationid = 3;
+    oneof result {
+        SuccessResponse success = 4;
+        ErrorResponse error = 5;
+    }
+    map<string, string> resp_attributes = 6;
+    int64 input_eventtime = 7;
+    int64 partner_interface_starttime = 8;
+}
+
+message SuccessResponse {
+    DataFormat format = 1;
+    int64 output_timestamp = 2;
+    string arm_id = 3;
+    string tenant_id = 4;
+    google.protobuf.BytesValue output_data = 5;
+    google.protobuf.StringValue etag = 6;
+    string event_type = 7;
+    string resource_location = 8;
+}
+
+enum ErrorType {
+    DROP = 0;
+    RETRY = 1;
+    POISON = 2;
+}
+
+message ErrorResponse {
+    ErrorType type = 1;
+    int32 retryAfter = 2;
+    string code = 3;
+    google.protobuf.StringValue message = 4;
+    string failedComponent = 5;
+}

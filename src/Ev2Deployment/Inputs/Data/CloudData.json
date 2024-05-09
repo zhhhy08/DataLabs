@@ -1,0 +1,32 @@
+[
+    {
+        "CloudName": "Int",
+        "Component": "Global",
+        "SubscriptionKey": "DataLabsIntSubscriptionLibrarySub"
+    },
+    {
+        "CloudName": "Int",
+        "Component": "Partner",
+        "SubscriptionKey": "DataLabs$config(stamp_$stamp().partner.partnerAcronym)IntSubscriptionLibrarySub"
+    },
+    {
+        "CloudName": "Int",
+        "Component": "ResourceFetcher",
+        "SubscriptionKey": "DataLabsIntSubscriptionLibrarySub"
+    },
+    {
+        "CloudName": "Production",
+        "Component": "Global",
+        "SubscriptionKey": "DataLabsRF$config(cloudName)Sub"
+    },
+    {
+        "CloudName": "Production",
+        "Component": "Partner",
+        "SubscriptionKey": "DataLabs$config(stamp_$stamp().partner.partnerAcronym)$config(cloudName)Sub"
+    },
+    {
+        "CloudName": "Production",
+        "Component": "ResourceFetcher",
+        "SubscriptionKey": "DataLabsRF$config(cloudName)Sub"
+    }
+]

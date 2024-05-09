@@ -1,0 +1,277 @@
+{
+  "advancedConfiguration": {
+    "combinationDeltaFetchLookback": null,
+    "combinationFullRefreshInterval": null,
+    "debug": false,
+    "distributionConfiguration": null,
+    "enableCostReporting": null,
+    "enableFullRefreshWhenMetricSourceCombinationsChangeV2": null,
+    "enableKustoLogsMonitorV2": null,
+    "enableMinHintsLookbackAsMonitorLookback": null,
+    "enableMonitorV2InheritOptimization": null,
+    "enableMonitorV2QueryInfoOptimizationToReduceMemoryUsage": null,
+    "enablePreviewBucketOffset": null,
+    "enableThresholdResultTypeChange": null,
+    "enableThrowInvalidSeriesExceptionInMetricFetch": null,
+    "handleNullDataInDTMonitorV2Training": null,
+    "ingestionDelayToSkip": null,
+    "limitsConfiguration": null,
+    "maxCombinationsForHintingRetrieval": null,
+    "monitorV2InheritOptimizationWhenNumberOfCombinations": null,
+    "skipMetricsDataLossValidation": null,
+    "skipMetricsDataQualityCheck": null,
+    "updateTimeSeriesMetadataForCompositeMetric": null,
+    "useExpressionEngineInBaselineAnomalyTraining": null,
+    "useLimitForHintingRetrieval": null
+  },
+  "alertConditions": [
+    {
+      "alertOutletIds": [
+        "e73a1ebe-aa99-4e81-bc2d-6051cbf2f91e"
+      ],
+      "bucket": null,
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 1,
+          "expressionId": "4f62dcde-1df5-44ec-b0fc-eb740cb1ceb2",
+          "id": "71ab26b6-a32b-49ef-9616-c4cafa48ec84",
+          "type": 0,
+          "value": "90"
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 1,
+      "id": "19014cbe-a796-4db5-87c0-26804d5b611c",
+      "metadata": {},
+      "name": "SEV2 Memory Violation",
+      "severity": 2
+    },
+    {
+      "alertOutletIds": [
+        "e73a1ebe-aa99-4e81-bc2d-6051cbf2f91e"
+      ],
+      "bucket": null,
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 1,
+          "expressionId": "4f62dcde-1df5-44ec-b0fc-eb740cb1ceb2",
+          "id": "71ab26b6-a32b-49ef-9616-c4cafa48ec84",
+          "type": 0,
+          "value": "80"
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 2,
+      "id": "7a98f627-e93f-42f3-9ee8-60f3a2656b22",
+      "metadata": {},
+      "name": "SEV3 Memory Violation",
+      "severity": 3
+    }
+  ],
+  "alertEnrichmentConfiguration": {
+    "customLinks": [
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "component",
+          "region",
+          "scaleUnit",
+          "service"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "1.00:00:00",
+        "path": [
+          "Platform Metrics",
+          "Memory Usage"
+        ],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "Memory Usage Dashboard"
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.GenericCustomLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "executionDelay": "00:00:00",
+        "link": "https://eng.ms/docs/cloud-ai-platform/azure-core/azure-management-and-platforms/control-plane-bburns/fleet-inventory/azure-resource-builder/monitors/highcpuormemory",
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "CPUMemoryTSG"
+      }
+    ]
+  },
+  "autoMitigationConfiguration": {
+    "healthyCountToMitigateIncident": 10,
+    "shouldMitigateIncident": false
+  },
+  "customMetadata": {
+    "Icm.TsgId": "https://eng.ms/docs/cloud-ai-platform/azure-core/azure-management-and-platforms/control-plane-bburns/azure-resource-graph/azure-resource-graph/datalabs/general/datalabsintroduction",
+    "Title": "[DataLabs]{Monitor.DisplayName} in SU: {Monitor.Dimension.ScaleUnit}, Region: {Monitor.Dimension.Region}"
+  },
+  "description": "Memory Percentage from the service running on AKS cluster is higher than expected.",
+  "expressions": [
+    {
+      "endTimeShift": null,
+      "id": "4f62dcde-1df5-44ec-b0fc-eb740cb1ceb2",
+      "lookback": null,
+      "name": "AverageMemoryPercentage",
+      "nullDataPointsHandling": null,
+      "percentages": [
+        {
+          "denominator": [],
+          "multiplier": 1,
+          "numerator": [
+            {
+              "conditions": [
+                {
+                  "dimensionName": "component",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "host",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "region",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scaleUnit",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "service",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                }
+              ],
+              "dataBlockType": 0,
+              "endTimeShift": null,
+              "isNegative": false,
+              "lookback": null,
+              "lookbackAggregation": 4,
+              "mdmAggregationConfiguration": null,
+              "multiTimeSeriesAggregation": 4,
+              "nullDataPointsHandling": null,
+              "timeSeriesId": "f6de4bc0-180b-4398-a21d-3a17edf939d8",
+              "timeSeriesType": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "frequency": "00:03:00",
+  "id": "9e320d69-31a0-47a9-b518-ee894bf86852",
+  "lastModifiedBy": "dylanhartono",
+  "lastModifiedTime": "2024-02-03T00:27:45.7216889Z",
+  "lookback": "00:05:00",
+  "name": "[Platform] High Memory Percentage",
+  "outlets": [
+    {
+      "id": "e73a1ebe-aa99-4e81-bc2d-6051cbf2f91e",
+      "routingId": "adrocs://Recovery/ARGDataLabs",
+      "type": 0
+    }
+  ],
+  "recoveryRules": [],
+  "resourceType": "ServiceHealth",
+  "schemaVersion": 0,
+  "state": 1,
+  "tags": [
+    "PlatformMetrics"
+  ],
+  "targetDimensions": [
+    {
+      "dimensionName": "component",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "region",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "scaleUnit",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "service",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    }
+  ],
+  "tenant": "ARGDataLabs",
+  "timeSeries": [
+    {
+      "dimensions": [
+        "component",
+        "host",
+        "region",
+        "scaleUnit",
+        "service"
+      ],
+      "id": "f6de4bc0-180b-4398-a21d-3a17edf939d8",
+      "metric": "cluster_memory_used_percent",
+      "name": "MemoryPercentage",
+      "namespace": "PlatformMetrics",
+      "samplingType": "Average",
+      "tenant": "ARGDataLabs",
+      "timeSeriesType": 0
+    }
+  ]
+}

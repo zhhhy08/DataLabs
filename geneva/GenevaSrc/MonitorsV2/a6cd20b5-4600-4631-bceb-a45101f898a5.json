@@ -1,0 +1,563 @@
+{
+  "advancedConfiguration": {
+    "combinationDeltaFetchLookback": null,
+    "combinationFullRefreshInterval": null,
+    "debug": false,
+    "distributionConfiguration": null,
+    "enableCostReporting": null,
+    "enableFullRefreshWhenMetricSourceCombinationsChangeV2": null,
+    "enableKustoLogsMonitorV2": null,
+    "enableMinHintsLookbackAsMonitorLookback": null,
+    "enableMonitorV2InheritOptimization": null,
+    "enableMonitorV2QueryInfoOptimizationToReduceMemoryUsage": null,
+    "enablePreviewBucketOffset": null,
+    "enableThresholdResultTypeChange": null,
+    "enableThrowInvalidSeriesExceptionInMetricFetch": null,
+    "handleNullDataInDTMonitorV2Training": null,
+    "ingestionDelayToSkip": null,
+    "limitsConfiguration": null,
+    "maxCombinationsForHintingRetrieval": null,
+    "monitorV2InheritOptimizationWhenNumberOfCombinations": null,
+    "skipMetricsDataLossValidation": null,
+    "skipMetricsDataQualityCheck": null,
+    "updateTimeSeriesMetadataForCompositeMetric": null,
+    "useExpressionEngineInBaselineAnomalyTraining": null,
+    "useLimitForHintingRetrieval": null
+  },
+  "alertConditions": [
+    {
+      "alertOutletIds": [],
+      "bucket": null,
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 1,
+          "expressionId": "1b326ed7-d8a9-49e4-bd9e-976fe79baa7c",
+          "id": "991e60b2-1bb5-4196-aec8-616d95c89f18",
+          "type": 0,
+          "value": "500"
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 2,
+      "id": "42efc6aa-de51-478d-9d39-7621f329af3d",
+      "metadata": {},
+      "name": "High ETagConflictCounter",
+      "severity": 3
+    },
+    {
+      "alertOutletIds": [],
+      "bucket": null,
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 1,
+          "expressionId": "1b326ed7-d8a9-49e4-bd9e-976fe79baa7c",
+          "id": "991e60b2-1bb5-4196-aec8-616d95c89f18",
+          "type": 0,
+          "value": "10000"
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 1,
+      "id": "947a440f-775b-4a35-ac2c-65c0513cfcf7",
+      "metadata": {},
+      "name": "Very High ETagConflictCounter",
+      "severity": 2
+    }
+  ],
+  "alertEnrichmentConfiguration": {
+    "customLinks": [
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "region",
+          "ConflictReason",
+          "scaleUnit",
+          "service",
+          "ResourceType"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "1.00:00:00",
+        "path": [
+          "IOService",
+          "Source Of Truth"
+        ],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "ARGDataLabs > IOService > Source Of Truth Dashboard"
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "region",
+          "ConflictReason",
+          "scaleUnit",
+          "service",
+          "ResourceType"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "1.00:00:00",
+        "path": [
+          "IOService",
+          "RetryQueue"
+        ],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "RetryQueue Dashboard (Check for Increase Due to ETag)"
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DGrepJarvisLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "clientQuery": "let resourceId = Regex.Match(properties, \"ResourceId=\\[(.*?)\\]\").Groups[1].Value\ngroupby resourceId let count = Count()\norderby count desc",
+        "dGrepEndpoint": "https://dgrepv2-frontend-prod.trafficmanager.net/",
+        "endpointAlias": "Diagnostics PROD",
+        "endTime": "{EndTime}",
+        "eventFilters": [
+          {
+            "isScrubbed": false,
+            "monikerRegex": null,
+            "nameRegex": "ActivityFailed",
+            "namespaceRegex": "ARGDataLabs",
+            "versionRegex": null
+          }
+        ],
+        "executionDelay": "00:00:00",
+        "identityColumns": {
+          "Region": [
+            "{Monitor.Dimension.region}"
+          ],
+          "ScaleUnit": [
+            "{Monitor.Dimension.scaleUnit}"
+          ]
+        },
+        "lookback": "00:15:00",
+        "maxResultRowCount": 15,
+        "maxRowCount": 500000,
+        "mdsEndpoint": "https://production.diagnostics.monitoring.core.windows.net/",
+        "preIncidentQueryTimeout": "00:00:50",
+        "serverQuery": "where activityName == \"OutputBlobUploadTaskFactory.ETagConflict\"",
+        "startTime": null,
+        "stepback": "00:00:00",
+        "title": "Top ResourceId with ETag Conflict",
+        "uxParameters": [
+          {
+            "key": "aggregatesVisible",
+            "value": true
+          },
+          {
+            "key": "aggregates",
+            "value": []
+          },
+          {
+            "key": "chartsVisible",
+            "value": false
+          },
+          {
+            "key": "chartEditorVisible",
+            "value": true
+          },
+          {
+            "key": "chartType",
+            "value": "line"
+          },
+          {
+            "key": "chartLayers",
+            "value": [
+              [
+                "New Layer",
+                ""
+              ]
+            ]
+          },
+          {
+            "key": "UTC",
+            "value": true
+          }
+        ]
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DGrepJarvisLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "clientQuery": "let resourceType = Regex.Match(properties, \"ResourceType=\\[(.*?)\\]\").Groups[1].Value\ngroupby resourceType let count = Count()\norderby count desc",
+        "dGrepEndpoint": "https://dgrepv2-frontend-prod.trafficmanager.net/",
+        "endpointAlias": "Diagnostics PROD",
+        "endTime": "{EndTime}",
+        "eventFilters": [
+          {
+            "isScrubbed": false,
+            "monikerRegex": null,
+            "nameRegex": "ActivityFailed",
+            "namespaceRegex": "ARGDataLabs",
+            "versionRegex": null
+          }
+        ],
+        "executionDelay": "00:00:00",
+        "identityColumns": {
+          "Region": [
+            "{Monitor.Dimension.region}"
+          ],
+          "ScaleUnit": [
+            "{Monitor.Dimension.scaleUnit}"
+          ]
+        },
+        "lookback": "00:15:00",
+        "maxResultRowCount": 15,
+        "maxRowCount": 500000,
+        "mdsEndpoint": "https://production.diagnostics.monitoring.core.windows.net/",
+        "preIncidentQueryTimeout": "00:00:50",
+        "serverQuery": "where activityName == \"OutputBlobUploadTaskFactory.ETagConflict\"",
+        "startTime": null,
+        "stepback": "00:00:00",
+        "title": "ResourceTypes with ETag Conflict",
+        "uxParameters": [
+          {
+            "key": "aggregatesVisible",
+            "value": true
+          },
+          {
+            "key": "aggregates",
+            "value": []
+          },
+          {
+            "key": "chartsVisible",
+            "value": false
+          },
+          {
+            "key": "chartEditorVisible",
+            "value": true
+          },
+          {
+            "key": "chartType",
+            "value": "line"
+          },
+          {
+            "key": "chartLayers",
+            "value": [
+              [
+                "New Layer",
+                ""
+              ]
+            ]
+          },
+          {
+            "key": "UTC",
+            "value": true
+          }
+        ]
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DGrepJarvisLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "clientQuery": "groupby exception let count = Count()\norderby count desc",
+        "dGrepEndpoint": "https://dgrepv2-frontend-prod.trafficmanager.net/",
+        "endpointAlias": "Diagnostics PROD",
+        "endTime": "{EndTime}",
+        "eventFilters": [
+          {
+            "isScrubbed": false,
+            "monikerRegex": null,
+            "nameRegex": "ActivityFailed",
+            "namespaceRegex": "ARGDataLabs",
+            "versionRegex": null
+          }
+        ],
+        "executionDelay": "00:00:00",
+        "identityColumns": {
+          "Region": [
+            "{Monitor.Dimension.region}"
+          ],
+          "ScaleUnit": [
+            "{Monitor.Dimension.scaleUnit}"
+          ]
+        },
+        "lookback": "00:15:00",
+        "maxResultRowCount": 15,
+        "maxRowCount": 500000,
+        "mdsEndpoint": "https://production.diagnostics.monitoring.core.windows.net/",
+        "preIncidentQueryTimeout": "00:00:50",
+        "serverQuery": "where activityName == \"OutputBlobClient.UploadContentAsync\"",
+        "startTime": null,
+        "stepback": "00:00:00",
+        "title": "OutputBlobClient.UploadContentAsync Activities",
+        "uxParameters": [
+          {
+            "key": "aggregatesVisible",
+            "value": true
+          },
+          {
+            "key": "aggregates",
+            "value": []
+          },
+          {
+            "key": "chartsVisible",
+            "value": false
+          },
+          {
+            "key": "chartEditorVisible",
+            "value": true
+          },
+          {
+            "key": "chartType",
+            "value": "line"
+          },
+          {
+            "key": "chartLayers",
+            "value": [
+              [
+                "New Layer",
+                ""
+              ]
+            ]
+          },
+          {
+            "key": "UTC",
+            "value": true
+          }
+        ]
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.GenericCustomLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "executionDelay": "00:00:00",
+        "link": "https://eng.ms/docs/cloud-ai-platform/azure-core/azure-management-and-platforms/control-plane-bburns/fleet-inventory/azure-resource-builder/monitors/etagconflicts",
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "ETagConflictsTSG"
+      }
+    ]
+  },
+  "autoMitigationConfiguration": {
+    "healthyCountToMitigateIncident": 10,
+    "shouldMitigateIncident": false
+  },
+  "customMetadata": {
+    "Icm.TsgId": "https://eng.ms/docs/cloud-ai-platform/azure-core/azure-management-and-platforms/control-plane-bburns/fleet-inventory/azure-resource-builder/monitors/etagconflicts",
+    "Title": "[DataLabs] {Monitor.DisplayName} for SU: {Monitor.Dimension.scaleUnit}, Region: {Monitor.Dimension.region}, EventHubName: {Monitor.Dimension.Name}"
+  },
+  "description": "ETag conflicts will occur when a blob is modified concurrently. This will impact stateful services, particularly when messages \nmodify the same blob for a storage account. ",
+  "expressions": [
+    {
+      "endTimeShift": null,
+      "id": "1b326ed7-d8a9-49e4-bd9e-976fe79baa7c",
+      "lookback": null,
+      "name": "ETagConflictCount",
+      "nullDataPointsHandling": null,
+      "percentages": [
+        {
+          "denominator": [],
+          "multiplier": 1,
+          "numerator": [
+            {
+              "conditions": [
+                {
+                  "dimensionName": "ConflictReason",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "NODE_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "POD_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "ResourceType",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "RetryCount",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "buildVersion",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "region",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scaleUnit",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "service",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                }
+              ],
+              "dataBlockType": 0,
+              "endTimeShift": null,
+              "isNegative": false,
+              "lookback": null,
+              "lookbackAggregation": 0,
+              "mdmAggregationConfiguration": null,
+              "multiTimeSeriesAggregation": 0,
+              "nullDataPointsHandling": null,
+              "timeSeriesId": "604862d8-2438-4543-98ef-8e23ac918a2e",
+              "timeSeriesType": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "frequency": "00:03:00",
+  "id": "a6cd20b5-4600-4631-bceb-a45101f898a5",
+  "lastModifiedBy": "dylanhartono",
+  "lastModifiedTime": "2024-02-03T00:22:22.3805697Z",
+  "lookback": "00:05:00",
+  "name": "[Blob] ETag Conflict Count",
+  "outlets": [],
+  "recoveryRules": [],
+  "resourceType": "ServiceHealthTemp",
+  "schemaVersion": 0,
+  "state": 2,
+  "tags": [
+    "Blob"
+  ],
+  "targetDimensions": [
+    {
+      "dimensionName": "region",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "ConflictReason",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 0,
+          "values": [
+            "EtagConflict"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "scaleUnit",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "service",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "ResourceType",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    }
+  ],
+  "tenant": "ARGDataLabs",
+  "timeSeries": [
+    {
+      "dimensions": [
+        "ConflictReason",
+        "NODE_NAME",
+        "POD_NAME",
+        "ResourceType",
+        "RetryCount",
+        "buildVersion",
+        "region",
+        "scaleUnit",
+        "service"
+      ],
+      "id": "604862d8-2438-4543-98ef-8e23ac918a2e",
+      "metric": "BlobSourceOfTruthUploadConflictCounter",
+      "name": "ETagConflictCount",
+      "namespace": "ARGDataLabs",
+      "samplingType": "Count",
+      "tenant": "ARGDataLabs",
+      "timeSeriesType": 0
+    }
+  ]
+}

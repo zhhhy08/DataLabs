@@ -1,0 +1,43 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "extensions": [
+    {
+      "Name": "HealthAndMonitor",
+      "Type": "Microsoft.Geneva.Health/HealthAndMonitor",
+      "Version": "2020-06-01",
+      "ConnectionProperties": {
+        "MaxExecutionTime": "PT30M",
+        "Authentication": {
+          "Type": "CertificateAuthentication",
+          "Reference": {
+            "Provider": "AzureKeyVault",
+            "Parameters": {
+              "SecretId": "https://datalabsgeneva-gbl-kv.vault.azure.net/secrets/DatalabsGenevaKeyVaultCert"
+            }
+          }
+        }
+      },
+      "Payloadproperties": {
+        "configurationPackage": {
+          "Reference": { "Path": "Package\\MonitorConfigs.zip" }
+        },
+        "monitoringAccountName": {
+          "Value": "ARGDataLabs"
+        },
+        "topologyConfigurationPath": {
+          "Value": "TopologyConfig"
+        },
+        "monitorV1ConfigurationPath": {
+          "Value": "Monitors"
+        },
+        "monitorV2ConfigurationPath": {
+          "Value": "MonitorsV2"
+        }
+        // "healthMonitorConfigurationPath": {
+        //  "Value": "HealthMonitors"
+        // }
+      }
+    }
+  ]
+}

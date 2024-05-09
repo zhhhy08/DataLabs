@@ -1,0 +1,145 @@
+{{- if .Values.resourceProxyService.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.resourceProxyConfigMap.name }}
+  namespace: {{ .Values.solutionNameSpace }}
+data:    
+# Resource Fetcher Related
+  ResourceFetcherEndpoints: {{ .Values.resourceProxyService.resourceFetcherEndpoints | default "" | quote }}
+  ResourceFetcherTokenResource: {{ .Values.resourceProxyService.resourceFetcherTokenResource | default "" | quote }}
+  ResourceFetcherHomeTenantId: {{ .Values.resourceProxyService.resourceFetcherHomeTenantId | default "" | quote }}
+  ResourceFetcherClientOption: {{ .Values.resourceProxyService.resourceFetcherClientOption | default "" | quote }}
+
+# Allowed Types
+  GetResourceAllowedTypes: {{ .Values.resourceProxyConfigMap.getResourceAllowedTypes | default "" | quote }}
+  CallARMGenericRequestAllowedTypes: {{ .Values.resourceProxyConfigMap.callARMGenericRequestAllowedTypes | default "" | quote }}
+  GetCollectionAllowedTypes: {{ .Values.resourceProxyConfigMap.getCollectionAllowedTypes | default "" | quote }}
+  GetManifestConfigAllowedTypes: {{ .Values.resourceProxyConfigMap.getManifestConfigAllowedTypes | default "" | quote }}
+  GetConfigSpecsAllowedTypes: {{ .Values.resourceProxyConfigMap.getConfigSpecsAllowedTypes | default "" | quote }}
+  GetCasResponseAllowedTypes: {{ .Values.resourceProxyConfigMap.getCasResponseAllowedTypes | default "" | quote }}
+  GetIdMappingAllowedTypes: {{ .Values.resourceProxyConfigMap.getIdMappingAllowedTypes | default "" | quote }}
+
+# Blob Client Related    
+  BlobStorageAccountNames: {{ .Values.ioConfigMap.blobStorageAccountNames | quote }}
+  BackupBlobStorageAccountNames: {{ .Values.ioConfigMap.backupBlobStorageAccountNames | quote }}
+  UseSourceOfTruth: {{ .Values.ioConfigMap.useSourceOfTruth | default true | quote }}
+  OutputBlobUploadMaxTimeOutInSec: {{ .Values.ioConfigMap.outputBlobUploadMaxTimeOutInSec | default "5/15" | quote }}
+  OutputBlobDownloadMaxTimeOutInSec: {{ .Values.ioConfigMap.outputBlobDownloadMaxTimeOutInSec | default "5/15" | quote }}
+  
+# Timeout
+  ResourceFetcherProxyMaxTimeOutInSec: {{ .Values.resourceProxyConfigMap.resourceFetcherProxyMaxTimeOutInSec | default "20/60" | quote }}
+  
+# Region
+  PrimaryRegionName: {{ .Values.primaryRegionName | quote }}
+  BackupRegionName: {{ .Values.backupRegionName | quote }}
+  
+# Throttling Related
+  SubscriptionARMReadSafeLimit: {{ .Values.resourceProxyConfigMap.subscriptionARMReadSafeLimit | default 5000 | quote }}
+  SubscriptionARMReadSafeLimit_BackoffMilliseconds: {{ .Values.resourceProxyConfigMap.subscriptionARMReadSafeLimit_BackoffMilliseconds | default 20000 | quote }}
+
+# Logging Related
+  LOGGER_MIN_LOG_LEVEL: {{ .Values.resourceProxyConfigMap.minLogLevel | default "Information" | quote }}
+  EnableGrpcTrace: {{ .Values.resourceProxyConfigMap.enableGrpcTrace | default false | quote }}
+  EnableHttpClientTrace: {{ .Values.resourceProxyConfigMap.enableHttpClientTrace | default false | quote }}
+  EnableAzureSDKActivity: {{ .Values.resourceProxyConfigMap.enableAzureSDKActivity | default false | quote }}
+  BlobStorageLogsEnabled: {{ .Values.resourceProxyConfigMap.blobStorageLogsEnabled | default false | quote }}
+  BlobStorageTraceEnabled: {{ .Values.resourceProxyConfigMap.blobStorageTraceEnabled | default false | quote }}
+  IncludeRunTimeMetrics: {{ .Values.resourceProxyConfigMap.includeRunTimeMetrics | default true | quote }}
+  IncludeHttpClientMetrics: {{ .Values.resourceProxyConfigMap.includeHttpClientMetrics | default false | quote }}
+
+# Cache Lookup Control
+  UseCacheInResourceFetcherProxy: {{ .Values.resourceProxyConfigMap.useCacheInResourceFetcherProxy | default true | quote }}
+  UseOutputCacheForRetry: {{ .Values.resourceProxyConfigMap.useOutputCacheForRetry | default false | quote }}
+  UseInputCacheForRetry: {{ .Values.resourceProxyConfigMap.useInputCacheForRetry | default true | quote }}
+
+# Partner Certifictes
+  {{- if .Values.resourceProxyService.partnerCertificates.isEnabled }}
+  AADTokenIssuer: {{ .Values.resourceProxyService.partnerCertificates.aadTokenIssuer | default "" | quote }}
+  AADAuthority: {{ .Values.resourceProxyService.partnerCertificates.aadAuthority | default "" | quote }}
+  DefaultTenantId: {{ .Values.resourceProxyService.partnerCertificates.tenantId | default "" | quote }}
+
+# ARM client Related
+  {{- if .Values.resourceProxyService.partnerCertificates.armClient.endpoints }}
+  ARMEndpoints: {{ .Values.resourceProxyService.partnerCertificates.armClient.endpoints | default "" | quote }}
+  ARMBackupEndpoints: {{ .Values.resourceProxyService.partnerCertificates.armClient.backupEndpoints | default "" | quote }}
+  ARMFirstPartyAppId: {{ .Values.resourceProxyService.partnerCertificates.armClient.firstPartyAppId | default "" | quote }}
+  ARMFirstPartyAppCertName: {{ .Values.resourceProxyService.partnerCertificates.armClient.certificateName | default "" | quote }}
+  ARMTokenResource: {{ .Values.resourceProxyService.partnerCertificates.armClient.armTokenResource | default "" | quote }}
+  ARMClientOption: {{ .Values.resourceProxyService.partnerCertificates.armClient.clientOption | default "" | quote }}
+  DefaultArmClientGetResourceTimeOutInSec: {{ .Values.resourceProxyService.partnerCertificates.armClient.defaultArmClientGetResourceTimeOutInSec | default "5/20" | quote }}
+  DefaultArmClientGenericApiTimeOutInSec: {{ .Values.resourceProxyService.partnerCertificates.armClient.defaultArmClientGenericApiTimeOutInSec | default "20/40" | quote }}
+  ArmClientResourceTimeOutMappings: {{ .Values.resourceProxyService.partnerCertificates.armClient.armClientResourceTimeOutMappings | default "" | quote }}
+  ArmClientGenericApiTimeOutMappings: {{ .Values.resourceProxyService.partnerCertificates.armClient.armClientGenericApiTimeOutMappings | default "" | quote }}
+  {{- end }}
+
+# CAS Client Related
+  {{- if .Values.resourceProxyService.partnerCertificates.casClient.endpoints }}
+  CasEndpoints: {{ .Values.resourceProxyService.partnerCertificates.casClient.endpoints | default "" | quote }}
+  CasBackupEndpoints: {{ .Values.resourceProxyService.partnerCertificates.casClient.backupEndpoints | default "" | quote }}
+  CasDstsCertificateName: {{ .Values.resourceProxyService.partnerCertificates.casClient.certificateName | default "" | quote }}  
+  CasDstsSkipServerCertificateValidation: {{ .Values.resourceProxyService.partnerCertificates.casClient.dstsSkipServerCertificateValidation | default false | quote }}  
+  CasDstsClientId: {{ .Values.resourceProxyService.partnerCertificates.casClient.dstsClientId | default "" | quote }}
+  CasDstsServerId: {{ .Values.resourceProxyService.partnerCertificates.casClient.dstsServerId | default "" | quote }}
+  CasDstsClientHome: {{ .Values.resourceProxyService.partnerCertificates.casClient.dstsClientHome | default "" | quote }}
+  CasDstsServerHome: {{ .Values.resourceProxyService.partnerCertificates.casClient.dstsServerHome | default "" | quote }}
+  CasDstsServerRealm: {{ .Values.resourceProxyService.partnerCertificates.casClient.dstsServerRealm | default "" | quote }}
+  CasClientOption: {{ .Values.resourceProxyService.partnerCertificates.casClient.clientOption | default "" | quote }}
+  DefaultCasClientTimeOutInSec: {{ .Values.resourceProxyService.partnerCertificates.casClient.defaultCasClientTimeOutInSec | default "10/20" | quote }}
+  CasClientTimeOutMappings: {{ .Values.resourceProxyService.partnerCertificates.casClient.casClientTimeOutMappings | default "" | quote }}
+  {{- end }}
+
+# ARG Query FrontDoor Client Related
+  {{- if .Values.resourceProxyService.partnerCertificates.qfdClient.endpoints }}
+  QfdEndpoints: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.endpoints | default "" | quote }}
+  QfdBackupEndpoints: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.backupEndpoints | default "" | quote }}
+  QfdDstsCertificateName: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.certificateName | default "" | quote }}  
+  QfdDstsSkipServerCertificateValidation: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.dstsSkipServerCertificateValidation | default false | quote }}  
+  QfdDstsClientId: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.dstsClientId | default "" | quote }}
+  QfdDstsServerId: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.dstsServerId | default "" | quote }}
+  QfdDstsClientHome: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.dstsClientHome | default "" | quote }}
+  QfdDstsServerHome: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.dstsServerHome | default "" | quote }}
+  QfdDstsServerRealm: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.dstsServerRealm | default "" | quote }}
+  QfdClientOption: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.clientOption | default "" | quote }}
+  DefaultQFDClientTimeOutInSec: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.defaultQFDClientTimeOutInSec | default "5/20" | quote }}
+  QfdClientTimeOutMappings: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.qfdClientTimeOutMappings | default "" | quote }}
+  {{- end }}
+
+# ARM Admin Client Related
+  {{- if .Values.resourceProxyService.partnerCertificates.armAdminClient.endpoints }}
+  ArmAdminEndpoints:  {{ .Values.resourceProxyService.partnerCertificates.armAdminClient.endpoints | default "" | quote }}
+  ArmAdminBackupEndpoints:  {{ .Values.resourceProxyService.partnerCertificates.armAdminClient.backupEndpoints | default "" | quote }}
+  ArmAdminCertificateName:  {{ .Values.resourceProxyService.partnerCertificates.armAdminClient.certificateName | default ""| quote }}
+  ArmAdminClientOption:  {{ .Values.resourceProxyService.partnerCertificates.armAdminClient.clientOption | default ""| quote }}
+  DefaultArmAdminClientTimeOutInSec: {{ .Values.resourceProxyService.partnerCertificates.armAdminClient.defaultArmAdminClientTimeOutInSec | default "10/20" | quote }}
+  ArmAdminClientTimeOutMappings: {{ .Values.resourceProxyService.partnerCertificates.armAdminClient.armAdminClientTimeOutMappings | default "" | quote }}
+  {{- end }}
+
+  {{- end }} # if .Values.resourceProxyService.partnerCertificates.isEnabled
+
+  {{- if .Values.cacheService.enabled }}
+  CachePoolDomain: "{{ .Values.cacheNameSpace }}.svc.cluster.local"
+  CachePoolDenyList: {{ .Values.cacheService.cachePoolDenyList | default "" | quote }}
+
+  # IO Cache Related
+  UseHashForResourceCacheKey: {{ .Values.ioConfigMap.useHashForResourceCacheKey | default true | quote }}
+  ResourceCacheReadQuorum: {{ .Values.ioConfigMap.resourceCacheReadQuorum | default 1 | quote }}
+
+  # Cache TTL Related
+  DefaultOutputCacheTTL: {{ .Values.ioConfigMap.defaultOutputCacheTTL | default "2.00:00:00" | quote }}
+  DefaultInputCacheTTL: {{ .Values.ioConfigMap.defaultInputCacheTTL | default "2.00:00:00" | quote }}
+  DefaultNotFoundEntryCacheTTL: {{ .Values.ioConfigMap.defaultNotFoundEntryCacheTTL | default "01:00:00" | quote }}
+  ResourceTypeCacheTTLMappings: {{ .Values.ioConfigMap.resourceTypeCacheTTLMappings | default "" | quote }}
+
+  {{- $numCachePool := len .Values.cacheService.cachePools }}
+  CacheNumPools: {{ $numCachePool | quote }}
+
+  {{- range $cacheIndex, $cachePool := .Values.cacheService.cachePools }}
+  CachePool-{{ $cacheIndex }}: {{ include "cachepool_config" $cachePool | trim | quote }}
+  CachePoolNodeReplicationMapping-{{ $cacheIndex }}: {{ $cachePool.nodeReplicationMapping | default "" | quote }}
+  CachePoolConnectionsOption-{{ $cacheIndex }}: {{ $cachePool.connectionsOption | default $.Values.cacheService.connectionsOption | default "" | quote }}
+  {{- end }} # end of range $cacheIndex, $cachePool := .Values.cacheService.cachePools
+
+  {{- end }} # if .Values.cacheService.enabled
+
+{{- end }} # if .Values.resourceProxyService.enabled

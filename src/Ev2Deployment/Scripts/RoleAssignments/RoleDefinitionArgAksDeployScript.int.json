@@ -1,0 +1,30 @@
+{
+    "Name": "Arg Aks Deploy Script",
+    "Id": "9aaff2e7-2ad7-4038-924d-5a0ae8a036fa",
+    "IsCustom": true,
+    "Description": "Roles for deploying aks one time ops and apps not currently possible via Ev2 for our configuration",
+    "Actions": [
+        "Microsoft.ContainerService/managedClusters/runCommand/action",
+        "Microsoft.ContainerService/managedClusters/commandResults/read",
+        "Microsoft.ContainerService/managedClusters/read",
+        "Microsoft.ContainerService/managedClusters/listClusterUserCredential/action",
+        "Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials/write",
+        "Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials/read",
+        "Microsoft.Network/privateDnsZones/*",
+        "Microsoft.Network/virtualNetworks/*",
+        "Microsoft.Network/virtualNetworks/subnets/*",
+        "Microsoft.Network/privateEndpoints/*",
+        "Microsoft.Network/networkinterfaces/*",
+        "Microsoft.Network/locations/availablePrivateEndpointTypes/read",
+        "Microsoft.ApiManagement/service/*",
+        "Microsoft.ApiManagement/service/privateEndpointConnections/*",
+        "Microsoft.Network/privateLinkServices/*"
+    ],
+    "NotActions": [],
+    "DataActions": [],
+    "NotDataActions": [],
+    "AssignableScopes": [
+        "/subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6",
+        "/subscriptions/6d5b60f5-24e0-4722-acbb-ad6b9ee7675f"
+    ]
+}

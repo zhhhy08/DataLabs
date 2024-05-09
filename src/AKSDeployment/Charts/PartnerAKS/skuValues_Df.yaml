@@ -1,0 +1,282 @@
+# Values File for SKU in INT Environment
+agentPoolName: upgradedpool
+primaryRegionName: "p-eus"
+backupRegionName: "b-eus"
+
+solutionInfo:
+  solutionName: &solutionName sku
+  aksClusterName: armdata-aks-sku-df-eastus
+  environment: Dogfood
+  region: eastus
+  scaleUnit: *solutionName
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+# Replace Client Id with MI's Client Id
+  clientId: 66db9ecf-dbb3-4586-bfd1-7ab04c903106
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+commonConfig:
+  notificationReceiverEndPoint: "arn-int-ntre.arn-int.core.windows.net"
+
+ioService:
+  replicaCount: 1
+
+partnerApp:
+  replicaCount: 1
+
+ioConfigMap:
+  # Replace Input EH, Output EH, Storage Account
+  inputEventHubNameSpaceAndName: "armdata-eh-sku-df-eastus/eh-sku-df-input"
+  outputEventHubNameSpaceAndName: "armdata-eh-sku-df-eastus/eh-sku-df-output"
+  eventHubStorageAccountName: "armdataskudfeastus"
+  blobStorageAccountNames: "armdataskudfeastus"
+  arnPublishStorageAccountNames: armdataskudfeastus
+  serviceBusNameSpaceAndName: "armdata-sb-sku-df-eastus/sb-sku-df-queue"
+  arnPublishEventGridDomainIds: "/subscriptions/82506e98-9fdb-41f5-ab67-031005041a26/resourceGroups/armdata-rg-sku-df-eastus/providers/Microsoft.EventGrid/domains/armdata-eg-sku-df-eastus"
+  arnPublishEventGridDomainEndpoints: "https://armdata-eg-sku-df-eastus.eastus-1.eventgrid.azure.net/api/events"
+  arnPublishEventGridTopics: "/subscriptions/82506e98-9fdb-41f5-ab67-031005041a26/resourceGroups/armdata-rg-sku-df-eastus/providers/Microsoft.EventGrid/domains/armdata-eg-sku-df-eastus/topics/arnpublishtopic"
+  pairedRegionArnPublishEventGridDomainIds: "/subscriptions/82506e98-9fdb-41f5-ab67-031005041a26/resourceGroups/armdata-rg-sku-df-eastus/providers/Microsoft.EventGrid/domains/armdata-eg-sku-df-eastus"
+  pairedRegionArnPublishEventGridDomainEndpoints: "https://armdata-eg-sku-df-eastus.eastus-1.eventgrid.azure.net/api/events"
+  pairedRegionArnPublishEventGridTopics: "/subscriptions/82506e98-9fdb-41f5-ab67-031005041a26/resourceGroups/armdata-rg-sku-df-eastus/providers/Microsoft.EventGrid/domains/armdata-eg-sku-df-eastus/topics/arnpublishtopic"
+  outputDataset: "subscriptionsku"
+  useSourceOfTruth: "false"
+  publishOutputToArn: "true"
+  inputCacheTypes: "Microsoft.Inventory/subscriptionInternalProperties;Microsoft.Resources/subscriptionZoneMappings;Microsoft.Resources/subscriptionRegistrations"
+  allowedOutputTypes: "microsoft.resourcegraph/skuproviders/resourcetypes/locations/skus"
+  dstsNotificationReceiver:
+    isEnabled: true
+
+ioImage:
+  repository: datalabsintacr.azurecr.io/inputoutputservice
+
+partnerConfig:
+  pods:
+  - name: sku-solution
+    serviceName: sku-solution-service 
+    replicaCount: 1
+    partnerConfigMap:
+      name: sku-service-config
+      minLogLevel: Information
+      enableGrpcTrace: false
+      enableHttpClientTrace: false
+      enableAzureSDKActivity: false
+      customConfig: |
+        { 
+          "subscriptionsKeyCount" : "2",
+          "configFetchIntervalInHours" : "6",
+          "globalSkuBatchSize": "1000",
+          "casClientId": "901c622e-9663-4c65-9008-df103ed6cc5a",
+          "serviceName": "sku-partialsync",
+          "useMget": "true"
+        }
+    containers:
+     - name: sku-container
+       repository: datalabsintacr.azurecr.io/skupartialsyncpartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5072 
+       multiResponseResourcesMatchTypes: | 
+                      {
+                      "eventTypes" :  "Microsoft.Inventory/skuProviders/resourceTypes/locations/globalSkus/write,Microsoft.Inventory/subscriptionInternalProperties/write,Microsoft.Resources/subscriptionZoneMappings/write,Microsoft.Features/featureProviders/subscriptionFeatureRegistrations/write,Microsoft.CapacityAllocation/capacityRestrictions/write" 
+                      }
+  - name: sku-fullsync-solution
+    serviceName: sku-fullsync-service 
+    replicaCount: 1
+    partnerConfigMap:
+      name: sku-fullsync-service-config
+      minLogLevel: Information
+      enableGrpcTrace: false
+      enableHttpClientTrace: false
+      enableAzureSDKActivity: false
+      customConfig: |
+         { 
+          "subscriptionsKeyCount" : "2",
+          "configFetchIntervalInHours" : "6",
+          "globalSkuBatchSize": "1000",
+          "casClientId": "901c622e-9663-4c65-9008-df103ed6cc5a",
+          "serviceName": "sku-fullsync",
+          "useMget": "true"
+         }
+    containers:
+     - name: sku-fullsync-container
+       repository: datalabsintacr.azurecr.io/skufullsyncpartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5080 
+       multiResponseResourcesMatchTypes: | 
+                      {
+                      "eventTypes" :  "Microsoft.ResourceGraph/skuFullSyncTriggerEvents/write" 
+                      }
+  - name: cache-ingestion
+    serviceName: cache-ingestion-service
+    replicaCount: 2
+    partnerConfigMap:
+      name: cache-ingestion-service-config
+    containers:
+     - name: cache-ingestion-container
+       repository: datalabsintacr.azurecr.io/armdatacachepartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5078
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" : "Microsoft.Inventory/subscriptionInternalProperties,Microsoft.Inventory/skuProviders/resourceTypes/locations/globalSkus"
+                      }
+
+resourceFetcherService:
+  replicaCount: 1
+ 
+resourceFetcherImage:
+  name: resourcefetcherservice
+  repository: datalabsintacr.azurecr.io/resourcefetcherservice
+  pullPolicy: Always
+  
+resourceFetcherConfigMap:
+  partnerNames: "abcsolution;sku"
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://resource-fetcher.resource-fetcher-namespace.svc.cluster.local:6072
+  resourceFetcherTokenResource: https://resourcefetcherservice-int.microsoft.com
+  resourceFetcherHomeTenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+  partnerCertificates:
+    isEnabled: true
+    secretProviderClassName: dsts-secret-provider
+    tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+    aadTokenIssuer: https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/
+    aadTokenAudience: https://resourcefetcherservice-int.microsoft.com
+    casClient:
+      endpoints: https://global.capacity.azure-test.net
+      certificateName: datalabs-dsts-client-int-gov-rp-art-int
+      # Cas test endpoint doesnt have a valid certificate yet
+      dstsSkipServerCertificateValidation: true
+      dstsClientId: c1c8a0fd-eba8-4c02-add2-d6b1ec35dd52
+      dstsServerId: https://capacityservicestcm.core.azure-test.net
+      dstsClientHome: https://co2agg04-passive-dsts.dsts.core.azure-test.net/dstsv2/7a433bfc-2514-4697-b467-e0933190487f
+      dstsServerHome: https://co2agg04-passive-dsts.dsts.core.azure-test.net/dstsv2/7a433bfc-2514-4697-b467-e0933190487f
+      dstsServerRealm: ""
+    qfdClient:
+      endpoints: https://arg-df-qfd.arg-df.core.windows.net
+      certificateName: datalabs-dsts-client-int-gov-rp-art-int
+      dstsSkipServerCertificateValidation: false
+      dstsClientId: c1c8a0fd-eba8-4c02-add2-d6b1ec35dd52
+      dstsServerId: 5a5b6d3c-f6cb-4570-95be-059ab813a8ff
+      dstsClientHome: https://co2agg04-passive-dsts.dsts.core.azure-test.net/dstsv2/7a433bfc-2514-4697-b467-e0933190487f
+      dstsServerHome: https://co2agg04-passive-dsts.dsts.core.azure-test.net/dstsv2/7a433bfc-2514-4697-b467-e0933190487f
+      dstsServerRealm: ""
+    armAdminClient:
+      endpoints: https://northeurope.api-dogfood-admin.resources.windows-int.net
+      certificateName: datalabs-arm-admin-int-gov-rp-art-int
+
+keyVault:
+  isEnabled: true
+  name: datalabsintgblkv
+  clientId: 85be24e3-7a05-44a4-8f76-f2d6d2c54c63
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+resourceProxyConfigMap:
+  getConfigSpecsAllowedTypes: "*:cache|write/12:00:00,armadmin|2022-10-01"
+  getManifestConfigAllowedTypes: "*:cache|write/12:00:00,armadmin|2022-10-01"
+  getCasResponseAllowedTypes: "*:cache|write/12:00:00,cas|2016-12-01"
+  getCollectionAllowedTypes: 
+    "microsoft.features/featureProviders/subscriptionFeatureRegistrations:cache|write/30:00:00,qfd|2022-10-01;
+    Microsoft.Inventory/subscriptionInternalProperties:cache|write/30:00:00,qfd|2022-10-01;
+    Microsoft.Resources/subscriptionZoneMappings:cache|write/30:00:00,qfd|2022-10-01;
+    Microsoft.Resources/subscriptionRegistrations:cache|write/30:00:00,qfd|2022-10-01"
+
+resourceProxyServiceAccount:
+  clientId: 66db9ecf-dbb3-4586-bfd1-7ab04c903106
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+  name: resource-fetcher-identity
+
+cacheService:
+  enabled: true
+  requestMemory: 5Gi
+  requestStorage: 4Gi
+  storageClassName: managed-csi
+  volumeClaimName: data
+  maxMainStoreMemory: 4g
+  maxHashIndexMemory: 1g
+  maxCompactionSegments: 2
+  cacheConfigMap:
+    checkPointIntervalDuration: "00:15:00"
+  cachePools:
+  - cacheName: iocache
+    readEnabled: true
+    nodePoolName: upgradedpool
+    nodeCount: 1
+    port: 3278
+    nodeReplication:
+    startOffset: 0
+
+partnerCacheService:
+  enabled: true
+  requestMemory: 5Gi
+  requestStorage: 4Gi
+  storageClassName: managed-csi
+  volumeClaimName: data
+  maxMainStoreMemory: 4g
+  maxHashIndexMemory: 1g
+  maxCompactionSegments: 2
+  cacheConfigMap:
+    checkPointIntervalDuration: "00:15:00"
+    hotConfigActions: |
+      {
+        "sortedSetAdd": {
+          "subscriptions-0": ["66db9ecf-dbb3-4586-bfd1-7ab04c903106"]
+        }
+      }
+  cachePools:
+  - cacheName: partnercache
+    readEnabled: true
+    nodePoolName: upgradedpool
+    nodeCount: 1
+    port: 3279
+    nodeReplication:
+    startOffset: 0
+
+adminService:
+  isEnabled: false
+  sslSecretProvider:
+    certificateName: datalabs-arm-admin-int-gov-rp-art-int
+
+adminServiceConfigMap:
+  dstsRealm: realm://dsts.core.azure-test.net/
+  dstsName: co2agg04-dsts.dsts.core.azure-test.net
+  serviceDns: dl-sku-df.eastus.cloudapp.azure.com
+  allowedActors: GenevaActionsTest,acisTestTodSMSTest,GenevaActionsDelegatedAuthNonProd
+
+# Monitoring configurations
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: true
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: Test
+    gcs_account: DataLabs
+    gcs_region: eastus
+    gcs_namespace: Datalabs
+    gcs_config_version: '1.6' # TODO Change to respective config version
+    # TODO: Replace subscriptionId for miResourceId
+    miResourceId: /subscriptions/82506e98-9fdb-41f5-ab67-031005041a26/resourcegroups/MC_armdata-rg-sku-df-eastus_armdata-aks-sku-df-eastus_eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/armdata-aks-sku-df-eastus-agentpool
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: DataLabs
+      namespace: DataLabs
+    Partner: # Change accountInfo for Partner (can be the same as DataLabs)
+      account: DataLabs
+      namespace: DataLabs
+
+  # TODO: Update to objectId of armdata-aks-sku-df-eastus agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "DataLabs",
+          "objectId": "405cf773-eee2-45a2-845e-c63d48c60ef6"
+        }
+      ]
+    }

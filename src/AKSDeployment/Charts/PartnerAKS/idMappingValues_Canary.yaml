@@ -1,0 +1,129 @@
+# Values File for IDMapping in Canary Environment
+primaryRegionName: "p-ecy"
+backupRegionName: "b-ecy"
+
+solutionInfo:
+  solutionName: &solutionName idmapping
+  aksClusterName: idmcanaryecyaks
+  environment: Canary
+  region: eastus2euap
+  scaleUnit: *solutionName
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount: 
+#MI of idm partner
+  clientId: 8eb50596-73ce-474b-ac6a-a813c325d488 
+  tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+
+ioConfigMap:
+  inputEventHubNameSpaceAndName: 'idmcanaryecyipehns0/idmcanaryecyipeh;idmcanaryecyipehns1/idmcanaryecyipeh' # flighting event hub
+  outputEventHubNameSpaceAndName: 'idmcanaryecyopehns0/idmcanaryecyopeh'
+  eventHubStorageAccountName: '0idmcanaryecyehcpsa'
+  blobStorageAccountNames: '' # no source of truth
+  backupInputEventHubNameSpaceAndName: "idmcanaryecybipehns0/idmcanaryecybipeh/00:05:00;idmcanaryecybipehns1/idmcanaryecybipeh/00:05:00"
+  backupBlobStorageAccountNames: "" # no source of truth
+  serviceBusNameSpaceAndName: 'idmcanaryecysb0/0idmcanaryecysbq'
+  outputDataset: 'idmapping'
+  useSourceOfTruth: 'false'
+  allowedOutputTypes: "microsoft.idmapping/identifiers"
+  arnPublishStorageAccountNames: "0idmcanaryecyarnpsa;1idmcanaryecyarnpsa;2idmcanaryecyarnpsa;3idmcanaryecyarnpsa;4idmcanaryecyarnpsa;5idmcanaryecyarnpsa"
+  arnPublishEventGridDomainIds: "/subscriptions/bb596f76-3c15-4e59-af1f-7b0b7ff25f4b/resourceGroups/DataLabsidmRG-eastus2euap/providers/Microsoft.EventGrid/domains/idmcanaryecyapeg1;/subscriptions/bb596f76-3c15-4e59-af1f-7b0b7ff25f4b/resourceGroups/DataLabsidmRG-eastus2euap/providers/Microsoft.EventGrid/domains/idmcanaryecyapeg2"
+  arnPublishEventGridDomainEndpoints: "https://idmcanaryecyapeg1.eastus2euap-1.eventgrid.azure.net/api/events;https://idmcanaryecyapeg2.eastus2euap-1.eventgrid.azure.net/api/events"
+  arnPublishEventGridTopics: "/subscriptions/bb596f76-3c15-4e59-af1f-7b0b7ff25f4b/resourceGroups/DataLabsidmRG-eastus2euap/providers/Microsoft.EventGrid/domains/idmcanaryecyapeg1/topics/arnpublishtopic;/subscriptions/bb596f76-3c15-4e59-af1f-7b0b7ff25f4b/resourceGroups/DataLabsidmRG-eastus2euap/providers/Microsoft.EventGrid/domains/idmcanaryecyapeg2/topics/arnpublishtopic"
+  pairedRegionArnPublishEventGridDomainIds: "/subscriptions/bb596f76-3c15-4e59-af1f-7b0b7ff25f4b/resourceGroups/DataLabsidmRG-eastus2euap/providers/Microsoft.EventGrid/domains/idmcanaryecyapeg1;/subscriptions/bb596f76-3c15-4e59-af1f-7b0b7ff25f4b/resourceGroups/DataLabsidmRG-eastus2euap/providers/Microsoft.EventGrid/domains/idmcanaryecyapeg2"
+  pairedRegionArnPublishEventGridDomainEndpoints: "https://idmcanaryecyapeg1.eastus2euap-1.eventgrid.azure.net/api/events;https://idmcanaryecyapeg2.eastus2euap-1.eventgrid.azure.net/api/events"
+  pairedRegionArnPublishEventGridTopics: "/subscriptions/bb596f76-3c15-4e59-af1f-7b0b7ff25f4b/resourceGroups/DataLabsidmRG-eastus2euap/providers/Microsoft.EventGrid/domains/idmcanaryecyapeg1/topics/arnpublishtopic;/subscriptions/bb596f76-3c15-4e59-af1f-7b0b7ff25f4b/resourceGroups/DataLabsidmRG-eastus2euap/providers/Microsoft.EventGrid/domains/idmcanaryecyapeg2/topics/arnpublishtopic"
+
+partnerConfig:    
+  pods:
+  - name: idmapping-solution
+    serviceName: idmapping-solution-service
+    partnerConfigMap:
+      name: idmapping-solution-config
+    containers:
+     - name: idmpartnersolution
+       repository: datalabscanaryacr.azurecr.io/idmpartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" : "*"
+                      }
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://rfcanaryecyaks.idm.canary.ecyaks:6072
+
+resourceProxyServiceAccount: 
+# MI of idm partner
+  clientId: 8eb50596-73ce-474b-ac6a-a813c325d488 
+
+cacheService:
+  enabled: false
+
+# TODO Canary below
+# 1. Update geneva account information (name, version, etc)
+# 2. Update managed identities (kubelet identity of AKS)
+# 3. Update repository
+
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: true
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGDataLabs
+    gcs_region: eastus2euap
+    gcs_namespace: ARGDataLabs
+    gcs_config_version: "1.6" 
+    miResourceId: /subscriptions/bb596f76-3c15-4e59-af1f-7b0b7ff25f4b/resourceGroups/MC_DataLabsidmRG-eastus2euap_idmcanaryecyaks_eastus2euap/providers/Microsoft.ManagedIdentity/userAssignedIdentities/idmcanaryecyaks-agentpool
+
+  partner:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGIdMapping
+    gcs_region: eastus2euap
+    gcs_namespace: ARGIdMapping
+    gcs_config_version: "3.1"
+    miResourceId: /subscriptions/bb596f76-3c15-4e59-af1f-7b0b7ff25f4b/resourceGroups/MC_DataLabsidmRG-eastus2euap_idmcanaryecyaks_eastus2euap/providers/Microsoft.ManagedIdentity/userAssignedIdentities/idmcanaryecyaks-agentpool
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  # metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: ARGDataLabs
+      namespace: ARGDataLabs
+    Partner: 
+      account: ARGIdMapping
+      namespace: ARGIdMapping
+
+  # objectId of idm aks-agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "ARGIdMapping",
+          "objectId": "a6727994-751a-4029-90dc-769f99e3fa94"
+        },
+        {
+          "account": "ARGDataLabs",
+          "objectId": "a6727994-751a-4029-90dc-769f99e3fa94"
+        }
+      ]
+    }
+
+keyVault:
+  name: idmcanaryecykv
+  clientId: ad301e44-f15a-4c86-a526-012f3376d1d3
+
+adminService:
+  isEnabled: true
+  sslSecretProvider:
+    certificateName: idmcanaryecyaks-ssl
+
+adminServiceConfigMap:
+  dstsRealm: realm://dsts.core.windows.net/
+  dstsName: prod-dsts.dsts.core.windows.net
+  serviceDns: prod.datalabs.core.windows.net
+  allowedActors: GenevaActionsPublicPrimary,GenevaActionsPublicSecondary,GenevaActionsPublicWestUs

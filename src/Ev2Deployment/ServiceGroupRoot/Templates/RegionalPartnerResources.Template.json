@@ -1,0 +1,374 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "cloudName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "partnerAcronym": {
+            "type": "string",
+            "maxLength": 4,
+            "metadata": {
+                "description": "short name of the partner"
+            }
+        },
+        "regionAcronym": {
+            "type": "string",
+            "maxLength": 5,
+            "metadata": {
+                "description": "standard acronym for region"
+            }
+        },
+        "adminGroupObjectIds": {
+            "type": "array"
+        },
+        "agentpoolConfig": {
+            "type": "array"
+        },
+        "cachepoolConfig": {
+            "type": "array"
+        },
+        "eventHubNamespaceConfigs": {
+            "type": "array"
+        },
+        "serviceBusConfigs": {
+            "type": "object"
+        },
+        "storageAccountConfigs": {
+            "type": "array"
+        },
+        "availabilityZonesInRegion": {
+            "type": "int"
+        },
+        "enableAdminService": {
+            "type": "string"
+        },
+        "dnsZoneName": {
+            "type": "string"
+        },
+        "cnameSuffix": {
+            "type": "string"
+        },
+        "datalabsSubId": {
+            "type": "string"
+        },
+        "privateAKSClusterTemplateUri": {
+            "type": "string"
+        },
+        "eventHubNamespaceTemplateUri": {
+            "type": "string"
+        },
+        "serviceBusTemplateUri": {
+            "type": "string"
+        },
+        "storageAccountTemplateUri": {
+            "type": "string"
+        },
+        "eventGridConfigs": {
+            "type": "array"
+        },
+        "eventGridTemplateUri": {
+            "type": "string"
+        },
+        "keyvaultTemplateUri": {
+            "type": "string"
+        },
+        "cnameTemplateUri": {
+            "type": "string"
+        },
+        "maintenanceConfigurationsConfigs" : {
+            "type": "object"
+        }
+    },
+    "variables": {
+        "IoConnectorResourceId": "[resourceId(subscription().subscriptionId, format('DataLabs{0}RG',parameters('partnerAcronym')), 'Microsoft.ManagedIdentity/userAssignedIdentities', concat(parameters('partnerAcronym'), parameters('cloudName'), 'ioconnectorid'))]",
+        "metadataSaConfig": {
+            "type": "metadataStorageAccount",
+            "typeAcronym": "md",
+            "createRAForIOConnector": "false",
+            "skuName": "Standard_ZRS",
+            "skuTier": "Standard",
+            "kind": "StorageV2",
+            "count": 1,
+            "useDeleteRetentionPolicy": false,
+            "retentionPolicyPeriod": 30
+        },
+        "partnerAksName": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), 'aks'))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2019-10-01",
+            "name": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), '-private-akscluster-deployment'))]",
+            "type": "Microsoft.Resources/deployments",
+            "comments": "DataLabs|PARTNER|AKS",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('privateAKSClusterTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "name": {
+                        "value": "[variables('partnerAksName')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "dnsPrefix": {
+                        "value": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), 'aks', '-dns'))]"
+                    },
+                    "agentpoolConfig": {
+                        "value": "[parameters('agentpoolConfig')]"
+                    },
+                    "cachepoolConfig": {
+                        "value": "[parameters('cachepoolConfig')]"
+                    },
+                    "adminGroupObjectIds": {
+                        "value": "[parameters('adminGroupObjectIds')]"
+                    },
+                    "maintenanceConfigurationsConfigs": {
+                        "value": "[parameters('maintenanceConfigurationsConfigs')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), parameters('eventHubNamespaceConfigs')[copyIndex()].typeAcronym, '-eventhubnamespace-deployment'))]",
+            "type": "Microsoft.Resources/deployments",
+            "comments": "DataLabs|PARTNER|EventHub",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('eventHubNamespaceTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "eventHubNamespacePrefix": {
+                        "value": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), parameters('eventHubNamespaceConfigs')[copyIndex()].typeAcronym, 'ehns'))]"
+                    },
+                    "eventHubSuffix": {
+                        "value": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), parameters('eventHubNamespaceConfigs')[copyIndex()].typeAcronym, 'eh'))]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "count": {
+                        "value": "[parameters('eventHubNamespaceConfigs')[copyIndex()].count]"
+                    },
+                    "partitionCount": {
+                        "value": "[parameters('eventHubNamespaceConfigs')[copyIndex()].partitionCount]"
+                    },
+                    "SkuTier": {
+                        "value": "[parameters('eventHubNamespaceConfigs')[copyIndex()].skuName]"
+                    },
+                    "IoConnectorResourceId": {
+                        "value": "[variables('IoConnectorResourceId')]"
+                    },
+                    "consumerGroups": {
+                        "value": "[if(contains(parameters('eventHubNamespaceConfigs')[copyIndex()],'consumerGroups'),parameters('eventHubNamespaceConfigs')[copyIndex()].consumerGroups, createArray())]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "eventhubnamespacesiterator",
+                "count": "[length(parameters('eventHubNamespaceConfigs'))]"
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), '-servicebus-deployment-', copyIndex()))]",
+            "type": "Microsoft.Resources/deployments",
+            "comments": "DataLabs|PARTNER|ServiceBus",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('serviceBusTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "serviceBusName": {
+                        "value": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), 'sb', copyIndex()))]"
+                    },
+                    "serviceBusQueueName": {
+                        "value": "[tolower(concat(copyIndex(), parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), 'sbq'))]"
+                    },
+                    "serviceBusInitialCapacity": {
+                        "value": "[parameters('serviceBusConfigs').initialCapacity]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "IoConnectorResourceId": {
+                        "value": "[variables('IoConnectorResourceId')]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "servicebusiterator",
+                "count": "[parameters('serviceBusConfigs').count]"
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), parameters('storageAccountConfigs')[copyIndex()].typeAcronym, '-storageaccount-deployment'))]",
+            "type": "Microsoft.Resources/deployments",
+            "comments": "DataLabs|PARTNER|StorageAccount",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('storageAccountTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "suffix": {
+                        "value": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), parameters('storageAccountConfigs')[copyIndex()].typeAcronym, 'sa'))]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "storageAccountConfigs": {
+                        "value": "[parameters('storageAccountConfigs')[copyIndex()]]"
+                    },
+                    "cloudName": {
+                        "value": "[parameters('cloudName')]"
+                    },
+                    "partnerAcronym": {
+                        "value": "[parameters('partnerAcronym')]"
+                    },
+                    "availabilityZonesInRegion": {
+                        "value": "[parameters('availabilityZonesInRegion')]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "storageaccountsiterator",
+                "count": "[length(parameters('storageAccountConfigs'))]"
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), parameters('eventGridConfigs')[copyIndex()].typeAcronym, '-eventGridConfigs-deployment'))]",
+            "type": "Microsoft.Resources/deployments",
+            "comments": "DataLabs|PARTNER|EventGrid",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('eventGridTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "prefix": {
+                        "value": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), parameters('eventGridConfigs')[copyIndex()].typeAcronym, 'eg'))]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "eventGridConfigs": {
+                        "value": "[parameters('eventGridConfigs')[copyIndex()]]"
+                    },
+                    "cloudName": {
+                        "value": "[parameters('cloudName')]"
+                    },
+                    "partnerAcronym": {
+                        "value": "[parameters('partnerAcronym')]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "eventgriddomaincopy",
+                "count": "[length(parameters('eventGridConfigs'))]"
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), '-metadata-storageaccount-deployment'))]",
+            "type": "Microsoft.Resources/deployments",
+            "comments": "DataLabs|PARTNER|KV-StorageAccount",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('storageAccountTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "suffix": {
+                        "value": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), variables('metadataSaConfig').typeAcronym, 'sa'))]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "storageAccountConfigs": {
+                        "value": "[variables('metadataSaConfig')]"
+                    },
+                    "cloudName": {
+                        "value": "[parameters('cloudName')]"
+                    },
+                    "partnerAcronym": {
+                        "value": "[parameters('partnerAcronym')]"
+                    },
+                    "availabilityZonesInRegion": {
+                        "value": "[parameters('availabilityZonesInRegion')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), '-keyvaultConfigs-deployment'))]",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'),'-metadata-storageaccount-deployment')))]"
+            ],
+            "comments": "DataLabs|PARTNER|KeyVault",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('keyvaultTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), 'kv'))]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "metadataSaName": {
+                        "value": "[tolower(concat('0', parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), variables('metadataSaConfig').typeAcronym, 'sa'))]"
+                    }
+                }
+            }
+        },
+        {
+            "condition": "[equals(parameters('enableAdminService'), 'true')]",
+            "apiVersion": "2019-10-01",
+            "name": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('regionAcronym'), '-cname-deployment'))]",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "datalabsrg",
+            "subscriptionId": "[parameters('datalabsSubId')]",
+            "comments": "DataLabs|PARTNER|CNAME",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('cnameTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "dnsZoneName": {
+                        "value": "[parameters('dnsZoneName')]"
+                    },
+                    "recordName": {
+                        "value": "[variables('partnerAksName')]"
+                    },
+                    "cnameAlias": {
+                        "value": "[tolower(concat(variables('partnerAksName'), '.', parameters('location'), '.', parameters('cnameSuffix')))]"
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Platforms>x64</Platforms>
+		<RootNamespace>Microsoft.Azure.ARMDataInsights.ArmDataCacheService</RootNamespace>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\PartnerCommon\Common.Partner.csproj" />
+	  <ProjectReference Include="..\SkuService\SkuService.Common\SkuService.Common.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Platforms>x64</Platforms>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.WindowsAzure.Arm.Infra.Configuration" />
+		<PackageReference Include="Microsoft.WindowsAzure.ResourceStack.Common.Core" />
+		<!-- Added due to CVE-2023-29331 -->
+		<PackageReference Include="Microsoft.Windows.Compatibility" />
+		<PackageReference Include="Newtonsoft.Json" />
+		<PackageReference Include="System.Data.SqlClient" />
+		<!-- Added due to CVE-2023-29331 -->
+		<PackageReference Include="System.Security.Cryptography.Pkcs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Common\Common.Core.csproj" />
+	  <ProjectReference Include="..\..\..\PartnerCommon\Common.Partner.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="GeoGroupNamesLocalized.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>GeoGroupNamesLocalized.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="GeoGroupNamesLocalized.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>GeoGroupNamesLocalized.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			<_Parameter1>Tests.$(AssemblyName)</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+</Project>

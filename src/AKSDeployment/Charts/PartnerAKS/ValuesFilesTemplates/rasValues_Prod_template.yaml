@@ -1,0 +1,144 @@
+# Values File for Resource Alias in ${cloud} ${region} Environment
+primaryRegionName: ${region}
+backupRegionName: ${backup_region}
+
+solutionInfo:
+  solutionName: &solutionName rassolution
+  aksClusterName: ras${cloud}${region}aks
+  environment: ${uppercase_cloud}
+  region: ${region_longname}
+  scaleUnit: *solutionName
+
+ioService:
+  replicaCount: 5 # override from dataLabServices.yaml
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+#MI of ras partner
+  clientId: ${mi_service_account_clientid}
+  tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+
+ioConfigMap:
+  inputEventHubNameSpaceAndName: "ras${cloud}${region}pipehns0/ras${cloud}${region}pipeh;ras${cloud}${region}pipehns1/ras${cloud}${region}pipeh"
+  eventHubStorageAccountName: "0ras${cloud}${region}ehcpsa"
+  blobStorageAccountNames: "" # No source of truth
+  backupInputEventHubNameSpaceAndName: "ras${cloud}${region}bpipehns0/ras${cloud}${region}bpipeh/00:05:00;ras${cloud}${region}bpipehns1/ras${cloud}${region}bpipeh/00:05:00"
+  backupBlobStorageAccountNames: ""
+  serviceBusNameSpaceAndName: "ras${cloud}${region}sb0/0ras${cloud}${region}sbq;ras${cloud}${region}sb1/1ras${cloud}${region}sbq"
+  outputDataset: "rassolution"
+  useSourceOfTruth: "false"
+  allowedOutputTypes: "microsoft.maintenance/scheduledevents;microsoft.aliases/namespaces/types/identifiers/values"
+  arnPublishStorageAccountNames: "0ras${cloud}${region}arnpsa;1ras${cloud}${region}arnpsa;2ras${cloud}${region}arnpsa;3ras${cloud}${region}arnpsa;4ras${cloud}${region}arnpsa;5ras${cloud}${region}arnpsa"
+  arnPublishEventGridDomainIds: "/subscriptions/${subscription}/resourceGroups/DataLabsrasRG-${region_longname}/providers/Microsoft.EventGrid/domains/ras${cloud}${region}apeg1;/subscriptions/${subscription}/resourceGroups/DataLabsrasRG-${region_longname}/providers/Microsoft.EventGrid/domains/ras${cloud}${region}apeg2"
+  arnPublishEventGridDomainEndpoints: "https://ras${cloud}${region}apeg1.${region_longname}-1.eventgrid.azure.net/api/events;https://ras${cloud}${region}apeg2.${region_longname}-1.eventgrid.azure.net/api/events"
+  arnPublishEventGridTopics: "/subscriptions/${subscription}/resourceGroups/DataLabsrasRG-${region_longname}/providers/Microsoft.EventGrid/domains/ras${cloud}${region}apeg1/topics/arnpublishtopic;/subscriptions/${subscription}/resourceGroups/DataLabsrasRG-${region_longname}/providers/Microsoft.EventGrid/domains/ras${cloud}${region}apeg2/topics/arnpublishtopic"
+  pairedRegionArnPublishEventGridDomainIds: "/subscriptions/${subscription}/resourceGroups/DataLabsrasRG-${backup_region_longname}/providers/Microsoft.EventGrid/domains/ras${cloud}${backup_region}apeg1;/subscriptions/${subscription}/resourceGroups/DataLabsrasRG-${backup_region_longname}/providers/Microsoft.EventGrid/domains/ras${cloud}${backup_region}apeg2"
+  pairedRegionArnPublishEventGridDomainEndpoints: "https://ras${cloud}${backup_region}apeg1.${backup_region_longname}-1.eventgrid.azure.net/api/events;https://ras${cloud}${backup_region}apeg2.${backup_region_longname}-1.eventgrid.azure.net/api/events"
+  pairedRegionArnPublishEventGridTopics: "/subscriptions/${subscription}/resourceGroups/DataLabsrasRG-${backup_region_longname}/providers/Microsoft.EventGrid/domains/ras${cloud}${backup_region}apeg1/topics/arnpublishtopic;/subscriptions/${subscription}/resourceGroups/DataLabsrasRG-${backup_region_longname}/providers/Microsoft.EventGrid/domains/ras${cloud}${backup_region}apeg2/topics/arnpublishtopic"
+
+partnerConfig:
+  pods:
+  - name: ras-solution
+    serviceName: ras-solution-service
+    replicaCount: 5
+    partnerConfigMap:
+      name: ras-solution-config    
+    containers:
+     - name: raspartnersolution
+       repository: datalabsprodacr.azurecr.io/raspartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" : "*"
+                      }
+
+resourceProxyServiceAccount: 
+# MI of ras partner
+  clientId: ${mi_service_account_clientid}
+  tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+
+resourceProxyConfigMap:
+  getIdMappingAllowedTypes:
+    "*:qfd|2016-09-01"
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://rf${cloud}${region}aks.ras.${cloud}.${region}aks:6072
+  partnerCertificates:
+    isEnabled: true
+    tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+    aadAuthority: https://login.microsoftonline.com
+    aadTokenIssuer: https://sts.windows.net/33e01921-4d64-4f8c-a055-5bdaffd5e33d/
+    qfdClient:
+      endpoints: https://arg-prod-rp.arg.core.windows.net
+      certificateName: <TODO>
+      dstsSkipServerCertificateValidation: false
+      dstsClientId: <TODO DSTS_CLIENT_ID>
+      dstsServerId: bce8590f-51bd-4560-b478-9cfb5aab0500
+      dstsClientHome: <TODO>
+      dstsServerHome: "https://prod-passive-dsts.dsts.core.windows.net/dstsv2/7a433bfc-2514-4697-b467-e0933190487f"
+      dstsServerRealm: "realm://dsts.core.windows.net/7a433bfc-2514-4697-b467-e0933190487f/"
+    
+# Monitoring Information
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: true
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGDataLabs
+    gcs_region: ${region_longname}
+    gcs_namespace: ARGDataLabs
+    gcs_config_version: "1.6"
+    miResourceId: ${aks_id}
+  partner:
+    gcs_environment: DiagnosticsProd
+    gcs_account: AliasDatalabsSlnProd
+    gcs_region: ${region_longname}
+    gcs_namespace: AliasDatalabsSlnProd
+    gcs_config_version: "1.1"
+    miResourceId: ${aks_id}
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  # metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: ARGDataLabs
+      namespace: ARGDataLabs
+    Partner: 
+      account: AliasDatalabsSlnProd
+      namespace: AliasDatalabsSlnProd
+
+  # objectId of idm aks-agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "ARGDataLabs",
+          "objectId": "${aks_objectid}"
+        },
+        {
+          "account": "AliasDatalabsSlnProd", 
+          "objectId": "${aks_objectid}"
+        }
+      ]
+    }
+
+    
+keyVault:
+  name: rasprodsdckv
+  clientId: # TODO: Add logic to add kv clientId
+
+adminService:
+  isEnabled: true
+  sslSecretProvider:
+    certificateName: rasprodsdcaks-ssl
+
+adminServiceConfigMap:
+  dstsRealm: realm://dsts.core.windows.net/
+  dstsName: prod-dsts.dsts.core.windows.net
+  serviceDns: prod.datalabs.core.windows.net
+  allowedActors: GenevaActionsPublicPrimary,GenevaActionsPublicSecondary,GenevaActionsPublicWestUs

@@ -1,0 +1,10 @@
+# Usage: 
+# set RESOURCE_GROUP "DataLabsidmRG-westus3"
+# set AKS_NAME "idmprodwu3aks"
+# Invoke-AzAksRunCommand -ResourceGroupName ${RESOURCE_GROUP} -Name ${AKS_NAME} -Force -Command "kubectl patch configmap solution-io-config -n solution-namespace --type merge --patch-file IncreaseBatching.yaml" -CommandContextAttachment "IncreaseBatching.yaml" 
+
+data:
+  OutputChannelNumBufferQueue: "5"
+  OutputChannelBufferDelay: "100"
+  BlobPayloadRoutingChannelNumBufferQueue: "8"
+  BlobPayloadRoutingChannelBufferDelay: "100"

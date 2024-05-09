@@ -1,0 +1,28 @@
+partnerConfig:    
+  pods:
+  - name: pol-cap-solution
+    serviceName: pol-cap-solution-service 
+    replicaCount: 3
+    partnerConfigMap:
+      name: pol-cap-solution-config
+    containers:
+     - name: polpartnersolution
+       repository: datalabsintacr.azurecr.io/polpartnersolution
+       tag: latest
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" :  "*" 
+                      }
+
+ioImage:
+  tag: latest
+
+resourceProxyImage:
+  tag: latest
+
+socat:
+  tag: latest
+
+cacheImage:
+  tag: latest

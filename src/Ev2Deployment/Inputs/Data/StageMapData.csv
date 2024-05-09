@@ -1,0 +1,10 @@
+Version,StageEnvironment,StageCloud,Sequence,StageName,Region,Stamps
+1.0.0.6,Test,Int,1,Test_Int_eastus,eastus,1:2:4:5
+1.0.0.6,Test,Int,2,Test_Int_eastus2,eastus2,3
+1.0.0.5,Prod,Production,1,Prod_Canary,eastus2euap,1-2-3
+1.0.0.5,Prod,Production,2,Prod_Region1,westus3,1-2-3-4-5
+1.0.0.5,Prod,Production,3,Prod_Region2,northeurope,1-2-3-4-5
+1.0.0.5,Prod,Production,4,Prod_Region3,southeastasia,2-3-4-5
+1.0.0.5,Prod,Production,5,Prod_Region4,eastus,1-2-3-4-5
+1.0.0.5,Prod,Production,6,Prod_Region5,swedencentral,1-2-3-4-5
+1.0.0.5,Prod,Production,7,Prod_Region6,eastasia,2-3-4-5

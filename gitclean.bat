@@ -1,0 +1,1 @@
+git clean -xdf -e *.vsidx -e read.lock -e Browse.VC*

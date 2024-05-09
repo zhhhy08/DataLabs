@@ -1,0 +1,14 @@
+{{- if .Values.resourceProxyService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.resourceProxyService.adminPortServiceName }}
+  namespace: {{ .Values.solutionNameSpace }}
+spec:
+  selector:
+    app: {{ .Values.resourceProxyService.name }}
+  ports:
+  - name: adminservice
+    port: {{ .Values.adminService.adminPort }}
+    protocol: TCP
+{{- end }}

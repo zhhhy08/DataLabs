@@ -1,0 +1,81 @@
+{{- range $pk, $pv := $.Values.partnerConfig.pods }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $pv.partnerConfigMap.name }}
+  namespace: {{ $.Values.partnerNameSpace }}
+data:
+  LOGGER_MIN_LOG_LEVEL: {{ $pv.partnerConfigMap.minLogLevel | default $.Values.partnerConfigMap.minLogLevel | default "Information" | quote }}
+  EnableGrpcTrace: {{ $pv.partnerConfigMap.enableGrpcTrace | default $.Values.partnerConfigMap.enableGrpcTrace | default false | quote }}
+  EnableHttpClientTrace: {{ $pv.partnerConfigMap.enableHttpClientTrace | default $.Values.partnerConfigMap.enableHttpClientTrace | default false | quote }}
+  EnableAzureSDKActivity: {{ $pv.partnerConfigMap.enableAzureSDKActivity | default $.Values.partnerConfigMap.enableAzureSDKActivity | default false | quote }}
+  IncludeRunTimeMetrics: {{ $pv.partnerConfigMap.includeRunTimeMetrics | default $.Values.partnerConfigMap.includeRunTimeMetrics | default true | quote }}
+  IncludeHttpClientMetrics: {{ $pv.partnerConfigMap.includeHttpClientMetrics | default $.Values.partnerConfigMap.includeHttpClientMetrics | default false | quote }}
+  
+  # Proxy Client Related  
+  ResourceProxyAddr: "dns://{{ $.Values.resourceProxyService.serviceName }}.{{ $.Values.solutionNameSpace }}.svc.cluster.local:{{ $.Values.resourceProxyService.port }}"
+  ResourceProxyHostPort: {{ $.Values.resourceProxyService.port | default 5073 | quote }}
+  ResourceProxyGrpcOption: {{ $pv.partnerConfigMap.resourceProxyGrpcOption | default $.Values.partnerConfigMap.resourceProxyGrpcOption | quote }}
+  ResourceProxyCallMaxTimeOutInSec: {{ $pv.partnerConfigMap.resourceProxyCallMaxTimeOutInSec | default $.Values.partnerConfigMap.resourceProxyCallMaxTimeOutInSec | default "20/60" | quote }}
+
+  # Region
+  PrimaryRegionName: {{ $.Values.primaryRegionName | quote }}
+  BackupRegionName: {{ $.Values.backupRegionName | quote }}
+
+  {{- if $.Values.dedicatedPartnerAKS }}
+  # Allowed Types
+  GetResourceAllowedTypes: {{ $.Values.resourceProxyConfigMap.getResourceAllowedTypes | default "" | quote }}
+  CallARMGenericRequestAllowedTypes: {{ $.Values.resourceProxyConfigMap.callARMGenericRequestAllowedTypes | default "" | quote }}
+  GetCollectionAllowedTypes: {{ $.Values.resourceProxyConfigMap.getCollectionAllowedTypes | default "" | quote }}
+  GetManifestConfigAllowedTypes: {{ $.Values.resourceProxyConfigMap.getManifestConfigAllowedTypes | default "" | quote }}
+  GetConfigSpecsAllowedTypes: {{ $.Values.resourceProxyConfigMap.getConfigSpecsAllowedTypes | default "" | quote }}
+  GetCasResponseAllowedTypes: {{ $.Values.resourceProxyConfigMap.getCasResponseAllowedTypes | default "" | quote }}
+  GetIdMappingAllowedTypes: {{ $.Values.resourceProxyConfigMap.getIdMappingAllowedTypes | default "" | quote }}
+  # Cache Lookup Control
+  UseSourceOfTruth: {{ $.Values.ioConfigMap.useSourceOfTruth | default true | quote }}
+  UseCacheLookupInProxyClient: {{ $pv.partnerConfigMap.useCacheLookupInProxyClient | default $.Values.partnerConfigMap.useCacheLookupInProxyClient | default true | quote }}
+  UseOutputCacheForRetry: {{ $.Values.resourceProxyConfigMap.useOutputCacheForRetry | default false | quote }}
+  UseInputCacheForRetry: {{ $.Values.resourceProxyConfigMap.useInputCacheForRetry | default true | quote }}
+
+  {{- if $.Values.cacheService.enabled }}
+  CachePoolDomain: "{{ $.Values.cacheNameSpace }}.svc.cluster.local"
+  CachePoolDenyList: {{ $.Values.cacheService.cachePoolDenyList | default "" | quote }}
+
+  # IO Cache Related
+  UseHashForResourceCacheKey: {{ $.Values.ioConfigMap.useHashForResourceCacheKey | default true | quote }}
+  ResourceCacheReadQuorum: {{ $.Values.ioConfigMap.resourceCacheReadQuorum | default 1 | quote }}
+
+  # Cache TTL Related
+  DefaultOutputCacheTTL: {{ $.Values.ioConfigMap.defaultOutputCacheTTL | default "2.00:00:00" | quote }}
+  DefaultInputCacheTTL: {{ $.Values.ioConfigMap.defaultInputCacheTTL | default "2.00:00:00" | quote }}
+  DefaultNotFoundEntryCacheTTL: {{ $.Values.ioConfigMap.defaultNotFoundEntryCacheTTL | default "01:00:00" | quote }}
+  ResourceTypeCacheTTLMappings: {{ $.Values.ioConfigMap.resourceTypeCacheTTLMappings | default "" | quote }}
+
+  {{- $numCachePool := len $.Values.cacheService.cachePools }}
+  CacheNumPools: {{ $numCachePool | quote }}
+
+  {{- range $cacheIndex, $cachePool := $.Values.cacheService.cachePools }}
+  CachePool-{{ $cacheIndex }}: {{ include "cachepool_config" $cachePool | trim | quote }}
+  CachePoolNodeReplicationMapping-{{ $cacheIndex }}: {{ $cachePool.nodeReplicationMapping | default "" | quote }}
+  CachePoolConnectionsOption-{{ $cacheIndex }}: {{ $cachePool.connectionsOption | default $.Values.cacheService.connectionsOption | default "" | quote }}
+  {{- end }} # end of range $cacheIndex, $cachePool := .Values.cacheService.cachePools
+  {{- end }} # if .Values.cacheService.enabled
+  {{- end }} # if $.Values.dedicatedPartnerAKS
+
+  {{- if $.Values.partnerCacheService.enabled }}
+  PARTNER_CachePoolDomain: "{{ $.Values.cacheNameSpace }}.svc.cluster.local"
+  PARTNER_CacheMGetMaxBatchSize: {{ $.Values.partnerConfigMap.partnerCacheMGetMaxBatchSize | default 500 | quote }}
+
+  {{- $partnerNumCachePool := len $.Values.partnerCacheService.cachePools }}
+  PARTNER_CacheNumPools: {{ $partnerNumCachePool | quote }}
+
+  {{- range $partnerCacheIndex, $partnerCachePool := $.Values.partnerCacheService.cachePools }}
+  PARTNER_CachePool-{{ $partnerCacheIndex }}: {{ include "cachepool_config" $partnerCachePool | trim | quote }}
+  PARTNER_CachePoolNodeReplicationMapping-{{ $partnerCacheIndex }}: {{ $partnerCachePool.nodeReplicationMapping | default "" | quote }}
+  PARTNER_CachePoolConnectionsOption-{{ $partnerCacheIndex }}: {{ $partnerCachePool.connectionsOption | default $.Values.partnerCacheService.connectionsOption | default "" | quote }}
+  {{- end }} # end of range $partnerCacheIndex, $partnerCachePool := .Values.partnerCacheService.cachePools
+  {{- end }} # if .Values.partnerCacheService.enabled
+
+  CustomConfig: {{ $pv.partnerConfigMap.customConfig | quote }}
+{{- end }} # range $pk, $pv := $.Values.partnerConfig.pods

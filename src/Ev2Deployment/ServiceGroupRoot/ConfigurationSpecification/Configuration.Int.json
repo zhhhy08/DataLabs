@@ -1,0 +1,695 @@
+{
+    "settings": {
+        "cloudName": "int",
+        "cloudTenant": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+        "countOfResourceFetcher": 1,
+        "countOfPartner": 5,
+        "adminGroupObjectIds": [
+            "c70a0001-4c4a-47b9-ae9b-358b11e9f43e"
+        ],
+        "subscriptionResourceDeployRegions": [
+            "eastus"
+        ],
+        "dnsZone": {
+            "name": "int.datalabs.core.windows.net",
+            "cnameSuffix": "cloudapp.azure.com",
+            "deployDnsZone": "true"
+        },
+        "datalabs": {
+            "subscriptionResources": {
+                "managedIdentityPrefixList": [
+                    "ev2"
+                ],
+            "containerRegistryRegions": [],
+                "deployRFAADApp": "false",
+                "publisherDomain": "microsoft.onmicrosoft.com"
+            }
+        },
+        "resourceFetcher": {
+            "valuesFilename": "values_Int.yaml",
+            "enableAdminService": "true",
+            "agentpool": [
+                {
+                    "name": "agentpool2",
+                    "vmSize": "Standard_F16s_v2",
+                    "minCountOfVm": 3,
+                    "maxCountOfVm": 10
+                }
+            ],
+        "cachepool" : [],
+            "subscriptionResources": {
+                "managedIdentityPrefixList": [
+                    ""
+                ]
+            }
+        },
+        "maintenanceConfigurations": {
+            "maintenanceWindow": {
+                "schedule": {
+                    "absoluteMonthly": {
+                        "intervalMonths": 1,
+                        "dayOfMonth": 1
+                    }
+                },
+                "durationHours": 24,
+                "utcOffset": "-05:00",
+                "startTime": "09:00",
+                "startDate": "2024-04-01"
+            },
+            "nodeOSUpgradePolicy": {
+                "schedule": {
+                    "absoluteMonthly": {
+                        "intervalMonths": 1,
+                        "dayOfMonth": 1
+                    }
+                },
+                "durationHours": 24,
+                "utcOffset": "-05:00",
+                "startTime": "09:00",
+                "startDate": "2024-04-01"
+            }
+        },
+        "stamp_1": {
+            "partner": {
+                "partnerName": "Azure Business Continuity",
+                "partnerAcronym": "abc",
+                "valuesFilename": "bcdrValues_Int.yaml",
+                "enableAdminService": "false",
+                "storageAccount": [
+                    {
+                        "type": "sourceOfTruthStorageAccount",
+                        "typeAcronym": "sot",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_GZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 2
+                    },
+                    {
+                        "type": "outputEventHubRetryStorageAccount",
+                        "typeAcronym": "oehr",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 2
+                    },
+                    {
+                        "type": "eventHubCheckpointStorageAccount",
+                        "typeAcronym": "ehcp",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": false,
+                        "retentionPolicyPeriod": 30,
+                        "count": 1
+                    },
+                    {
+                        "type": "arnPublishStorageAccount",
+                        "typeAcronym": "arnp",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 2
+                    }
+                ],
+                "eventHubNamespace": [
+                    {
+                        "type": "inputEventHubNamespace",
+                        "skuName": "Standard",
+                        "typeAcronym": "ip",
+                        "count": 1,
+                        "partitionCount": 32
+                    },
+                    {
+                        "type": "inputEventHubNamespacePremium",
+                        "skuName": "Premium",
+                        "typeAcronym": "premip",
+                        "count": 1,
+                        "partitionCount": 60
+                    },
+                    {
+                        "type": "backupInputEventHubNamespace",
+                        "skuName": "Premium",
+                        "typeAcronym": "bip",
+                        "count": 1,
+                        "partitionCount": 60,
+                        "consumerGroups": [
+                            "$Default",
+                            "secondary"
+                        ]
+                    },
+                    {
+                        "type": "outputEventHubNamespace",
+                        "skuName": "Standard",
+                        "typeAcronym": "op",
+                        "count": 1,
+                        "partitionCount": 32
+                    }
+                ],
+                "agentpool": [
+                    {
+                        "name": "agentpool2",
+                        "vmSize": "Standard_F16s_v2",
+                        "minCountOfVm": 3,
+                        "maxCountOfVm": 10,
+                        "azones": [
+                            "1",
+                            "2"
+                        ],
+                        "osDiskSizeGB": 128,
+                        "maxPods": 100
+                    }
+                ],
+                "cachepool" : [
+                    {
+                        "name": "cachepool1",
+                        "vmSize": "Standard_F16s_v2",
+                        "minCountOfVm": 1,
+                        "maxCountOfVm": 2,
+                        "mode": "User",
+                    "azones": [ "1" ]
+                    },
+                    {
+                        "name": "cachepool2",
+                        "vmSize": "Standard_F16s_v2",
+                        "minCountOfVm": 1,
+                        "maxCountOfVm": 2,
+                        "mode": "User",
+                    "azones": [ "2" ]
+                    },
+                    {
+                        "name": "cachepool3",
+                        "vmSize": "Standard_F16s_v2",
+                        "minCountOfVm": 1,
+                        "maxCountOfVm": 2,
+                        "mode": "User",
+                    "azones": [ "3" ]
+                    }
+                ],
+                "serviceBus": {
+                    "count": 1,
+                    "initialCapacity": 1
+                },
+                "eventGrid": [
+                    {
+                        "type": "ArnPublishEventGrid",
+                        "typeAcronym": "ap",
+                        "topicName": "arnpublishtopic",
+                        "count": 1
+                    }
+                ],
+                "subscriptionResources": {
+                    "managedIdentityPrefixList": [
+                        "ioconnector",
+                        "testing"
+                    ]
+                }
+            }
+        },
+        "stamp_2": {
+            "partner": {
+                "partnerName": "IdMapping",
+                "partnerAcronym": "idm",
+                "valuesFilename": "idMappingValues_Int.yaml",
+                "enableAdminService": "true",
+                "storageAccount": [
+                    {
+                        "type": "sourceOfTruthStorageAccount",
+                        "typeAcronym": "sot",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_GZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 0
+                    },
+                    {
+                        "type": "outputEventHubRetryStorageAccount",
+                        "typeAcronym": "oehr",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 2
+                    },
+                    {
+                        "type": "eventHubCheckpointStorageAccount",
+                        "typeAcronym": "ehcp",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": false,
+                        "retentionPolicyPeriod": 30,
+                        "count": 1
+                    },
+                    {
+                        "type": "arnPublishStorageAccount",
+                        "typeAcronym": "arnp",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 2
+                    }
+                ],
+                "eventHubNamespace": [
+                    {
+                        "type": "inputEventHubNamespace",
+                        "skuName": "Standard",
+                        "typeAcronym": "ip",
+                        "count": 1,
+                        "partitionCount": 32
+                    },
+                    {
+                        "type": "inputEventHubNamespacePremium",
+                        "skuName": "Premium",
+                        "typeAcronym": "premip",
+                        "count": 1,
+                        "partitionCount": 60
+                    },
+                    {
+                        "type": "backupInputEventHubNamespace",
+                        "skuName": "Premium",
+                        "typeAcronym": "bip",
+                        "count": 1,
+                        "partitionCount": 60,
+                        "consumerGroups": [
+                            "$Default",
+                            "secondary"
+                        ]
+                    },
+                    {
+                        "type": "outputEventHubNamespace",
+                        "skuName": "Standard",
+                        "typeAcronym": "op",
+                        "count": 1,
+                        "partitionCount": 32
+                    }
+                ],
+                "agentpool": [
+                    {
+                        "name": "agentpool2",
+                        "vmSize": "Standard_F16s_v2",
+                        "minCountOfVm": 3,
+                        "maxCountOfVm": 10
+                    }
+                ],
+            "cachepool" : [],
+                "serviceBus": {
+                    "count": 1,
+                    "initialCapacity": 1
+                },
+                "eventGrid": [
+                    {
+                        "type": "ArnPublishEventGrid",
+                        "typeAcronym": "ap",
+                        "topicName": "arnpublishtopic",
+                        "count": 1
+                    }
+                ],
+                "subscriptionResources": {
+                    "managedIdentityPrefixList": [
+                        "ioconnector"
+                    ]
+                }
+            }
+        },
+        "stamp_3": {
+            "partner": {
+                "partnerName": "Azure Policy",
+                "partnerAcronym": "cap",
+                "valuesFilename": "capabilitiesValues_Int.yaml",
+                "enableAdminService": "false",
+                "storageAccount": [
+                    {
+                        "type": "sourceOfTruthStorageAccount",
+                        "typeAcronym": "sot",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_GZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 2
+                    },
+                    {
+                        "type": "outputEventHubRetryStorageAccount",
+                        "typeAcronym": "oehr",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 2
+                    },
+                    {
+                        "type": "eventHubCheckpointStorageAccount",
+                        "typeAcronym": "ehcp",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": false,
+                        "retentionPolicyPeriod": 30,
+                        "count": 1
+                    },
+                    {
+                        "type": "arnPublishStorageAccount",
+                        "typeAcronym": "arnp",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 2
+                    }
+                ],
+                "eventHubNamespace": [
+                    {
+                        "type": "inputEventHubNamespacePremium",
+                        "skuName": "Premium",
+                        "typeAcronym": "premip",
+                        "count": 1,
+                        "partitionCount": 60
+                    },
+                    {
+                        "type": "backupInputEventHubNamespace",
+                        "skuName": "Premium",
+                        "typeAcronym": "bip",
+                        "count": 1,
+                        "partitionCount": 60,
+                        "consumerGroups": [
+                            "$Default",
+                            "secondary"
+                        ]
+                    },
+                    {
+                        "type": "outputEventHubNamespace",
+                        "skuName": "Standard",
+                        "typeAcronym": "op",
+                        "count": 1,
+                        "partitionCount": 32
+                    }
+                ],
+                "agentpool": [
+                    {
+                        "name": "agentpool",
+                        "vmSize": "Standard_F16s_v2",
+                        "minCountOfVm": 5,
+                        "maxCountOfVm": 10
+                    }
+                ],
+            "cachepool" : [],
+                "serviceBus": {
+                    "count": 1,
+                    "initialCapacity": 1
+                },
+                "eventGrid": [
+                    {
+                        "type": "ArnPublishEventGrid",
+                        "typeAcronym": "ap",
+                        "topicName": "arnpublishtopic",
+                        "count": 1
+                    }
+                ],
+                "subscriptionResources": {
+                    "managedIdentityPrefixList": [
+                        "ioconnector"
+                    ]
+                }
+            }
+        },
+        "stamp_4": {
+            "partner": {
+                "partnerName": "ResourceAlias",
+                "partnerAcronym": "ras",
+                "valuesFilename": "rasValues_Int.yaml",
+                "enableAdminService": "false",
+                "storageAccount": [
+                    {
+                        "type": "sourceOfTruthStorageAccount",
+                        "typeAcronym": "sot",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_GZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 0
+                    },
+                    {
+                        "type": "outputEventHubRetryStorageAccount",
+                        "typeAcronym": "oehr",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 0
+                    },
+                    {
+                        "type": "eventHubCheckpointStorageAccount",
+                        "typeAcronym": "ehcp",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": false,
+                        "retentionPolicyPeriod": 30,
+                        "count": 1
+                    },
+                    {
+                        "type": "arnPublishStorageAccount",
+                        "typeAcronym": "arnp",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 2
+                    }
+                ],
+                "eventHubNamespace": [
+                    {
+                        "type": "inputEventHubNamespacePremium",
+                        "skuName": "Premium",
+                        "typeAcronym": "premip",
+                        "count": 1,
+                        "partitionCount": 60
+                    },
+                    {
+                        "type": "backupInputEventHubNamespace",
+                        "skuName": "Premium",
+                        "typeAcronym": "bip",
+                        "count": 1,
+                        "partitionCount": 60,
+                        "consumerGroups": [
+                            "$Default",
+                            "secondary"
+                        ]
+                    },
+                    {
+                        "type": "outputEventHubNamespace",
+                        "skuName": "Standard",
+                        "typeAcronym": "op",
+                        "count": 0,
+                        "partitionCount": 32
+                    }
+                ],
+                "agentpool": [
+                    {
+                        "name": "agentpool",
+                        "vmSize": "Standard_F16s_v2",
+                        "minCountOfVm": 3,
+                        "maxCountOfVm": 3,
+                        "osDiskSizeGB": 128,
+                        "maxPods": 100
+                    }
+                ],
+            "cachepool" : [],
+                "serviceBus": {
+                    "count": 1,
+                    "initialCapacity": 1
+                },
+                "eventGrid": [
+                    {
+                        "type": "ArnPublishEventGrid",
+                        "typeAcronym": "ap",
+                        "topicName": "arnpublishtopic",
+                        "count": 1
+                    }
+                ],
+                "subscriptionResources": {
+                    "managedIdentityPrefixList": [
+                        "ioconnector"
+                    ]
+                }
+            }
+        },
+        "stamp_5": {
+            "partner": {
+                "partnerName": "Azores",
+                "partnerAcronym": "azr",
+                "valuesFilename": "azoresValues_Int.yaml",
+                "enableAdminService": "false",
+                "storageAccount": [
+                    {
+                        "type": "sourceOfTruthStorageAccount",
+                        "typeAcronym": "sot",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_GZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 0
+                    },
+                    {
+                        "type": "outputEventHubRetryStorageAccount",
+                        "typeAcronym": "oehr",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 0
+                    },
+                    {
+                        "type": "eventHubCheckpointStorageAccount",
+                        "typeAcronym": "ehcp",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": false,
+                        "retentionPolicyPeriod": 30,
+                        "count": 1
+                    },
+                    {
+                        "type": "arnPublishStorageAccount",
+                        "typeAcronym": "arnp",
+                        "createRAForIOConnector": "false",
+                        "skuName": "Standard_ZRS",
+                        "skuTier": "Standard",
+                        "kind": "StorageV2",
+                        "useDeleteRetentionPolicy": true,
+                        "retentionPolicyPeriod": 30,
+                        "count": 2
+                    }
+                ],
+                "eventHubNamespace": [
+                    {
+                        "type": "inputEventHubNamespace",
+                        "skuName": "Standard",
+                        "typeAcronym": "ip",
+                        "count": 1,
+                        "partitionCount": 32
+                    },
+                    {
+                        "type": "inputEventHubNamespacePremium",
+                        "skuName": "Premium",
+                        "typeAcronym": "premip",
+                        "count": 1,
+                        "partitionCount": 60
+                    },
+                    {
+                        "type": "backupInputEventHubNamespace",
+                        "skuName": "Premium",
+                        "typeAcronym": "bip",
+                        "count": 1,
+                        "partitionCount": 60,
+                        "consumerGroups": [
+                            "$Default",
+                            "secondary"
+                        ]
+                    },
+                    {
+                        "type": "outputEventHubNamespace",
+                        "skuName": "Standard",
+                        "typeAcronym": "op",
+                        "count": 0,
+                        "partitionCount": 32
+                    }
+                ],
+                "agentpool": [
+                    {
+                        "name": "agentpool",
+                        "vmSize": "Standard_F16s_v2",
+                        "minCountOfVm": 3,
+                        "maxCountOfVm": 10
+                    }
+                ],
+                "cachepool" : [
+                    {
+                        "name": "cachepool",
+                        "vmSize": "Standard_F16s_v2",
+                        "minCountOfVm": 3,
+                        "maxCountOfVm": 10,
+                        "mode": "User"
+                    }
+                ],
+                "serviceBus": {
+                    "count": 1,
+                    "initialCapacity": 1
+                },
+                "eventGrid": [
+                    {
+                        "type": "ArnPublishEventGrid",
+                        "typeAcronym": "ap",
+                        "topicName": "arnpublishtopic",
+                        "count": 1
+                    }
+                ],
+                "subscriptionResources": {
+                    "managedIdentityPrefixList": [
+                        "ioconnector",
+                        "testing"
+                    ]
+                }
+            }
+        }
+    },
+    "geographies": [
+        {
+            "name": "United States",
+            "regions": [
+                {
+                    "name": "eastus",
+                    "settings": {
+                        "regionAcronym": "eus",
+                        "pairedRegionAcronym": "",
+                        "pairedRegionLocation": ""
+                    }
+                },
+                {
+                    "name": "eastus2",
+                    "settings": {
+                        "regionAcronym": "eu2",
+                        "pairedRegionAcronym": "",
+                        "pairedRegionLocation": ""
+                    }
+                }
+            ]
+        }
+    ]
+}

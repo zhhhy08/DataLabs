@@ -1,0 +1,131 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Use IntelliSense to find out which attributes exist for C# debugging
+      // Use hover for the description of the existing attributes
+      // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md.
+      "name": "SamplePartnerSolutionService Debug",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build SamplePartnerSolutionService",
+      // If you have changed target frameworks, make sure to update the program path.
+      "program": "${workspaceFolder}/out/Debug-x64/SamplePartnerSolutionService/SamplePartnerSolutionService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/out/Debug-x64/SamplePartnerSolutionService",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      // Use IntelliSense to find out which attributes exist for C# debugging
+      // Use hover for the description of the existing attributes
+      // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md.
+      "name": "AzoresPartnerSolutionService Debug",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build AzoresPartnerSolutionService",
+      // If you have changed target frameworks, make sure to update the program path.
+      "program": "${workspaceFolder}/out/Debug-x64/AzoresPartnerSolutionService/AzoresPartnerSolutionService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/out/Debug-x64/AzoresPartnerSolutionService",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": "InputOutputService Debug",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build InputOutputService",
+      // If you have changed target frameworks, make sure to update the program path.
+      "program": "${workspaceFolder}/out/Debug-x64/InputOutputService/InputOutputService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/out/Debug-x64/InputOutputService",
+      "stopAtEntry": false,
+      "launchSettingsProfile": "InputOutputService",
+      "launchSettingsFilePath": "${workspaceFolder}/src/DataLabs/InputOutputService/Properties/launchSettings.json"
+    },
+    {
+      "name": "ResourceFetcherProxyService Debug",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build ResourceFetcherProxyService",
+      // If you have changed target frameworks, make sure to update the program path.
+      "program": "${workspaceFolder}/out/Debug-x64/ResourceFetcherProxyService/ResourceFetcherProxyService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/out/Debug-x64/ResourceFetcherProxyService",
+      "stopAtEntry": false,
+      "launchSettingsProfile": "ResourceFetcherProxyService",
+      "launchSettingsFilePath": "${workspaceFolder}/src/DataLabs/ResourceFetcherProxyService/Properties/launchSettings.json"
+    },
+    {
+      "name": "ResourceFetcherService Debug",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build ResourceFetcherService",
+      // If you have changed target frameworks, make sure to update the program path.
+      "program": "${workspaceFolder}/out/Debug-x64/ResourceFetcherService/ResourceFetcherService.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/out/Debug-x64/ResourceFetcherService",
+      "stopAtEntry": false,
+      "launchSettingsProfile": "ResourceFetcherService",
+      "launchSettingsFilePath": "${workspaceFolder}/src/DataLabs/ResourceFetcherService/Properties/launchSettings.json"
+    },
+    {
+      "name": "ResourceFetcherTester Debug",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build ResourceFetcherTester",
+      // If you have changed target frameworks, make sure to update the program path.
+      "program": "${workspaceFolder}/out/Debug-x64/ResourceFetcherTester/ResourceFetcherTester.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/out/Debug-x64/ResourceFetcherTester",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": "GarnetServer Debug",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build GarnetServer",
+      // If you have changed target frameworks, make sure to update the program path.
+      "program": "${workspaceFolder}/out/Debug-x64/GarnetServer/GarnetServer.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/out/Debug-x64/GarnetServer",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": ".NET Core Attach",
+      "type": "coreclr",
+      "request": "attach"
+    },
+    {
+      "type": "PowerShell",
+      "request": "launch",
+      "name": "PowerShell Launch (current file)",
+      "script": "${file}",
+      "args": []
+    },
+    {
+      "type": "PowerShell",
+      "request": "attach",
+      "name": "PowerShell Attach to Host Process",
+      "processId": "${command.PickPSHostProcess}",
+      "runspaceId": 1
+    },
+    {
+      "type": "PowerShell",
+      "request": "launch",
+      "name": "PowerShell Interactive Session",
+      "cwd": "${workspaceRoot}"
+    }
+  ]
+}

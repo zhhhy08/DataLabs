@@ -1,0 +1,24 @@
+{
+  "Debug_DoNotUseMeters": "true",
+
+  "SolutionName": "capsolution",
+  "PrimaryRegionName": "testprimary",
+  "BackupRegionName": "testbackup",
+  "UseSourceOfTruth": "false",
+
+  "EnableGrpcTrace": "true",
+  "EnableHttpClientTrace": "true",
+  "EnableAzureSDKActivity": "true",
+
+  "ResourceProxyCallMaxTimeOutInSec": "120/240",
+
+  "CallARMGenericRequestAllowedTypes": "/providers/Microsoft.Authorization/policySetDefinitions:resourcefetcher_arm;/providers/Microsoft.Authorization/policyDefinitions:resourcefetcher_arm;/providers:resourcefetcher_arm",
+  "GetCollectionAllowedTypes": "",
+  "GetManifestConfigAllowedTypes": "",
+  "GetConfigSpecsAllowedTypes": "",
+  "GetCasResponseAllowedTypes": "",
+  "GetIdMappingAllowedTypes": "",
+
+  "resourceProxyGrpcOption": "LBPolicy=LOCAL"
+}
+

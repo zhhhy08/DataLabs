@@ -1,0 +1,136 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-01-01/rolloutParameters.json",
+    "contentVersion": "1.0.0.0",
+    "shellExtensions": [
+        {
+            "name": "Run",
+            "type": "Run",
+            "properties": {
+                "maxExecutionTime": "PT50M",
+                "skipDeleteAfterExecution": "false"
+            },
+            "package": {
+                "reference": {
+                    "path": "Run.tar"
+                }
+            },
+            "launch": {
+            "command": ["/bin/bash", "/package/unarchive/ImagesUploadToACR.sh"],
+                "environmentVariables": [
+                    {
+                        "name": "DESTINATION_ACR_NAME",
+                        "value": "__DESTINATION_ACR_NAME__"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_ABCPARTNERSOLUTION",
+                        "reference": {
+                            "path": "images/abcpartnersolution.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_AZRPARTNERSOLUTION",
+                        "reference": {
+                            "path": "images/azorespartnersolution.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_IDMPARTNERSOLUTION",
+                        "reference": {
+                            "path": "images/idmpartnersolution.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_RASPARTNERSOLUTION",
+                        "reference": {
+                            "path": "images/raspartnersolution.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_SKUPARTIALSYNCPARTNERSOLUTION",
+                        "reference": {
+                            "path": "images/skupartialsyncpartnersolution.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_SKUFULLSYNCPARTNERSOLUTION",
+                        "reference": {
+                            "path": "images/skufullsyncpartnersolution.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_ARMDATACACHEPARTNERSOLUTION",
+                        "reference": {
+                            "path": "images/armdatacachepartnersolution.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_CAPPARTNERSOLUTION",
+                        "reference": {
+                            "path": "images/cappartnersolution.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_GARNETSERVER",
+                        "reference": {
+                            "path": "images/garnetserver.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_INPUTOUTPUTSERVICE",
+                        "reference": {
+                            "path": "images/inputoutputservice.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_RESOURCEFETCHERPROXYSERVICE",
+                        "reference": {
+                            "path": "images/resourcefetcherproxyservice.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_RESOURCEFETCHERSERVICE",
+                        "reference": {
+                            "path": "images/resourcefetcherservice.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_SOCAT",
+                        "reference": {
+                            "path": "images/socat.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TARBALL_IMAGE_FILE_SAS_ADMINSERVICE",
+                        "reference": {
+                            "path": "images/adminservice.tar.gz"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "TAG_NAME",
+                        "value": "__BUILD_VERSION__"
+                    }
+                ],
+                "identity": {
+                    "type": "userAssigned",
+                    "userAssignedIdentities": [
+                        "__SCRIPT_EV2_MANAGED_IDENTITY__"
+                    ]
+                }
+            }
+        }
+    ]
+}

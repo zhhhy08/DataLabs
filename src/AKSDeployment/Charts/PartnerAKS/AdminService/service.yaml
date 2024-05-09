@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: admin-service
+  name: admin-service
+  namespace: admin-namespace
+  annotations:
+    service.beta.kubernetes.io/azure-dns-label-name: [[<DNS_LABEL_NAME>]]
+spec:
+  ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 443
+  selector:
+    app: admin-service
+  type: LoadBalancer

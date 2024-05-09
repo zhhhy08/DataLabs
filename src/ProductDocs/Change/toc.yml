@@ -1,0 +1,10 @@
+- name: Resource Configuration Changes
+  items:
+    - name: Resource Configuration Changes Documentation
+      href: AzureResourceChangeDocRef.md
+    - name: BCDR for ARG Scale Unit
+      href: ChangeComputeArgSuBCDR.md
+    - name: BCDR for Modern Scale Unit
+      href: ChangeComputeModernSuBCDR.md
+    - name: BCDR for Azure Storage Accounts
+      href: StorageAccountsBCDR.md

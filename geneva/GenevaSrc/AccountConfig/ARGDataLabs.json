@@ -1,0 +1,589 @@
+{
+  "apPkiAcls": [],
+  "autoPreAggWarmPathMappings": [],
+  "certificates": [],
+  "contributors": [
+    {
+      "alias": "tapajitrajak",
+      "role": "Administrator"
+    },
+    {
+      "alias": "nitinrao",
+      "role": "Administrator"
+    },
+    {
+      "alias": "FAJIN",
+      "role": "Administrator"
+    },
+    {
+      "alias": "ARPGUP",
+      "role": "Administrator"
+    },
+    {
+      "alias": "PONARAYA",
+      "role": "Administrator"
+    },
+    {
+      "alias": "CHGUPTA",
+      "role": "Administrator"
+    },
+    {
+      "alias": "DYLANHARTONO",
+      "role": "Administrator"
+    },
+    {
+      "alias": "JAEYOUNGYOON",
+      "role": "Administrator"
+    }
+  ],
+  "dsmsAcls": [],
+  "grafanaInstances": [],
+  "grafanaInstancesMetadata": [],
+  "keyVaultAcls": [
+    {
+      "acl": "geneva.keyvault.datalabs.net",
+      "description": "EV2 Access SAN",
+      "role": "Administrator"
+    }
+  ],
+  "lastUpdatedBy": "chgupta",
+  "lastUpdateTime": "2024-02-28T02:13:03.6324505Z",
+  "managedIdentityObjectIdAcls": [
+    {
+      "description": "rasprodwu3aks (5/3/2024)",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "c991fc64-6147-40f7-8643-f08962ef73c9"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rasprodseaaks (5/3/2024)",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "9c076021-957a-4795-9d36-1cb2aa05f291"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rasprodsdcaks (5/3/2024)",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "a6eead52-45c2-41fe-a5ac-7d207a352b22"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rasprodneuaks (5/3/2024)",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "c63ed82d-9f97-4050-ab2d-ee61dc4cc324"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rasprodeusaks (5/3/2024)",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "ce724c06-04c0-42a3-9de7-ead3dbc6d4fb"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rasprodeaaks (5/3/2024)",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "470542b4-6fee-4040-89dd-ca8ac5607dc4"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "capprodsdcaks(3/11/2024)",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "7623aae0-197c-4dc2-a7d2-8590bac96538"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "capprodneuaks(3/11/2024)",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "e3623686-d2f4-4e6b-a7b2-13bfc597be74"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "capprodeusaks(3/11/2024)",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "dc65af9b-51f4-4381-a0df-9a607987314d"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "capprodwu3aks(3/11/2024)",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "490e4988-1716-42df-a41e-cddd57819994"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "capprodseaaks(3/11/2024)",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "198f4427-e3d4-486f-b18b-04deb4112367"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "capprodeaaks(3/11/2024)",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "c1364902-eb7d-4388-98fc-1ca7d4a1598f"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "skuprodwu3aks(1/8/2024)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\12ed2b01-7647-44b9-ad9f-a8a66bf35f10",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "12ed2b01-7647-44b9-ad9f-a8a66bf35f10"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "skuprodseaaks(1/8/2024)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\57e0c965-a88f-4bdd-b191-e20a22bd5e8d",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "57e0c965-a88f-4bdd-b191-e20a22bd5e8d"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "skuprodsdcaks(1/8/2024)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\e4e7a4a5-06c9-4187-8dbc-816f98731d06",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "e4e7a4a5-06c9-4187-8dbc-816f98731d06"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "skuprodneuaks(1/8/2024)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\4996d8b4-a1a8-497d-96e8-89c348ed1db5",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "4996d8b4-a1a8-497d-96e8-89c348ed1db5"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "skuprodeusaks(1/8/2024)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\e2658960-aa32-4471-b1d5-782a90e49c16",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "e2658960-aa32-4471-b1d5-782a90e49c16"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "skuprodeaaks(1/8/2024)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\d5ba630c-0460-42cb-a40a-a743f18353e7",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "d5ba630c-0460-42cb-a40a-a743f18353e7"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rfprodeaaks(9/29/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\7c9eecaf-3b3d-44a9-b9f3-7846f53c4a37",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "7c9eecaf-3b3d-44a9-b9f3-7846f53c4a37"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rfprodseaaks(9/29/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\66d61953-3393-4f6c-83fe-a7eadca539d7",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "66d61953-3393-4f6c-83fe-a7eadca539d7"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "idmprodeaaks(9/28/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\a8967bdd-cdd6-4d0b-b725-6e75d255ce94",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "a8967bdd-cdd6-4d0b-b725-6e75d255ce94"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "idmprodseaaks(9/28/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\a0b38f46-7a81-45c5-8945-381a4533b646",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "a0b38f46-7a81-45c5-8945-381a4533b646"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "idmprodneuaks(9/28/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\88ed6dfc-bee3-4487-90bc-d207bc75d6e6",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "88ed6dfc-bee3-4487-90bc-d207bc75d6e6"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "idmprodsdcaks(9/28/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\0bc544e4-7a88-4720-9b9f-3fcaf69834ce",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "0bc544e4-7a88-4720-9b9f-3fcaf69834ce"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "idmprodeusaks(9/28/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\f2305251-f026-408b-bf60-bdbc6784bde9",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "f2305251-f026-408b-bf60-bdbc6784bde9"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "abcprodneuaks(9/28/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\319645d4-ab36-44dd-86e4-949c0efc481f",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "319645d4-ab36-44dd-86e4-949c0efc481f"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rfprodneuaks(9/28/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\c6e05e65-7e7f-4d46-b404-a2021bb76521",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "c6e05e65-7e7f-4d46-b404-a2021bb76521"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "abcprodsdcaks(9/28/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\d46bee85-0667-4ba4-80b4-ef90a574bcfa",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "d46bee85-0667-4ba4-80b4-ef90a574bcfa"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rfprodsdcaks(9/28/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\95951243-bf10-43ce-ad3d-3cb83db39e3e",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "95951243-bf10-43ce-ad3d-3cb83db39e3e"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "abcprodeusaks(9/28/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\292a9cd3-69ee-4a80-a413-40fc56022945",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "292a9cd3-69ee-4a80-a413-40fc56022945"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rfprodeusaks(9/28/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\a90b3eb2-ca59-44e6-a1f6-c966c09b2c2b",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "a90b3eb2-ca59-44e6-a1f6-c966c09b2c2b"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rfcanaryecyaks(9/21/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\3b383479-d4d7-427e-84a7-22e421c398b3",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "3b383479-d4d7-427e-84a7-22e421c398b3"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "idmcanaryecyaks(9/21/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\a6727994-751a-4029-90dc-769f99e3fa94",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "a6727994-751a-4029-90dc-769f99e3fa94"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "abccanaryecyaks(9/21/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\66fade2d-0bc3-425a-b48f-ecf2408a0341",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "66fade2d-0bc3-425a-b48f-ecf2408a0341"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "idmprodsdcaks (9/7/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\fa202cb0-2510-492d-9764-1733a70a2c50",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "fa202cb0-2510-492d-9764-1733a70a2c50"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "idmprodwu3aks (9/7/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\76f91273-03bb-4071-b56b-910ed86ca690",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "76f91273-03bb-4071-b56b-910ed86ca690"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "idmprodneuaks (9/7/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\1e51c4ab-abda-463b-b9ff-c8e4edc09db4",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "1e51c4ab-abda-463b-b9ff-c8e4edc09db4"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "idmprodeusaks (9/7/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\1619a1e0-41b9-4769-ac51-f317187148aa",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "1619a1e0-41b9-4769-ac51-f317187148aa"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rfprodeusaks (8/31/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\4ed42762-e1ca-4ada-99aa-15a548cd8a70",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "4ed42762-e1ca-4ada-99aa-15a548cd8a70"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "abcprodeusaks (8/31/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\7893a43a-cb6e-4a63-8b7c-743cde686a6a",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "7893a43a-cb6e-4a63-8b7c-743cde686a6a"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rfprodneuaks (8/31/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\8ca20d00-f000-43ab-a766-b578a1d4d00f",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "8ca20d00-f000-43ab-a766-b578a1d4d00f"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "abcprodneuaks (8/31/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\2e4be9bc-354f-4da5-a02f-b130e638bb80",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "2e4be9bc-354f-4da5-a02f-b130e638bb80"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rfprodsdcaks (8/31/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\d5003d9d-1766-4652-846e-c57f791078ea",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "d5003d9d-1766-4652-846e-c57f791078ea"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "abcprodsdcaks (8/31/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\4d39a97e-48bb-458c-ba5a-148a67470993",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "4d39a97e-48bb-458c-ba5a-148a67470993"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rfprodwu3aks (8/21/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\477c8ca7-f771-4c42-9715-0241b6c54172",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "477c8ca7-f771-4c42-9715-0241b6c54172"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "abcprodwu3aks (8/21/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\4d39a97e-48bb-458c-ba5a-148a67470993",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "4d39a97e-48bb-458c-ba5a-148a67470993"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "rfcanaryecyaks (8/8/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\d6d94d14-65e0-467d-adbd-2c382f2c2b28",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "d6d94d14-65e0-467d-adbd-2c382f2c2b28"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "idmcanaryecyaks (8/8/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\3fc818f2-6d4f-4d64-8eea-a87ee34014cd",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "3fc818f2-6d4f-4d64-8eea-a87ee34014cd"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    },
+    {
+      "description": "abccanaryecyaks (9/22/2023)",
+      "identity": "33e01921-4d64-4f8c-a055-5bdaffd5e33d\\66fade2d-0bc3-425a-b48f-ecf2408a0341",
+      "managedIdentityByObjectId": {
+        "aadTenantId": "33e01921-4d64-4f8c-a055-5bdaffd5e33d",
+        "objectId": "66fade2d-0bc3-425a-b48f-ecf2408a0341"
+      },
+      "roleConfiguration": {
+        "name": "MetricPublisher"
+      }
+    }
+  ],
+  "managedIdentityResourceTypeAcls": [],
+  "mirrorAccountSyncFlagsTable": {},
+  "mirrorMonitoringAccountList": [],
+  "securityGroups": {
+    "ame\\tm-resourcetopology": "Administrator"
+  },
+  "serviceTreeId": "aaaf3216-8989-44a6-85d1-4014ea83167f",
+  "tenant": "ARGDataLabs",
+  "version": 26
+}

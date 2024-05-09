@@ -1,0 +1,19 @@
+{{- if .Values.cacheService.enabled }}
+{{ $index := .Values.setArrayIndexVar }}
+{{- $numCachePool := len .Values.cacheService.cachePools }}
+{{- if lt $index $numCachePool }}
+{{ $cachePool := index .Values.cacheService.cachePools $index }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $cachePool.cacheName }}
+  namespace: {{ $.Values.cacheNameSpace }}
+spec:
+  clusterIP: None
+  selector:
+    app: {{ $cachePool.cacheName }}
+  ports:
+  - port: {{ $cachePool.port }}
+    protocol: TCP
+{{- end }}
+{{- end }}

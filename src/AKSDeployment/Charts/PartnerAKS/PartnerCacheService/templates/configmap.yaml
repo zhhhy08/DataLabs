@@ -1,0 +1,29 @@
+{{- if .Values.partnerCacheService.enabled }}
+{{ $index := .Values.setArrayIndexVar }}
+{{- $numCachePool := len .Values.partnerCacheService.cachePools }}
+{{- if lt $index $numCachePool }}
+{{ $cachePool := index .Values.partnerCacheService.cachePools $index }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $cachePool.cacheName }}-config
+  namespace: {{ $.Values.cacheNameSpace }}
+data:
+  {{- if $cachePool.cacheConfigMap }}    
+  LOGGER_MIN_LOG_LEVEL: {{ $cachePool.cacheConfigMap.minLogLevel | default $.Values.partnerCacheService.cacheConfigMap.minLogLevel | default "Information" | quote }}
+  IncludeRunTimeMetrics: {{ $cachePool.cacheConfigMap.includeRunTimeMetrics | default $.Values.partnerCacheService.cacheConfigMap.includeRunTimeMetrics | default true | quote }}
+  ThreadPoolNumThreads: {{ $cachePool.cacheConfigMap.threadPoolNumThreads | default $.Values.partnerCacheService.cacheConfigMap.threadPoolNumThreads | default 8192 | quote }}
+  NetworkSendThrottleMax: {{ $cachePool.cacheConfigMap.networkSendThrottleMax | default $.Values.partnerCacheService.cacheConfigMap.networkSendThrottleMax | default 64 | quote }}
+  CheckPointIntervalDuration: {{ $cachePool.cacheConfigMap.checkPointIntervalDuration | default $.Values.partnerCacheService.cacheConfigMap.checkPointIntervalDuration | default "00:30:00" | quote }}
+  UseBackgroundSave: {{ $cachePool.cacheConfigMap.useBackgroundSave | default $.Values.partnerCacheService.cacheConfigMap.useBackgroundSave | default true | quote }}
+  {{- else }}
+  LOGGER_MIN_LOG_LEVEL: {{ $.Values.partnerCacheService.cacheConfigMap.minLogLevel | default "Information" | quote }}
+  IncludeRunTimeMetrics: {{ $.Values.partnerCacheService.cacheConfigMap.includeRunTimeMetrics | default true | quote }}
+  ThreadPoolNumThreads: {{ $.Values.partnerCacheService.cacheConfigMap.threadPoolNumThreads | default 8192 | quote }}
+  NetworkSendThrottleMax: {{ $.Values.partnerCacheService.cacheConfigMap.networkSendThrottleMax | default 64 | quote }}
+  CheckPointIntervalDuration: {{ $.Values.partnerCacheService.cacheConfigMap.checkPointIntervalDuration | default "00:30:00" | quote }}
+  UseBackgroundSave: {{ $.Values.partnerCacheService.cacheConfigMap.useBackgroundSave | default true | quote }}
+  {{- end }}
+  HotConfigActions: {{ $.Values.partnerCacheService.cacheConfigMap.hotConfigActions | default "" | quote }}
+{{- end }}
+{{- end }}

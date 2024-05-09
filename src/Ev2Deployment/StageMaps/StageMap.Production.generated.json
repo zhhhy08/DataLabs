@@ -1,0 +1,293 @@
+{
+  "$schema": "https://ev2schema.azure.net/schemas/2020-04-01/StageMap.json",
+  "name": "Microsoft.Azure.Datalabs.Production",
+  "version": "1.0.0.5",
+  "configuration": {
+    "promotion": {
+      "manual": true,
+      "timeout": "P3D"
+    }
+  },
+  "stages": [
+    {
+      "sequence": 1,
+      "name": "Prod_Canary",
+      "regions": [
+        "eastus2euap"
+      ],
+      "stages": [
+        {
+          "sequence": 1,
+          "name": "StampSet1",
+          "stamps": [
+            "1"
+          ]
+        },
+        {
+          "sequence": 2,
+          "name": "StampSet2",
+          "stamps": [
+            "2"
+          ]
+        },
+        {
+          "sequence": 3,
+          "name": "StampSet3",
+          "stamps": [
+            "3"
+          ]
+        }
+      ]
+    },
+    {
+      "sequence": 2,
+      "name": "Prod_Region1",
+      "regions": [
+        "westus3"
+      ],
+      "stages": [
+        {
+          "sequence": 1,
+          "name": "StampSet1",
+          "stamps": [
+            "1"
+          ]
+        },
+        {
+          "sequence": 2,
+          "name": "StampSet2",
+          "stamps": [
+            "2"
+          ]
+        },
+        {
+          "sequence": 3,
+          "name": "StampSet3",
+          "stamps": [
+            "3"
+          ]
+        },
+        {
+          "sequence": 4,
+          "name": "StampSet4",
+          "stamps": [
+            "4"
+          ]
+        },
+        {
+          "sequence": 5,
+          "name": "StampSet5",
+          "stamps": [
+            "5"
+          ]
+        }
+      ]
+    },
+    {
+      "sequence": 3,
+      "name": "Prod_Region2",
+      "regions": [
+        "northeurope"
+      ],
+      "stages": [
+        {
+          "sequence": 1,
+          "name": "StampSet1",
+          "stamps": [
+            "1"
+          ]
+        },
+        {
+          "sequence": 2,
+          "name": "StampSet2",
+          "stamps": [
+            "2"
+          ]
+        },
+        {
+          "sequence": 3,
+          "name": "StampSet3",
+          "stamps": [
+            "3"
+          ]
+        },
+        {
+          "sequence": 4,
+          "name": "StampSet4",
+          "stamps": [
+            "4"
+          ]
+        },
+        {
+          "sequence": 5,
+          "name": "StampSet5",
+          "stamps": [
+            "5"
+          ]
+        }
+      ]
+    },
+    {
+      "sequence": 4,
+      "name": "Prod_Region3",
+      "regions": [
+        "southeastasia"
+      ],
+      "stages": [
+        {
+          "sequence": 1,
+          "name": "StampSet1",
+          "stamps": [
+            "2"
+          ]
+        },
+        {
+          "sequence": 2,
+          "name": "StampSet2",
+          "stamps": [
+            "3"
+          ]
+        },
+        {
+          "sequence": 3,
+          "name": "StampSet3",
+          "stamps": [
+            "4"
+          ]
+        },
+        {
+          "sequence": 4,
+          "name": "StampSet4",
+          "stamps": [
+            "5"
+          ]
+        }
+      ]
+    },
+    {
+      "sequence": 5,
+      "name": "Prod_Region4",
+      "regions": [
+        "eastus"
+      ],
+      "stages": [
+        {
+          "sequence": 1,
+          "name": "StampSet1",
+          "stamps": [
+            "1"
+          ]
+        },
+        {
+          "sequence": 2,
+          "name": "StampSet2",
+          "stamps": [
+            "2"
+          ]
+        },
+        {
+          "sequence": 3,
+          "name": "StampSet3",
+          "stamps": [
+            "3"
+          ]
+        },
+        {
+          "sequence": 4,
+          "name": "StampSet4",
+          "stamps": [
+            "4"
+          ]
+        },
+        {
+          "sequence": 5,
+          "name": "StampSet5",
+          "stamps": [
+            "5"
+          ]
+        }
+      ]
+    },
+    {
+      "sequence": 6,
+      "name": "Prod_Region5",
+      "regions": [
+        "swedencentral"
+      ],
+      "stages": [
+        {
+          "sequence": 1,
+          "name": "StampSet1",
+          "stamps": [
+            "1"
+          ]
+        },
+        {
+          "sequence": 2,
+          "name": "StampSet2",
+          "stamps": [
+            "2"
+          ]
+        },
+        {
+          "sequence": 3,
+          "name": "StampSet3",
+          "stamps": [
+            "3"
+          ]
+        },
+        {
+          "sequence": 4,
+          "name": "StampSet4",
+          "stamps": [
+            "4"
+          ]
+        },
+        {
+          "sequence": 5,
+          "name": "StampSet5",
+          "stamps": [
+            "5"
+          ]
+        }
+      ]
+    },
+    {
+      "sequence": 7,
+      "name": "Prod_Region6",
+      "regions": [
+        "eastasia"
+      ],
+      "stages": [
+        {
+          "sequence": 1,
+          "name": "StampSet1",
+          "stamps": [
+            "2"
+          ]
+        },
+        {
+          "sequence": 2,
+          "name": "StampSet2",
+          "stamps": [
+            "3"
+          ]
+        },
+        {
+          "sequence": 3,
+          "name": "StampSet3",
+          "stamps": [
+            "4"
+          ]
+        },
+        {
+          "sequence": 4,
+          "name": "StampSet4",
+          "stamps": [
+            "5"
+          ]
+        }
+      ]
+    }
+  ]
+}

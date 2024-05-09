@@ -1,0 +1,151 @@
+{{- if .Values.resourceProxyService.enabled }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Values.resourceProxyService.name }}
+  namespace: {{ .Values.solutionNameSpace }}
+  labels:
+    app: {{ .Values.resourceProxyService.name }}
+spec:
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  minReadySeconds: {{ .Values.resourceProxyService.minReadySeconds }}
+  selector:
+    matchLabels:
+      app: {{ .Values.resourceProxyService.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.resourceProxyService.name }}
+        azure.workload.identity/use: "true"
+    spec:
+      nodeSelector:
+        "agentpool": {{ .Values.agentPoolName }}
+      serviceAccountName: {{ .Values.resourceProxyServiceAccount.name }}
+      volumes:
+      {{- if .Values.resourceProxyService.partnerCertificates.isEnabled }}
+      - name: dsts-secret-store-inline
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: {{ .Values.resourceProxyService.partnerCertificates.secretProviderClassName }}
+      {{- end }}
+      - name: config-volume
+        configMap:
+          name: {{ .Values.resourceProxyConfigMap.name }}
+      # Monitoring Volumes
+      - name: mdsd-run-vol  # connects with monitor pod for logs/traces
+        hostPath:
+          path: {{ .Values.mdsd.hostPathPath | quote }}
+      - name: ifx-path      # connects with monitor pod for metrics
+        hostPath:
+          path: {{ .Values.mdm.ifxmetrics_socket_folder_hostPath | quote }}
+      containers:
+      - name: {{ .Values.resourceProxyImage.name }}
+        image: {{ .Values.resourceProxyImage.repository }}:{{ .Values.resourceProxyImage.tag }}
+        imagePullPolicy: {{ .Values.resourceProxyImage.pullPolicy }}
+        resources:
+          requests:
+            memory: {{ .Values.resourceProxyImage.requestMemory | quote }}
+          limits:
+            memory: {{ .Values.resourceProxyImage.maxMemorySize | quote }}
+        volumeMounts:
+        {{- if  .Values.resourceProxyService.partnerCertificates.isEnabled }}
+        - name: dsts-secret-store-inline
+          mountPath: /secrets-store
+          readOnly: true
+        {{- end }}
+        - name: config-volume
+          mountPath: "/config"
+          readOnly: true
+        # Monitor Volume Mounts
+        - name: mdsd-run-vol
+          mountPath: {{ .Values.mdsd.run_dir_path | quote }}
+        - name: ifx-path
+          mountPath: {{ .Values.mdm.ifxmetrics_socket_folder_path | quote }}
+        ports:
+        - containerPort: {{ .Values.resourceProxyService.port }}
+          hostPort: {{ .Values.resourceProxyService.port }}
+        - containerPort: {{ .Values.adminService.adminPort }}
+        env:
+        - name: scaleUnit
+          value: "{{ .Values.solutionInfo.scaleUnit }}"
+        - name: service
+          value: "ResourceProxyService"
+        - name: region
+          value: "{{ .Values.solutionInfo.region }}"
+        - name: buildVersion
+          value: "{{ .Values.resourceProxyImage.tag }}"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP 
+        - name: DOTNET_EnableDiagnostics
+          value: "1"
+        - name: DOTNET_RUNNING_IN_CONTAINER
+          value: "true"
+        - name: DOTNET_USE_POLLING_FILE_WATCHER
+          value: "true"
+        - name: CONFIGMAP_DIR
+          value: "/config"
+        - name: SECRETS_STORE_DIR
+          value: "/secrets-store"
+        - name: LOGGER_MIN_LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.resourceProxyConfigMap.name }}
+              key: LOGGER_MIN_LOG_LEVEL
+        # Monitoring endpoint values
+        - name: OTLP_EXPORTER_TYPE
+          value: {{ .Values.monitorInfo.exporterType }}
+        - name: MDSD_DATALABS_ENDPOINT
+          value: {{ include "otlp_endpoint.mdsd" .Values.mdsd | trim | quote }}
+        - name: MDM_DATALABS_ENDPOINT
+          value: {{ include "otlp_endpoint.mdm" (dict "info" .Values.mdm.accountInfo.DataLabs "Values" .Values) | trim | quote }}
+---     
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.resourceProxyService.name }}-networkpolicy
+  namespace: {{ .Values.solutionNameSpace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Values.resourceProxyService.name }}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    {{- range $pk, $pv := $.Values.partnerConfig.pods }}
+    - namespaceSelector:
+        matchLabels:
+          name: {{ $.Values.partnerNameSpace }}
+      podSelector:
+        matchLabels:      
+          app: {{ $pv.name }}
+    {{- end }}
+    ports:
+     - port: {{ .Values.resourceProxyService.port }}
+       protocol: TCP
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: {{ .Values.adminServiceNameSpace }}
+      podSelector:
+        matchLabels:
+          app: {{ .Values.adminService.deployment.labels.app }}
+    ports:
+     - port: {{ .Values.adminService.adminPort }}
+       protocol: TCP
+{{- end }}

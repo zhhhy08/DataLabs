@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.Build.Traversal">
+    <ItemGroup>
+        <ProjectReference Include="AKSDeployment\AKSDeployment.csproj" Pack="false" />
+        <ProjectReference Include="DataLabs\**\*.*proj" Pack="false" />
+        <!-- TODO- Add exclude when needed -->
+        <ProjectFile Include="Docs\TSGsValidation.csproj" Condition="'$(IsOfficialBuild)' != 'true'" />
+        <ProjectFile Include="ProductDocs\ProductDocsValidation.csproj" Condition="'$(IsOfficialBuild)' != 'true'" />
+    </ItemGroup>
+</Project>

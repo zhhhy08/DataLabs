@@ -1,0 +1,504 @@
+{
+  "advancedConfiguration": {
+    "combinationDeltaFetchLookback": null,
+    "combinationFullRefreshInterval": null,
+    "debug": false,
+    "distributionConfiguration": null,
+    "enableCostReporting": null,
+    "enableFullRefreshWhenMetricSourceCombinationsChangeV2": null,
+    "enableKustoLogsMonitorV2": null,
+    "enableMinHintsLookbackAsMonitorLookback": null,
+    "enableMonitorV2InheritOptimization": null,
+    "enableMonitorV2QueryInfoOptimizationToReduceMemoryUsage": null,
+    "enablePreviewBucketOffset": null,
+    "enableThresholdResultTypeChange": null,
+    "enableThrowInvalidSeriesExceptionInMetricFetch": null,
+    "handleNullDataInDTMonitorV2Training": null,
+    "ingestionDelayToSkip": null,
+    "limitsConfiguration": null,
+    "maxCombinationsForHintingRetrieval": null,
+    "monitorV2InheritOptimizationWhenNumberOfCombinations": null,
+    "skipMetricsDataLossValidation": null,
+    "skipMetricsDataQualityCheck": null,
+    "updateTimeSeriesMetadataForCompositeMetric": null,
+    "useExpressionEngineInBaselineAnomalyTraining": null,
+    "useLimitForHintingRetrieval": null
+  },
+  "alertConditions": [
+    {
+      "alertOutletIds": [],
+      "bucket": {
+        "bucketCount": "5",
+        "totalBucketCount": "6"
+      },
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 1,
+          "expressionId": "72f75a40-bf7c-43e1-b050-5b9135184249",
+          "id": "87262b19-ce74-49bf-946a-94bcfc5b4770",
+          "type": 0,
+          "value": "10000"
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 2,
+      "id": "bcad8d55-563f-4c08-9cdc-ac2447af4e1b",
+      "metadata": {},
+      "name": "SEV 3 - High EventHubWaitingMessages",
+      "severity": 3
+    },
+    {
+      "alertOutletIds": [],
+      "bucket": {
+        "bucketCount": "5",
+        "totalBucketCount": "6"
+      },
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 1,
+          "expressionId": "72f75a40-bf7c-43e1-b050-5b9135184249",
+          "id": "87262b19-ce74-49bf-946a-94bcfc5b4770",
+          "type": 0,
+          "value": "50000"
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 1,
+      "id": "a670de73-2cf3-4ba6-a6ef-c180b54a8dc5",
+      "metadata": {},
+      "name": "SEV 2 - High EventHubWaitingMessages",
+      "severity": 2
+    }
+  ],
+  "alertEnrichmentConfiguration": {
+    "customLinks": [
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "scaleUnit",
+          "region"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "01:00:00",
+        "path": [
+          "IOService",
+          "InputEventHub"
+        ],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "ARGDataLabs > IOService > InputEventHub (EventHub Waiting Messages)"
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "scaleUnit",
+          "region",
+          "Name",
+          "service",
+          "component"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "1.00:00:00",
+        "path": [],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "ARGDataLabs (General ActivityFailures)"
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DGrepJarvisLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "clientQuery": "groupby activityName, exception let count = Count()\norderby count desc",
+        "dGrepEndpoint": "https://dgrepv2-frontend-prod.trafficmanager.net/",
+        "endpointAlias": "Diagnostics PROD",
+        "endTime": "{EndTime}",
+        "eventFilters": [
+          {
+            "isScrubbed": false,
+            "monikerRegex": null,
+            "nameRegex": "ActivityFailed",
+            "namespaceRegex": "ARGDataLabs",
+            "versionRegex": null
+          }
+        ],
+        "executionDelay": "00:00:00",
+        "identityColumns": {
+          "Region": [
+            "{Monitor.Dimension.region}"
+          ],
+          "ScaleUnit": [
+            "{Monitor.Dimension.scaleUnit}"
+          ]
+        },
+        "lookback": "00:30:00",
+        "maxResultRowCount": 15,
+        "maxRowCount": 500000,
+        "mdsEndpoint": "https://production.diagnostics.monitoring.core.windows.net/",
+        "preIncidentQueryTimeout": "00:00:50",
+        "serverQuery": "where activityName.contains(\"EventHubTaskManager\")",
+        "startTime": null,
+        "stepback": "00:00:00",
+        "title": "EventHubTaskManager Failures",
+        "uxParameters": [
+          {
+            "key": "aggregatesVisible",
+            "value": true
+          },
+          {
+            "key": "aggregates",
+            "value": [
+              "Count by TaskName"
+            ]
+          },
+          {
+            "key": "chartsVisible",
+            "value": false
+          },
+          {
+            "key": "chartEditorVisible",
+            "value": true
+          },
+          {
+            "key": "chartType",
+            "value": "line"
+          },
+          {
+            "key": "chartLayers",
+            "value": [
+              [
+                "New Layer",
+                ""
+              ]
+            ]
+          },
+          {
+            "key": "UTC",
+            "value": false
+          }
+        ]
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DGrepJarvisLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "clientQuery": "let Subscription = inputResourceId.Split('/')[2]\ngroupby Subscription let MessageCount = Count()\norderby MessageCount desc",
+        "dGrepEndpoint": "https://dgrepv2-frontend-prod.trafficmanager.net/",
+        "endpointAlias": "Diagnostics PROD",
+        "endTime": "{EndTime}",
+        "eventFilters": [
+          {
+            "isScrubbed": false,
+            "monikerRegex": null,
+            "nameRegex": "ActivityFailed",
+            "namespaceRegex": "ARGDataLabs",
+            "versionRegex": null
+          }
+        ],
+        "executionDelay": "00:00:00",
+        "identityColumns": {
+          "Region": [
+            "{Monitor.Dimension.region}"
+          ],
+          "ScaleUnit": [
+            "{Monitor.Dimension.scaleUnit}"
+          ]
+        },
+        "lookback": "00:30:00",
+        "maxResultRowCount": 15,
+        "maxRowCount": 500000,
+        "mdsEndpoint": "https://production.diagnostics.monitoring.core.windows.net/",
+        "preIncidentQueryTimeout": "00:00:50",
+        "serverQuery": "where activityName.contains(\"PayloadDisassemblyTaskFactory.ProcessChildTask\")",
+        "startTime": null,
+        "stepback": "00:00:00",
+        "title": "Assess Impact: Review Subscriptions Processed after EventHubManager Processes Again",
+        "uxParameters": [
+          {
+            "key": "aggregatesVisible",
+            "value": true
+          },
+          {
+            "key": "aggregates",
+            "value": [
+              "Count by TaskName"
+            ]
+          },
+          {
+            "key": "chartsVisible",
+            "value": false
+          },
+          {
+            "key": "chartEditorVisible",
+            "value": true
+          },
+          {
+            "key": "chartType",
+            "value": "line"
+          },
+          {
+            "key": "chartLayers",
+            "value": [
+              [
+                "New Layer",
+                ""
+              ]
+            ]
+          },
+          {
+            "key": "UTC",
+            "value": false
+          }
+        ]
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.GenericCustomLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "executionDelay": "00:00:00",
+        "link": "https://eng.ms/docs/cloud-ai-platform/azure-core/azure-management-and-platforms/control-plane-bburns/fleet-inventory/azure-resource-builder/monitors/highinputeventhubwaitingmessages",
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "HighInputEHWaitingMessageTSG"
+      }
+    ]
+  },
+  "autoMitigationConfiguration": {
+    "healthyCountToMitigateIncident": 10,
+    "shouldMitigateIncident": false
+  },
+  "customMetadata": {
+    "Icm.TsgId": "https://eng.ms/docs/cloud-ai-platform/azure-core/azure-management-and-platforms/control-plane-bburns/fleet-inventory/azure-resource-builder/monitors/highinputeventhubwaitingmessages",
+    "Title": "[DataLabs] {Monitor.DisplayName} for SU: {Monitor.Dimension.scaleUnit}, Region: {Monitor.Dimension.region}, EventHubName: {Monitor.Dimension.Name}"
+  },
+  "description": "Messages waiting in Input EventHub for IOService. Spikes can occur due to increase in notifications from ARN and MX, but messages should always decrease. Otherwise, further investigation is required.",
+  "expressions": [
+    {
+      "endTimeShift": null,
+      "id": "72f75a40-bf7c-43e1-b050-5b9135184249",
+      "lookback": null,
+      "name": "EventHubWaitingMessagesExpression",
+      "nullDataPointsHandling": null,
+      "percentages": [
+        {
+          "denominator": [],
+          "multiplier": 1,
+          "numerator": [
+            {
+              "conditions": [
+                {
+                  "dimensionName": "Id",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "NODE_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "Name",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "POD_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "buildVersion",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "component",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "region",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scaleUnit",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "service",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                }
+              ],
+              "dataBlockType": 0,
+              "endTimeShift": null,
+              "isNegative": false,
+              "lookback": null,
+              "lookbackAggregation": 0,
+              "mdmAggregationConfiguration": null,
+              "multiTimeSeriesAggregation": 0,
+              "nullDataPointsHandling": null,
+              "timeSeriesId": "f2db48cb-e99c-4fbf-977d-4a2cb48ee7c5",
+              "timeSeriesType": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "frequency": "00:03:00",
+  "id": "311cdc50-91aa-4a19-bbd8-02fce7fc5000",
+  "lastModifiedBy": "jaeyoungyoon",
+  "lastModifiedTime": "2024-04-26T03:37:31.2497453Z",
+  "lookback": "00:05:00",
+  "name": "[IOService] HighWaitingMessagesOnInputEventHub",
+  "outlets": [],
+  "recoveryRules": [],
+  "resourceType": "ServiceHealth",
+  "schemaVersion": 0,
+  "state": 1,
+  "tags": [
+    "InputEventHub",
+    "IOService"
+  ],
+  "targetDimensions": [
+    {
+      "dimensionName": "scaleUnit",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "region",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "westus3"
+          ]
+        },
+        {
+          "filterType": 1,
+          "values": [
+            "eastus"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "Name",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "service",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "component",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    }
+  ],
+  "tenant": "ARGDataLabs",
+  "timeSeries": [
+    {
+      "dimensions": [
+        "Id",
+        "NODE_NAME",
+        "Name",
+        "POD_NAME",
+        "buildVersion",
+        "component",
+        "region",
+        "scaleUnit",
+        "service"
+      ],
+      "id": "f2db48cb-e99c-4fbf-977d-4a2cb48ee7c5",
+      "metric": "EventHubWaitingMessages",
+      "name": "EventHubWaitingMessages",
+      "namespace": "ARGDataLabs",
+      "samplingType": "Average",
+      "tenant": "ARGDataLabs",
+      "timeSeriesType": 0
+    }
+  ]
+}

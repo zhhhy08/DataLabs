@@ -1,0 +1,203 @@
+{
+  "advancedConfiguration": {
+    "combinationDeltaFetchLookback": null,
+    "combinationFullRefreshInterval": null,
+    "debug": false,
+    "distributionConfiguration": null,
+    "enableCostReporting": null,
+    "enableFullRefreshWhenMetricSourceCombinationsChangeV2": null,
+    "enableKustoLogsMonitorV2": null,
+    "enableMinHintsLookbackAsMonitorLookback": null,
+    "enableMonitorV2InheritOptimization": null,
+    "enableMonitorV2QueryInfoOptimizationToReduceMemoryUsage": null,
+    "enablePreviewBucketOffset": null,
+    "enableThresholdResultTypeChange": null,
+    "enableThrowInvalidSeriesExceptionInMetricFetch": null,
+    "handleNullDataInDTMonitorV2Training": null,
+    "ingestionDelayToSkip": null,
+    "limitsConfiguration": null,
+    "maxCombinationsForHintingRetrieval": null,
+    "monitorV2InheritOptimizationWhenNumberOfCombinations": null,
+    "skipMetricsDataLossValidation": null,
+    "skipMetricsDataQualityCheck": null,
+    "updateTimeSeriesMetadataForCompositeMetric": null,
+    "useExpressionEngineInBaselineAnomalyTraining": null,
+    "useLimitForHintingRetrieval": null
+  },
+  "alertConditions": [
+    {
+      "alertOutletIds": [],
+      "bucket": null,
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 1,
+          "expressionId": "4c8037bd-123b-4df8-b01a-009cff5d9ac7",
+          "id": "0c97d363-501c-48b7-8100-0b6eb68fb4fc",
+          "type": 0,
+          "value": 0.0
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 1,
+      "metadata": {},
+      "name": "alertCondition 1",
+      "severity": 4
+    }
+  ],
+  "alertEnrichmentConfiguration": {
+    "customLinks": []
+  },
+  "autoMitigationConfiguration": {
+    "healthyCountToMitigateIncident": 10,
+    "shouldMitigateIncident": false
+  },
+  "customMetadata": {
+    "Message": "MetricsExtension is throttling the monitoring account due to high memory consumption of MetricsExtension or account ingestion per interval is exceeding the limit.",
+    "Title": "Monitoring Account is Throttled by Client"
+  },
+  "description": "",
+  "expressions": [
+    {
+      "endTimeShift": null,
+      "id": "4c8037bd-123b-4df8-b01a-009cff5d9ac7",
+      "lookback": null,
+      "name": "expression throttled by backpressure ",
+      "nullDataPointsHandling": null,
+      "percentages": [
+        {
+          "denominator": [],
+          "multiplier": 1.0,
+          "numerator": [
+            {
+              "aggregationWindow": null,
+              "conditions": [
+                {
+                  "dimensionName": "Category",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "Endpoint",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "Reason",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "SourceEnvironment",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                }
+              ],
+              "dataBlockType": 0,
+              "endTimeShift": null,
+              "isNegative": false,
+              "lookback": null,
+              "lookbackAggregation": 0,
+              "mdmAggregationConfiguration": null,
+              "multiTimeSeriesAggregation": 0,
+              "nullDataPointsHandling": null,
+              "timeSeriesId": "1c0a3acb-dbe0-4f39-a1e1-78943e1c4f5a",
+              "timeSeriesType": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "frequency": "00:03:00",
+  "id": "b4278458-f874-cc16-8e75-5e3e962c2b75",
+  "lastModifiedBy": "DYLANHARTONO",
+  "lastModifiedTime": "2023-06-10T02:04:10.5542867Z",
+  "lookback": "00:05:00",
+  "name": "ME Monitor Backpressure Throttling Basic V2 (Curated Experience-MeBasicQos2)",
+  "nullDataPointsHandling": null,
+  "outlets": [],
+  "resourceType": "ME Environment",
+  "schemaVersion": 0,
+  "state": 1,
+  "tags": [
+    "MetricsExtension2"
+  ],
+  "targetDimensions": [
+    {
+      "dimensionName": "SourceEnvironment",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "Endpoint",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "Reason",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "Category",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "PreRawEvents"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    }
+  ],
+  "tenant": "ARGDataLabs",
+  "timeSeries": [
+    {
+      "dimensions": [
+        "Category",
+        "Endpoint",
+        "Reason",
+        "SourceEnvironment"
+      ],
+      "id": "1c0a3acb-dbe0-4f39-a1e1-78943e1c4f5a",
+      "metric": "MetricsDroppedCount",
+      "name": "Metrics Dropped",
+      "namespace": "MetricsExtension2",
+      "samplingType": "Sum",
+      "tenant": "ARGDataLabs",
+      "timeSeriesType": 0
+    }
+  ]
+}

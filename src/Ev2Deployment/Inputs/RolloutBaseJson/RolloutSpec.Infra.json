@@ -1,0 +1,79 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-04-01/RegionAgnosticRolloutSpecification.json",
+    "contentVersion": "1.0.0.0",
+    "rolloutMetadata": {
+        "serviceModelPath": "Rollouts\\Infra\\DataLabs.ServiceModel.Infra.json",
+        "scopeBindingsPath": "ScopeBindings.json",
+        "name": "DataLabs.Infra.Buildout",
+        "rolloutType": "Major",
+        "buildSource": {
+            "parameters": {
+                "serviceGroupRoot": "ServiceGroupRoot",
+                "versionFile": "BuildVer.txt"
+            }
+        },
+        "Notification": {
+            "Email": {
+                "To": "earc@microsoft.com"
+            },
+            "incident": {
+                "providerType": "IcM",
+                "properties": {
+                    "connectorId": "80fcf79d-1483-4d33-b4fc-675f40fa7298",
+                    "routingId": "AIMS://GOV_ART:AzureResourceTopology/Ev2Deployment"
+                }
+            }
+        }
+    },
+    "orchestratedSteps": [
+        {
+            "name": "SubscriptionDataLabsResources",
+            "targetType": "ServiceResourceDefinition",
+            "targetName": "SubscriptionDataLabsResources",
+            "actions": [
+                "Deploy"
+            ],
+        "dependsOn": []
+        },
+        {
+            "name": "SubscriptionPartnerResources",
+            "targetType": "ServiceResourceDefinition",
+            "targetName": "SubscriptionPartnerResources",
+            "actions": [
+                "Deploy"
+            ],
+        "dependsOn": []
+        },
+        {
+            "name": "SubscriptionResourceFetcherResources",
+            "targetType": "ServiceResourceDefinition",
+            "targetName": "SubscriptionResourceFetcherResources",
+            "actions": [
+                "Deploy"
+            ],
+        "dependsOn": []
+        },
+        {
+            "name": "RegionalPartnerResources",
+            "targetType": "ServiceResourceDefinition",
+            "targetName": "RegionalPartnerResources",
+            "actions": [
+                "Deploy"
+            ],
+            "dependsOn": [
+                "SubscriptionPartnerResources"
+            ]
+        },
+        {
+            "name": "RegionalResourceFetcherResources",
+            "targetType": "ServiceResourceDefinition",
+            "targetName": "RegionalResourceFetcherResources",
+            "actions": [
+                "Deploy"
+            ],
+            "dependsOn": [
+                "SubscriptionResourceFetcherResources"
+            ]
+        }
+    ]
+}

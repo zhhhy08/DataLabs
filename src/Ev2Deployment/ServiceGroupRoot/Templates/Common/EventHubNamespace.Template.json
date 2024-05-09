@@ -1,0 +1,171 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "eventHubNamespacePrefix": {
+            "type": "string"
+        },
+        "eventHubSuffix": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "count": {
+            "type": "int"
+        },
+        "partitionCount": {
+            "type": "int"
+        },
+        "SkuTier": {
+            "type": "string"
+        },
+        "IoConnectorResourceId": {
+            "type": "string"
+        },
+        "consumerGroups": {
+            "type": "array"
+        }
+    },
+    "variables": {
+        "EventHubDataOwnerRoleDefId": "f526a384-b230-433a-b45c-95f59c4a2dec",
+        "StandardEhProperties": {
+            "kafkaEnabled": false,
+            "zoneRedundant": true,
+            "isAutoInflateEnabled": true,
+            "maximumThroughputUnits": 20
+        },
+        "PremiumEhProperties": {
+            "zoneRedundant": true
+        },
+        "ConsumerGroupNames": "[if(empty(parameters('consumerGroups')),createArray('$Default'),parameters('consumerGroups'))]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('eventHubNamespacePrefix'), copyIndex())]",
+            "type": "Microsoft.EventHub/namespaces",
+            "apiVersion": "2021-11-01",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('SkuTier')]",
+                "tier": "[parameters('SkuTier')]",
+                "capacity": "[if(equals(parameters('SkuTier'), 'Premium'), '4' , '20')]"
+            },
+            "properties": "[if(equals(parameters('SkuTier'), 'Premium'), variables('PremiumEhProperties') , variables('StandardEhProperties'))]",
+            "copy": {
+                "name": "eventhubnamespaceiterator",
+                "count": "[parameters('count')]"
+            }
+        },
+        {
+            "name": "[concat(parameters('eventHubNamespacePrefix'), copyIndex(), '/', concat(copyIndex(), parameters('eventHubSuffix')))]",
+            "type": "Microsoft.EventHub/namespaces/eventHubs",
+            "apiVersion": "2021-11-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "messageRetentionInDays": 7,
+                "partitionCount": "[parameters('partitionCount')]",
+                "status": "Active"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', concat(parameters('eventHubNamespacePrefix'), copyIndex()))]"
+            ],
+            "copy": {
+                "name": "eventhubnamespaceiterator",
+                "count": "[parameters('count')]"
+            }
+        },
+        {
+            "name": "[concat(parameters('eventHubNamespacePrefix'), copyIndex(), '/', parameters('eventHubSuffix'))]",
+            "type": "Microsoft.EventHub/namespaces/eventHubs",
+            "apiVersion": "2021-11-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "messageRetentionInDays": 7,
+                "partitionCount": "[parameters('partitionCount')]",
+                "status": "Active"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', concat(parameters('eventHubNamespacePrefix'), copyIndex()))]"
+            ],
+            "copy": {
+                "name": "eventhubiterator",
+                "count": "[parameters('count')]"
+            }
+        },
+        {
+            "condition": false,
+            "name": "[guid(variables('EventHubDataOwnerRoleDefId'), parameters('location'), parameters('IoConnectorResourceId'),concat(parameters('eventHubNamespacePrefix'), copyIndex()))]",
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2022-04-01",
+            "properties": {
+                "roleDefinitionId": "[SubscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('EventHubDataOwnerRoleDefId'))]",
+                "principalId": "[reference(parameters('IoConnectorResourceId'), '2018-11-30', 'Full').properties.principalId]",
+                "principalType": "ServicePrincipal"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', concat(parameters('eventHubNamespacePrefix'), copyIndex()))]"
+            ],
+            "copy": {
+                "name": "eventhubnamespaceiterator",
+                "count": "[parameters('count')]"
+            }
+        },
+        {
+            "name": "[concat('ConsumerGroupDeployment-',parameters('eventHubNamespacePrefix'), copyIndex())]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2022-09-01",
+            "dependsOn": [
+                "eventhubiterator"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                    "eventHubNamespacePrefix": {
+                        "value": "[concat(parameters('eventHubNamespacePrefix'), copyIndex())]"
+                    },
+                    "eventHubSuffix": {
+                        "value": "[parameters('eventHubSuffix')]"
+                    },
+                    "consumerGroupNames": {
+                        "value": "[variables('ConsumerGroupNames')]"
+                    }
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "eventHubNamespacePrefix": {
+                            "type": "string"
+                        },
+                        "eventHubSuffix": {
+                            "type": "string"
+                        },
+                        "consumerGroupNames": {
+                            "type": "array"
+                        }
+                    },
+                    "resources": [
+                        {
+                            "type": "Microsoft.EventHub/namespaces/eventHubs/consumerGroups",
+                            "apiVersion": "2017-04-01",
+                            "name": "[concat(parameters('eventHubNamespacePrefix'), '/', parameters('eventHubSuffix'), '/', parameters('consumerGroupNames')[copyIndex()])]",
+                        "properties": {},
+                            "copy": {
+                                "name": "consumerGroupLoop",
+                                "count": "[length(parameters('consumerGroupNames'))]"
+                            }
+                        }
+                    ]
+                }
+            },
+            "copy": {
+                "name": "eventhubnamespaceiterator",
+                "count": "[parameters('count')]"
+            }
+        }
+    ]
+}

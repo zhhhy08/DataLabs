@@ -1,0 +1,15 @@
+{
+  "EnlistmentRootPaths": {
+    "SourceRootDirs": [
+      "src"
+    ],
+    "OutputRootDirs": [
+      "out"
+    ],
+    "VersionGenerationMode": "SkipVersionGeneration"
+  },
+  "MSBuild": {
+    "Version": "17.9"
+  },
+  "QuickBuildArgs": "-DetectDuplicateBinplace DetectAll -UseHardlinksInCache"
+}

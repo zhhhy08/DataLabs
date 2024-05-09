@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.Build.NoTargets">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <DocParameters>$(DocParameters) --warningsAsErrors true --disableGitFeatures true</DocParameters>
+    <MetadataOutputFolder>$(OutputPath)</MetadataOutputFolder>
+    <LogFile>$(LogPath)docfx.log</LogFile>
+    <RebuildDoc>true</RebuildDoc>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="docfx.console">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

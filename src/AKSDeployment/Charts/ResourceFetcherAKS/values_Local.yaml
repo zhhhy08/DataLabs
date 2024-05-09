@@ -1,0 +1,96 @@
+solutionInfo:
+  aksClusterName: resourcefetcher-test-eastus
+  environment: INT
+  region: eastus
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+resourceFetcherServiceAccount:
+  # Replace Client Id with MI's Client Id
+  clientId: 4a00c7f5-8a50-40d2-982a-fac5861bca2e
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+resourceFetcherService:
+  replicaCount: 3    
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+  aadTokenIssuer: https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/
+  aadTokenAudience: https://resourcefetcherservice-int.microsoft.com
+# ARM Client Related
+  armClient:
+    firstPartyAppId: e6a18a18-ffe6-4ac3-b822-362bb577a6a3
+    certificateName: aad-rp-int-arg-first-party-app-cert
+  casClient:
+    endpoints: ""
+    backupEndpoints: ""
+    certificateName: ""
+  qfdClient:
+    endpoints: ""
+    backupEndpoints: ""
+    certificateName: ""
+  armAdminClient:
+    endpoints: https://northeurope.api-dogfood-admin.resources.windows-int.net
+    backupEndpoints: ""
+    certificateName: ""
+
+keyVault:
+  name: datalabsintgblkv
+  clientId: 26d422f5-0069-43c4-9351-1953e90656ee
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+resourceFetcherConfigMap:
+  partnerNames: "abcsolution"    # this should match with Partner AKS value file's solution name (solutionInfo -> solutionName)
+
+abcsolutionConfigMap:
+  clientIds: 2b463c85-d826-4cb8-ae2e-170d68fe7284
+
+resourceFetcherImage:
+  repository: datalabsintacr.azurecr.io/resourcefetcherservice
+  tag: latest
+
+# AdminService
+adminService:
+  sslSecretProvider:
+    isEnabled: false
+    cloudName: AzurePublicCloud # per cloud
+
+adminServiceImage:
+  repository: datalabsintacr.azurecr.io/adminservice
+  tag: latest
+
+adminServiceConfigMap:
+  dstsRealm: realm://dsts.core.azure-test.net/
+  dstsName: co2agg04-dsts.dsts.core.azure-test.net
+  serviceDns: dlgenevaactionshandlerservice.eastus.cloudapp.azure.com
+  allowedActors: GenevaActionsTest,acisTestTodSMSTest,GenevaActionsDelegatedAuthNonProd
+
+# Monitoring configurations
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  
+genevaAccounts:
+  datalabs:
+    gcs_environment: Test
+    gcs_account: abctestacc1
+    gcs_region: eastus
+    gcs_namespace: abccenter
+    gcs_config_version: "1.13" # TODO Change to respective config version
+    miResourceId: /subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourcegroups/ResourceFetcher/providers/Microsoft.ManagedIdentity/userAssignedIdentities/resourcefetcher-test-acrpush
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  metricEndpoint: https://global.ppe.microsoftmetrics.com/
+  
+  accountInfo:
+    DataLabs:
+      account: abctestacc1
+      namespace: abctestacc1-ResourceFetcher-int
+
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "abctestacc1",
+          "objectId": "2fd508f3-20f9-49b9-8202-78f56930fcc2"
+        }
+      ]
+    }
+

@@ -1,0 +1,82 @@
+#################################################################################
+#                      OneBranch Pipelines - Release YAML Build                 #
+# Documentation:  https://aka.ms/obpipelines                                    #
+# Yaml Schema:    https://aka.ms/obpipelines/yaml/schema                        #
+# Retail Tasks:   https://aka.ms/obpipelines/tasks                              #
+# Support:        https://aka.ms/onebranchsup                                   #
+#################################################################################
+
+trigger: none
+
+parameters: 
+- name: 'debug'
+  displayName: 'Enable debug output'
+  type: boolean
+  default: false
+
+variables:
+  CDP_DEFINITION_BUILD_COUNT: $[counter('', 0)] 
+  system.debug: ${{ parameters.debug }}
+  ENABLE_PRS_DELAYSIGN: 0
+  NUGET_XMLDOC_MODE: none
+  WindowsContainerImage: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest' 
+  PackageFeedEndpoint: https://pkgs.dev.azure.com/msazure/_packaging/GenevaGitOps/nuget/v2
+  #GENEVA_GITOPS_SOURCEROOT: $(Build.SourcesDirectory)\GenevaSrc\
+  GENEVA_GITOPS_SERVICEGROUPROOT: $(Pipeline.Workspace)/DataLabs-Geneva/drop_build_main/ServiceGroupRoot
+  GENEVA_GITOPS_PACKAGEROOT: $(Pipeline.Workspace)/DataLabs-Geneva/drop_build_main/Package/
+
+resources:
+  repositories: 
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+  pipelines:
+    - pipeline: DataLabs-Geneva
+      source: Mgmt-Governance-DataLabs-Geneva-Official
+      project: One
+      trigger: 
+        branches:
+          include:
+          - main
+
+extends:
+  template: v2/OneBranch.Official.CrossPlat.yml@templates
+  parameters:
+    globalSdl:
+      tsa:
+        enabled: false
+      binskim:
+        break: true
+      policheck:
+        break: true
+
+    stages:
+    - stage: 'Prod_ValidateAndDeployGenevaConfiguration'
+      displayName: 'Prod:ValidateAndDeployGenevaConfiguration'
+      variables:
+        ob_release_environment: Production
+        ob_release_servicetreeid: "00df9fbf-c722-42e4-9acd-bc7125483b22"
+        ob_release_usedeploymentjob: true
+        ob_deploymentjob_environment: "DataLabs-Geneva"
+        ev2_rolloutinfra: "Prod"
+
+      jobs:
+      - job: ReleaseDeployment
+        pool:
+          type: release
+        steps: 
+          - download: DataLabs-Geneva
+            artifact: drop_build_main
+          - task: vsrm-ev2.vss-services-ev2.adm-release-task.ExpressV2Internal@1
+            inputs:
+              UseServerMonitorTask: true
+              EnableStrictValidation: false
+              ValidateOnly: false
+              EndpointProviderType: Ev2Endpoint
+              ConnectedServiceName: 'Ev2Datalabs-Geneva'
+              ServiceRootLocation: 'LinkedArtifact'
+              RolloutSpecType: RSPath
+              ServiceRootPath: '$(Pipeline.Workspace)/DataLabs-Geneva/drop_build_main/'
+              RolloutSpecPath: '$(Pipeline.Workspace)/DataLabs-Geneva/drop_build_main/RolloutSpec.json'

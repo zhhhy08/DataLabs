@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.resourceFetcherService.adminPortServiceName }}
+  namespace: {{ .Values.resourceFetcherNameSpace }}
+spec:
+  selector:
+    app: {{ .Values.resourceFetcherService.name }}
+  ports:
+  - name: adminservice
+    port: {{ .Values.adminService.adminPort }}
+    protocol: TCP

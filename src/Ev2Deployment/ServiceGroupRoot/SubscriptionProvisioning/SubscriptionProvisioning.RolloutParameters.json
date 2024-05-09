@@ -1,0 +1,25 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-01-01/rolloutParameters.json",
+    "contentVersion": "1.0.0.0",
+    "subscriptions": [
+        {
+            "name": "SubscriptionProvisioning",
+            "displayName": "__DISPLAY_NAME__",
+            "initialOwnerPrincipalId": "05c6bba5-53fd-4704-9299-bbf9a789920c",
+            "workload": "Production",
+            "billing": {
+                "scope": "/billingAccounts/3984c6f4-2d2a-4b04-93ce-43cf4824b698:c2ff2d7c-162e-4c31-b715-1405de6d9cf3_2019-05-31/billingProfiles/f38ee5f4-d0ee-40a0-8e3f-633d9d9df8b6/invoiceSections/00df9fbf-c722-42e4-9acd-bc7125483b22",
+                "pcCode": "P10236672",
+                "costCategory": "FR",
+                "airsRegisteredUserPrincipalId": "d954c3a1-d94d-46f5-b252-08cb229047b2"
+            },
+            "isServiceScope": "true",
+            "certificateIssuance": {
+                "allowedDomains": [
+                    "__ONECERT_DOMAINS__"
+                ],
+                "domainRegistrationProvider": "OneCert"
+            }
+        }
+    ]
+}

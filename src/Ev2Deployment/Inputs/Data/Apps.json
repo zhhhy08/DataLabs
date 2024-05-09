@@ -1,0 +1,72 @@
+[
+    {
+        "Name": "RegionalPartnerResourceGroup",
+        "AzureResourceGroupName": "DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location()",
+        "ConfigsScopeBindingName": "PartnerConfigs",
+        "AppName": "AdminService",
+        "Component": "Partner"
+    },
+    {
+        "Name": "RegionalPartnerResourceGroup",
+        "AzureResourceGroupName": "DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location()",
+        "ConfigsScopeBindingName": "PartnerConfigs",
+        "AppName": "CacheService",
+        "Component": "Partner"
+    },
+    {
+        "Name": "RegionalPartnerResourceGroup",
+        "AzureResourceGroupName": "DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location()",
+        "ConfigsScopeBindingName": "PartnerConfigs",
+        "AppName": "IOService",
+        "Component": "Partner"
+    },
+    {
+        "Name": "RegionalPartnerResourceGroup",
+        "AzureResourceGroupName": "DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location()",
+        "ConfigsScopeBindingName": "PartnerConfigs",
+        "AppName": "MonitorService",
+        "Component": "Partner"
+    },
+    {
+        "Name": "RegionalPartnerResourceGroup",
+        "AzureResourceGroupName": "DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location()",
+        "ConfigsScopeBindingName": "PartnerConfigs",
+        "AppName": "PartnerCacheService",
+        "Component": "Partner"
+    },
+    {
+        "Name": "RegionalPartnerResourceGroup",
+        "AzureResourceGroupName": "DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location()",
+        "ConfigsScopeBindingName": "PartnerConfigs",
+        "AppName": "PartnerService",
+        "Component": "Partner"
+    },
+    {
+        "Name": "RegionalPartnerResourceGroup",
+        "AzureResourceGroupName": "DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location()",
+        "ConfigsScopeBindingName": "PartnerConfigs",
+        "AppName": "ResourceProxy",
+        "Component": "Partner"
+    },
+    {
+        "Name": "RegionalResourceFetcherResourceGroup",
+        "AzureResourceGroupName": "DataLabsRFRG-$location()",
+        "ConfigsScopeBindingName": "ResourceFetcherConfigs",
+        "AppName": "AdminService",
+        "Component": "ResourceFetcher"
+    },
+    {
+        "Name": "RegionalResourceFetcherResourceGroup",
+        "AzureResourceGroupName": "DataLabsRFRG-$location()",
+        "ConfigsScopeBindingName": "ResourceFetcherConfigs",
+        "AppName": "MonitorService",
+        "Component": "ResourceFetcher"
+    },
+    {
+        "Name": "RegionalResourceFetcherResourceGroup",
+        "AzureResourceGroupName": "DataLabsRFRG-$location()",
+        "ConfigsScopeBindingName": "ResourceFetcherConfigs",
+        "AppName": "ResourceFetcherService",
+        "Component": "ResourceFetcher"
+    }
+]

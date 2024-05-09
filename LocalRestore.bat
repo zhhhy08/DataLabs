@@ -1,0 +1,1 @@
+"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\msbuild.exe" "dirs.proj" /nologo /nr:false  /t:Restore /p:platform="x64" /p:configuration="release" /m

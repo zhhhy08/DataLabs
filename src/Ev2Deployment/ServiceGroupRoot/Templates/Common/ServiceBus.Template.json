@@ -1,0 +1,187 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "serviceBusName": {
+            "type": "string"
+        },
+        "serviceBusInitialCapacity": {
+            "type": "int"
+        },
+        "serviceBusQueueName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "IoConnectorResourceId": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "AzureServiceBusDataOwnerRoleDefId": "090c5cfd-751d-490a-894a-3ce6f1109419"
+    },
+    "resources": [
+        {
+            "name": "[parameters('serviceBusName')]",
+            "type": "Microsoft.ServiceBus/namespaces",
+            "apiVersion": "2018-01-01-preview",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Premium",
+                "tier": "Premium",
+                "capacity": "[parameters('serviceBusInitialCapacity')]"
+            },
+            "properties": {
+                "zoneRedundant": true
+            }
+        },
+        {
+            "name": "[concat(parameters('serviceBusName'), '/', parameters('serviceBusQueueName'))]",
+            "type": "Microsoft.ServiceBus/namespaces/queues",
+            "apiVersion": "2018-01-01-preview",
+            "location": "[parameters('location')]",
+            "properties": {
+                "lockDuration": "PT1M",
+                "defaultMessageTimeToLive": "P14D",
+                "maxSizeInMegabytes": 81920,
+                "deadLetteringOnMessageExpiration": true,
+                "requiresDuplicateDetection": false,
+                "requiresSession": false,
+                "maxDeliveryCount": 10,
+                "duplicateDetectionHistoryTimeWindow": "PT10M",
+                "enableBatchedOperations": true,
+                "enablePartitioning": false,
+                "enableExpress": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBusName'))]"
+            ]
+        },
+        {
+            "condition": false,
+            "name": "[guid(parameters('serviceBusName'), variables('AzureServiceBusDataOwnerRoleDefId'), parameters('IoConnectorResourceId'))]",
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2022-04-01",
+            "properties": {
+                "roleDefinitionId": "[SubscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('AzureServiceBusDataOwnerRoleDefId'))]",
+                "principalId": "[reference(parameters('IoConnectorResourceId'), '2018-11-30', 'Full').properties.principalId]",
+                "principalType": "ServicePrincipal"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBusName'))]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('serviceBusName'),'-AutoscaleSettings')]",
+            "type": "Microsoft.Insights/autoscaleSettings",
+            "location": "[parameters('location')]",
+            "apiVersion": "2015-04-01",
+            "properties": {
+                "enabled": true,
+                "targetResourceUri": "[concat(resourceGroup().id,'/providers/Microsoft.ServiceBus/namespaces/', parameters('serviceBusName'))]",
+                "profiles": [
+                    {
+                        "name": "Auto created default scale condition",
+                        "capacity": {
+                            "minimum": "[parameters('serviceBusInitialCapacity')]",
+                            "maximum": "16",
+                            "default": "[parameters('serviceBusInitialCapacity')]"
+                        },
+                        "rules": [
+                            {
+                                "scaleAction": {
+                                    "direction": "Increase",
+                                    "type": "ServiceAllowedNextValue",
+                                    "value": "1",
+                                    "cooldown": "PT5M"
+                                },
+                                "metricTrigger": {
+                                    "metricName": "NamespaceCpuUsage",
+                                    "metricNamespace": "microsoft.servicebus/namespaces",
+                                    "metricResourceUri": "[concat(resourceGroup().id,'/providers/Microsoft.ServiceBus/namespaces/', parameters('serviceBusName'))]",
+                                    "operator": "GreaterThan",
+                                    "statistic": "Average",
+                                    "threshold": 75,
+                                    "timeAggregation": "Average",
+                                    "timeGrain": "PT1M",
+                                    "timeWindow": "PT5M",
+                                "Dimensions": [],
+                                    "dividePerInstance": false
+                                }
+                            },
+                            {
+                                "scaleAction": {
+                                    "direction": "Increase",
+                                    "type": "ServiceAllowedNextValue",
+                                    "value": "1",
+                                    "cooldown": "PT5M"
+                                },
+                                "metricTrigger": {
+                                    "metricName": "NamespaceMemoryUsage",
+                                    "metricNamespace": "microsoft.servicebus/namespaces",
+                                    "metricResourceUri": "[concat(resourceGroup().id,'/providers/Microsoft.ServiceBus/namespaces/', parameters('serviceBusName'))]",
+                                    "operator": "GreaterThan",
+                                    "statistic": "Average",
+                                    "threshold": 75,
+                                    "timeAggregation": "Average",
+                                    "timeGrain": "PT1M",
+                                    "timeWindow": "PT5M",
+                                "Dimensions": [],
+                                    "dividePerInstance": false
+                                }
+                            },
+                            {
+                                "scaleAction": {
+                                    "direction": "Decrease",
+                                    "type": "ServiceAllowedNextValue",
+                                    "value": "1",
+                                    "cooldown": "PT10M"
+                                },
+                                "metricTrigger": {
+                                    "metricName": "NamespaceCpuUsage",
+                                    "metricNamespace": "microsoft.servicebus/namespaces",
+                                    "metricResourceUri": "[concat(resourceGroup().id,'/providers/Microsoft.ServiceBus/namespaces/', parameters('serviceBusName'))]",
+                                    "operator": "LessThan",
+                                    "statistic": "Average",
+                                    "threshold": 45,
+                                    "timeAggregation": "Average",
+                                    "timeGrain": "PT1M",
+                                    "timeWindow": "PT10M",
+                                "Dimensions": [],
+                                    "dividePerInstance": false
+                                }
+                            },
+                            {
+                                "scaleAction": {
+                                    "direction": "Decrease",
+                                    "type": "ServiceAllowedNextValue",
+                                    "value": "1",
+                                    "cooldown": "PT10M"
+                                },
+                                "metricTrigger": {
+                                    "metricName": "NamespaceMemoryUsage",
+                                    "metricNamespace": "microsoft.servicebus/namespaces",
+                                    "metricResourceUri": "[concat(resourceGroup().id,'/providers/Microsoft.ServiceBus/namespaces/', parameters('serviceBusName'))]",
+                                    "operator": "LessThan",
+                                    "statistic": "Average",
+                                    "threshold": 45,
+                                    "timeAggregation": "Average",
+                                    "timeGrain": "PT1M",
+                                    "timeWindow": "PT10M",
+                                "Dimensions": [],
+                                    "dividePerInstance": false
+                                }
+                            }
+                        ]
+                    }
+                ],
+            "notifications": [],
+                "targetResourceLocation": "[parameters('location')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBusName'))]"
+            ]
+        }
+    ]
+}

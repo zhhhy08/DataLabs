@@ -1,0 +1,422 @@
+{
+  "advancedConfiguration": {
+    "combinationDeltaFetchLookback": null,
+    "combinationFullRefreshInterval": null,
+    "debug": false,
+    "distributionConfiguration": null,
+    "enableCostReporting": null,
+    "enableFullRefreshWhenMetricSourceCombinationsChangeV2": null,
+    "enableKustoLogsMonitorV2": null,
+    "enableMinHintsLookbackAsMonitorLookback": null,
+    "enableMonitorV2InheritOptimization": null,
+    "enableMonitorV2QueryInfoOptimizationToReduceMemoryUsage": null,
+    "enablePreviewBucketOffset": null,
+    "enableThresholdResultTypeChange": null,
+    "enableThrowInvalidSeriesExceptionInMetricFetch": null,
+    "handleNullDataInDTMonitorV2Training": null,
+    "ingestionDelayToSkip": null,
+    "limitsConfiguration": null,
+    "maxCombinationsForHintingRetrieval": null,
+    "monitorV2InheritOptimizationWhenNumberOfCombinations": null,
+    "skipMetricsDataLossValidation": null,
+    "skipMetricsDataQualityCheck": null,
+    "updateTimeSeriesMetadataForCompositeMetric": null,
+    "useExpressionEngineInBaselineAnomalyTraining": null,
+    "useLimitForHintingRetrieval": null
+  },
+  "alertConditions": [
+    {
+      "alertOutletIds": [],
+      "bucket": null,
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 2,
+          "expressionId": "a2df3a09-c721-4c2e-b285-b315994b7960",
+          "id": "ca6a72bd-f107-4ad0-8cd5-130d0bb61f63",
+          "type": 0,
+          "value": "1"
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 2,
+      "id": "22802cc5-90ec-4163-8e58-e1f07134492e",
+      "metadata": {},
+      "name": "Critical Errors Found",
+      "severity": 3
+    },
+    {
+      "alertOutletIds": [],
+      "bucket": null,
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 2,
+          "expressionId": "a2df3a09-c721-4c2e-b285-b315994b7960",
+          "id": "ca6a72bd-f107-4ad0-8cd5-130d0bb61f63",
+          "type": 0,
+          "value": 1000
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 1,
+      "id": "c5fbacf5-ff1b-410c-8a78-b2621039779a",
+      "metadata": {},
+      "name": "Significant Critical Errors Found",
+      "severity": 2
+    }
+  ],
+  "alertEnrichmentConfiguration": {
+    "customLinks": [
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "Monitor.Tenant",
+          "activityName",
+          "scaleUnit",
+          "region",
+          "service",
+          "component"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "1.00:00:00",
+        "path": [],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "Critical Error Counter"
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DGrepJarvisLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "dGrepEndpoint": "https://dgrepv2-frontend-prod.trafficmanager.net/",
+        "endpointAlias": "Diagnostics PROD",
+        "endTime": "{EndTime}",
+        "eventFilters": [
+          {
+            "isScrubbed": false,
+            "monikerRegex": null,
+            "nameRegex": "ActivityCompleted",
+            "namespaceRegex": "ARGDataLabs",
+            "versionRegex": null
+          },
+          {
+            "isScrubbed": false,
+            "monikerRegex": null,
+            "nameRegex": "ActivityFailed",
+            "namespaceRegex": "ARGDataLabs",
+            "versionRegex": null
+          }
+        ],
+        "executionDelay": "00:00:00",
+        "identityColumns": {
+          "__Region__": [
+            "{Monitor.Dimension.region}"
+          ],
+          "ScaleUnit": [
+            "{Monitor.Dimension.scaleUnit}"
+          ]
+        },
+        "lookback": "02:00:00",
+        "maxResultRowCount": 15,
+        "maxRowCount": 500000,
+        "mdsEndpoint": "https://production.diagnostics.monitoring.core.windows.net/",
+        "preIncidentQueryTimeout": "00:00:50",
+        "serverQuery": "source\n| where component == \"{Monitor.Dimension.component}\"\n| where activityName == \"{Monitor.Dimension.activityName}\"",
+        "startTime": null,
+        "stepback": "00:00:00",
+        "title": "Critical Failure Activity Counts for Service",
+        "uxParameters": [
+          {
+            "key": "aggregatesVisible",
+            "value": false
+          },
+          {
+            "key": "aggregates",
+            "value": [
+              "Count by EventData",
+              "Count by DequeueCount",
+              "Count by SlimResourceType",
+              "Count by activityName",
+              "Count by exception",
+              "Count by service",
+              "Count by RoleInstance",
+              "Count by Environment"
+            ]
+          },
+          {
+            "key": "chartsVisible",
+            "value": false
+          },
+          {
+            "key": "chartEditorVisible",
+            "value": true
+          },
+          {
+            "key": "chartType",
+            "value": "line"
+          },
+          {
+            "key": "chartLayers",
+            "value": [
+              [
+                "New Layer",
+                "groupby TIMESTAMP.roundDown(\"PT1M\") as X\nlet Count = Count()"
+              ]
+            ]
+          },
+          {
+            "key": "UTC",
+            "value": false
+          }
+        ]
+      }
+    ]
+  },
+  "autoMitigationConfiguration": {
+    "healthyCountToMitigateIncident": 10,
+    "shouldMitigateIncident": false
+  },
+  "customMetadata": {
+    "Title": "[DataLabs] {Monitor.DisplayName} is unhealthy in SU {Monitor.Dimension.scaleUnit}, region {Monitor.Dimension.region}, service {Monitor.Dimension.service}"
+  },
+  "description": "Critical Errors are written in the code to not exist. This monitor will help track any critical errors that happen in the system. ",
+  "expressions": [
+    {
+      "endTimeShift": null,
+      "id": "a2df3a09-c721-4c2e-b285-b315994b7960",
+      "lookback": null,
+      "name": "CriticalErrors",
+      "nullDataPointsHandling": null,
+      "percentages": [
+        {
+          "denominator": [],
+          "multiplier": 1,
+          "numerator": [
+            {
+              "conditions": [
+                {
+                  "dimensionName": "NODE_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "POD_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "activityName",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "buildVersion",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "component",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "parentActivityName",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "region",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scaleUnit",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scenario",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "service",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                }
+              ],
+              "dataBlockType": 0,
+              "endTimeShift": null,
+              "isNegative": false,
+              "lookback": null,
+              "lookbackAggregation": 0,
+              "mdmAggregationConfiguration": null,
+              "multiTimeSeriesAggregation": 0,
+              "nullDataPointsHandling": null,
+              "timeSeriesId": "76725988-e1a7-4963-ab2b-ab909d27fceb",
+              "timeSeriesType": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "frequency": "00:03:00",
+  "id": "4880b65c-d672-400e-95dd-26526edda014",
+  "lastModifiedBy": "ponaraya",
+  "lastModifiedTime": "2024-05-03T20:06:51.3694917Z",
+  "lookback": "00:05:00",
+  "name": "[ActivityTracing] CriticalActivityFailed Count",
+  "outlets": [],
+  "recoveryRules": [],
+  "resourceType": "ServiceHealth",
+  "schemaVersion": 0,
+  "state": 1,
+  "tags": [
+    "ActivityTracing"
+  ],
+  "targetDimensions": [
+    {
+      "dimensionName": "scaleUnit",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "region",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "service",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "component",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "activityName",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    }
+  ],
+  "tenant": "ARGDataLabs",
+  "timeSeries": [
+    {
+      "dimensions": [
+        "NODE_NAME",
+        "POD_NAME",
+        "activityName",
+        "buildVersion",
+        "component",
+        "parentActivityName",
+        "region",
+        "scaleUnit",
+        "scenario",
+        "service"
+      ],
+      "id": "76725988-e1a7-4963-ab2b-ab909d27fceb",
+      "metric": "CriticalActivityErrorCounter",
+      "name": "CriticalErrors",
+      "namespace": "ARGDataLabs",
+      "samplingType": "Count",
+      "tenant": "ARGDataLabs",
+      "timeSeriesType": 0
+    }
+  ]
+}

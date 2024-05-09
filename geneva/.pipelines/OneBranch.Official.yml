@@ -1,0 +1,194 @@
+#################################################################################
+#                      OneBranch Pipelines - PR Build                           #
+# This pipeline was created by EasyStart from a sample located at:              #
+#   https://aka.ms/obpipelines/easystart/samples                                #
+# Documentation:  https://aka.ms/obpipelines                                    #
+# Yaml Schema:    https://aka.ms/obpipelines/yaml/schema                        #
+# Retail Tasks:   https://aka.ms/obpipelines/tasks                              #
+# Support:        https://aka.ms/onebranchsup                                   #
+#################################################################################
+# GitOps Variables or Parameters
+#
+# The convention for folders used by the GitOps Ev2 flow are:
+# - /GenevaSrc   
+#   - Location of your account configuration files/folders such as Logs/, Metrics/, AccountConfig, Monitors/, MonitorsV2/, etc.
+# - /ServiceGroupRoot
+#   - Location of Ev2 artifacts used by the Ev2 extension to process changes to your account configurations
+#
+# It's recommended you stay with the convention, but you may override paths as needed. This may prevent the update from working.
+# Sample variables are provided for convenience using the default values when the cmdlet parameters are not specified
+# when called.
+#
+# GENEVA_GITOPS_SOURCEROOT: $(Build.SourcesDirectory)\GenevaSrc\
+# GENEVA_GITOPS_SERVICEGROUPROOT: $(Build.SourcesDirectory)\ServiceGroupRoot\
+# GENEVA_GITOPS_PACKAGEROOT: $(Build.SourcesDirectory)\ServiceGroupRoot\Package\
+#
+# If you wish to use parameters instead of variables you may enable your pipeline to use 
+# pipeline callee provided parameters to override folder paths and any future
+# options for functions from the powershell module.
+#
+# For example:
+# - name: 'genevaGitOpsSourceRoot'
+#   displayName: 'Geneva GitOps Source Root Path'
+#   type: filePath
+#   default: $(Build.SourcesDirectory)\GenevaSrc\
+
+# https://aka.ms/obpipelines/triggers
+trigger: 
+  branches:
+    include: [ main, master ]
+# NOTE: If you cohost your configuration with service source code, you should strongly consider
+# adding a filter to only trigger this pipeline for changes to the configuration files/folders.
+  paths:
+    include:
+      - geneva/*
+
+parameters: # parameters are shown up in ADO UI in a build queue time
+- name: 'debug'
+  displayName: 'Enable debug output'
+  type: boolean
+  default: false
+
+variables:
+  CDP_DEFINITION_BUILD_COUNT: $[counter('', 0)] # needed for onebranch.pipeline.version task https://aka.ms/obpipelines/versioning
+  system.debug: ${{ parameters.debug }}
+  ENABLE_PRS_DELAYSIGN: 0
+  ROOT: $(Build.SourcesDirectory)
+  REPOROOT: $(Build.SourcesDirectory)
+  OUTPUTROOT: $(Build.SourcesDirectory)\out
+  NUGET_XMLDOC_MODE: none
+
+  # Docker image which is used to build the project https://aka.ms/obpipelines/containers
+  WindowsContainerImage: 'onebranch.azurecr.io/windows/ltsc2019/vse2019:latest' 
+  # If your ADO project is not under the MSAzure organization, you will need to create a new ADO Artifact feed, 
+  # add azure-feed://msazure/GenevaGitOps@Local as an Upstream Source, search for and install the Upstream package
+  # Geneva.GitOps.PSModule. Then, update the PackageFeedEndpoint variable to point to your new feed.
+  PackageFeedEndpoint: https://pkgs.dev.azure.com/msazure/_packaging/GenevaGitOps/nuget/v2
+
+resources:
+  repositories: 
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+extends:
+  template: v2/OneBranch.Official.CrossPlat.yml@templates # https://aka.ms/obpipelines/templates
+  parameters:
+    globalSdl: # https://aka.ms/obpipelines/sdl
+      tsa:
+        enabled: false # onebranch publish all sdl results to TSA. If TSA is disabled all SDL tools will forced into 'break' build mode.
+      # credscan:
+      #   suppressionsFile: $(Build.SourcesDirectory)\.config\CredScanSuppressions.json
+      binskim:
+        break: true # always break the build on binskim issues. You can disable it by setting to 'false'
+      policheck:
+        break: true # always break the build on policheck issues. You can disable it by setting to 'false'
+      # suppression:
+      #   suppressionFile: $(Build.SourcesDirectory)\.gdn\global.gdnsuppress
+
+    stages:
+    - stage: build
+      jobs:
+      - job: main
+        pool:
+          type: windows  # read more about custom job pool types at https://aka.ms/obpipelines/yaml/jobs
+        
+        variables: # More settings at https://aka.ms/obpipelines/yaml/jobs
+          ob_outputDirectory: '$(Build.SourcesDirectory)\out' # this directory is uploaded to pipeline artifacts, reddog and cloudvault. More info at https://aka.ms/obpipelines/artifacts
+          ob_sdl_binskim_break: true # https://aka.ms/obpipelines/sdl
+
+          # ob_sdl_suppression_suppressionFile: $(Build.SourcesDirectory)\.gdn\build.nonofficial.gdnsuppress
+
+        steps:
+          - task: onebranch.pipeline.version@1 # generates automatic version. For other versioning options check https://aka.ms/obpipelines/versioning
+            displayName: 'Setup BuildNumber'
+            inputs:
+              system: 'RevisionCounter'
+              major: '1'
+              minor: '0'
+              exclude_commit: true
+
+          # Geneva GitOps tasks
+          # comment out the write tasks if you do not wish to use those features
+          - task: PowerShell@2
+            displayName: 'Register, Install and Execute Geneva GitOps actions from ADO Artifacts Feed'
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+              ENDPOINT: $(PackageFeedEndpoint)
+            inputs:
+              targetType: 'inline'
+              script: |
+                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+                $token = $env:SYSTEM_ACCESSTOKEN | ConvertTo-SecureString -AsPlainText -Force
+                $credential = New-Object System.Management.Automation.PSCredential($env:SYSTEM_ACCESSTOKEN, $token)
+                $sourceName = "GenevaGitOpsArtifacts"
+                $feedUri = $env:ENDPOINT
+                $source = Get-PackageSource -Name $sourceName -ErrorAction SilentlyContinue
+                if ($null -eq $source) { Register-PackageSource -Name $sourceName -ProviderName PowerShellGet -Location $feedUri -Trusted -Credential $credential }
+                $moduleName = "Geneva.GitOps.PSModule"
+                Install-Module -Name $moduleName -Repository $sourceName -Force -Credential $credential -AllowClobber
+                new-item -path .\GenevaSrc -ItemType Directory -Name Logs
+                new-item -path .\GenevaSrc -ItemType Directory -Name Monitors
+                Write-LogsArtifacts
+                Write-MetricsArtifacts
+                Write-HealthArtifacts
+                Write-DashboardArtifacts
+              pwsh: true
+              workingDirectory: 'geneva/'
+
+
+          # /Geneva GitOps tasks
+
+          # With the artifacts created for the extension to use, copy and publish them for consumption
+          - task: PowerShell@2
+            displayName: 'Copy artifacts to output'
+            inputs:
+              targetType: 'inline'
+              script: |
+                $DESTINATION = "$(Build.SourcesDirectory)\out"
+                Get-ChildItem -Path "$(Build.SourcesDirectory)\geneva\ServiceGroupRoot\" -Force | foreach { copy-item -Path $_.FullName -Recurse -Destination $DESTINATION\$_  }
+
+          # This task may not be needed depending on your project settings (would be auto injected by OneBranch, for example)
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.SourcesDirectory)\out'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
+
+    # OPTIONAL, you must be using OneBranch Release YAML Pipelines to use this section
+    # https://eng.ms/docs/products/onebranch/release/typesofreleasedefinitions/yamlreleasepipelines
+    # If you're using Multi-Stage Pipelines (Build + Release in one YAML file), you can use the following to publish the build artifacts to the release pipeline
+#   - stage: 'Prod_ValidateGenevaConfiguration'      
+#     displayName: 'Prod:ValidateGenevaConfiguration'
+#     dependsOn: build
+#     variables:
+#       ob_release_environment: Production
+#       ob_release_servicetreeid: "<YOUR SERVICE TREE ID>" 
+#       ob_release_usedeploymentjob: true
+#       # you'll need to create or use an existing ADO Environment
+#       # https://eng.ms/docs/products/onebranch/release/typesofreleasedefinitions/yamlreleasepipelines/yamlenvironments/adoenvironment
+#       ob_deploymentjob_environment: "<YOUR ENVIRONMENT NAME>"          
+#       ev2_rolloutinfra: "Prod"
+#     # NOTE This is the pipeline used during each PR iteration
+#     # we only want validation, not release
+#     # Depending on the Ev2 Extensions being targeted, they may not support the Ev2 /validate API
+#     # ValidateOnly will be ignored if the extension does not support it and only the Ev2 artifacts will be validated
+#     jobs:
+#     - job: ReleaseValidation
+#       pool:          
+#         type: release  # read more about custom job types at https://aka.ms/obpipelines/yaml/jobs       
+#           
+#       steps: # These steps will be run in unrestricted container's network         
+#         - download: current # current is used in multi-stage to refer to the build stage's output
+#         - task: vsrm-ev2.vss-services-ev2.adm-release-task.ExpressV2Internal@1
+#           inputs:
+#             UseServerMonitorTask: true
+#             EnableStrictValidation: true
+#             ValidateOnly: true
+#             EndpointProviderType: ApprovalService
+#             ApprovalServiceEnvironment: Production
+#             ServiceRootLocation: 'LinkedArtifact'
+#             RolloutSpecType: 'RSPath'
+#             ServiceRootPath: '$(Pipeline.Workspace)/drop_build_main'
+#             RolloutSpecPath: '$(Pipeline.Workspace)/drop_build_main/<GENEVA SERVICE GROUP ROOT>/RolloutSpec.json'

@@ -1,0 +1,8 @@
+# Usage: 
+# set RESOURCE_GROUP ABC-eastus
+# set AKS_NAME abc-test-eastus
+# Invoke-AzAksRunCommand -ResourceGroupName ${RESOURCE_GROUP} -Name ${AKS_NAME} -Force -Command "kubectl patch configmap resourceproxy-config -n solution-namespace --type merge --patch-file ChangeArmMinReadsLimit.yaml" -CommandContextAttachment "ChangeArmMinReadsLimit.yaml"
+
+data:
+  SubscriptionARMReadSafeLimit_BackoffMilliseconds: "600000"
+  SubscriptionARMReadSafeLimit: "5000"

@@ -1,0 +1,645 @@
+{
+  "advancedConfiguration": {
+    "combinationDeltaFetchLookback": null,
+    "combinationFullRefreshInterval": null,
+    "debug": false,
+    "distributionConfiguration": null,
+    "enableCostReporting": null,
+    "enableFullRefreshWhenMetricSourceCombinationsChangeV2": null,
+    "enableKustoLogsMonitorV2": null,
+    "enableMinHintsLookbackAsMonitorLookback": null,
+    "enableMonitorV2InheritOptimization": null,
+    "enableMonitorV2QueryInfoOptimizationToReduceMemoryUsage": null,
+    "enablePreviewBucketOffset": null,
+    "enableThresholdResultTypeChange": null,
+    "enableThrowInvalidSeriesExceptionInMetricFetch": null,
+    "handleNullDataInDTMonitorV2Training": null,
+    "ingestionDelayToSkip": null,
+    "limitsConfiguration": null,
+    "maxCombinationsForHintingRetrieval": null,
+    "monitorV2InheritOptimizationWhenNumberOfCombinations": null,
+    "skipMetricsDataLossValidation": null,
+    "skipMetricsDataQualityCheck": null,
+    "updateTimeSeriesMetadataForCompositeMetric": null,
+    "useExpressionEngineInBaselineAnomalyTraining": null,
+    "useLimitForHintingRetrieval": null
+  },
+  "alertConditions": [
+    {
+      "alertOutletIds": [],
+      "bucket": null,
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 1,
+          "expressionId": "863d76f8-73d9-46f4-a693-cd80cad96dc5",
+          "id": "87262b19-ce74-49bf-946a-94bcfc5b4770",
+          "type": 0,
+          "value": 10000
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 2,
+      "id": "b64cbd6b-ef9c-484c-851a-99860dc0b1ed",
+      "metadata": {},
+      "name": "Slow Internal Duration",
+      "severity": 3
+    },
+    {
+      "alertOutletIds": [],
+      "bucket": null,
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 1,
+          "expressionId": "863d76f8-73d9-46f4-a693-cd80cad96dc5",
+          "id": "87262b19-ce74-49bf-946a-94bcfc5b4770",
+          "type": 0,
+          "value": 60000
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 2,
+      "id": "11835b5e-4442-480a-bd18-90520ed7cb4b",
+      "metadata": {},
+      "name": "Very Slow Internal Duration",
+      "severity": 2
+    }
+  ],
+  "alertEnrichmentConfiguration": {
+    "customLinks": [
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "scaleUnit",
+          "region"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "01:00:00",
+        "path": [
+          "IOService",
+          "DataFlow"
+        ],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "Data Flow"
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "EventTaskType",
+          "scaleUnit",
+          "region"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "1.00:00:00",
+        "path": [],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "ActivityTracing Duration"
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DGrepJarvisLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "clientQuery": "orderby durationMilliseconds desc",
+        "dGrepEndpoint": "https://dgrepv2-frontend-prod.trafficmanager.net/",
+        "endpointAlias": "Diagnostics PROD",
+        "endTime": "{EndTime}",
+        "eventFilters": [
+          {
+            "isScrubbed": false,
+            "monikerRegex": null,
+            "nameRegex": "Span",
+            "namespaceRegex": "ARGDataLabs",
+            "versionRegex": null
+          }
+        ],
+        "executionDelay": "00:00:00",
+        "identityColumns": {
+          "Region": [
+            "{Monitor.Dimension.region}"
+          ],
+          "ScaleUnit": [
+            "{Monitor.Dimension.scaleUnit}"
+          ]
+        },
+        "lookback": "00:15:00",
+        "maxResultRowCount": 15,
+        "maxRowCount": 500000,
+        "mdsEndpoint": "https://production.diagnostics.monitoring.core.windows.net/",
+        "preIncidentQueryTimeout": "00:00:50",
+        "serverQuery": "where durationMilliseconds > 10000 // Current SLO for message duration (without partner processing)",
+        "startTime": null,
+        "stepback": "00:00:00",
+        "title": "High Duration Traces",
+        "uxParameters": [
+          {
+            "key": "aggregatesVisible",
+            "value": true
+          },
+          {
+            "key": "aggregates",
+            "value": []
+          },
+          {
+            "key": "chartsVisible",
+            "value": false
+          },
+          {
+            "key": "chartEditorVisible",
+            "value": true
+          },
+          {
+            "key": "chartType",
+            "value": "line"
+          },
+          {
+            "key": "chartLayers",
+            "value": [
+              [
+                "New Layer",
+                ""
+              ]
+            ]
+          },
+          {
+            "key": "UTC",
+            "value": true
+          }
+        ]
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.GenericCustomLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "executionDelay": "00:00:00",
+        "link": "https://eng.ms/docs/cloud-ai-platform/azure-core/azure-management-and-platforms/control-plane-bburns/fleet-inventory/azure-resource-builder/monitors/slomessagedurationhigh",
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "SLOMessageDurationTSG"
+      }
+    ]
+  },
+  "autoMitigationConfiguration": {
+    "healthyCountToMitigateIncident": 10,
+    "shouldMitigateIncident": false
+  },
+  "customMetadata": {
+    "Icm.TsgId": "https://eng.ms/docs/cloud-ai-platform/azure-core/azure-management-and-platforms/control-plane-bburns/fleet-inventory/azure-resource-builder/monitors/slomessagedurationhigh",
+    "Title": "[Data Labs] {Monitor.DisplayName} for SU: {Monitor.Dimension.scaleUnit}, Region: {Monitor.Dimension.region}, NodeName: {Monitor.Dimension.NODE_NAME} "
+  },
+  "description": "Total message processing time, ignoring partner processing.",
+  "expressions": [
+    {
+      "endTimeShift": null,
+      "id": "72f75a40-bf7c-43e1-b050-5b9135184249",
+      "lookback": null,
+      "name": "E2E Duration",
+      "nullDataPointsHandling": {
+        "nullDataPointsPercentage": null,
+        "nullDataPointsSkipMode": 1,
+        "valueOnNull": null
+      },
+      "percentages": [
+        {
+          "denominator": [],
+          "multiplier": 1,
+          "numerator": [
+            {
+              "conditions": [
+                {
+                  "dimensionName": "EventTaskType",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "IsRetry",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "NODE_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "POD_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "buildVersion",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "isActivityFailed",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "region",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scaleUnit",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "service",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                }
+              ],
+              "dataBlockType": 0,
+              "endTimeShift": null,
+              "isNegative": false,
+              "lookback": null,
+              "lookbackAggregation": 4,
+              "mdmAggregationConfiguration": null,
+              "multiTimeSeriesAggregation": 4,
+              "nullDataPointsHandling": {
+                "nullDataPointsPercentage": null,
+                "nullDataPointsSkipMode": 1,
+                "valueOnNull": null
+              },
+              "timeSeriesId": "f2db48cb-e99c-4fbf-977d-4a2cb48ee7c5",
+              "timeSeriesType": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "endTimeShift": null,
+      "id": "95a5b949-e13c-4637-a286-393d46dea08e",
+      "lookback": null,
+      "name": "Partner Duration",
+      "nullDataPointsHandling": {
+        "nullDataPointsPercentage": null,
+        "nullDataPointsSkipMode": 1,
+        "valueOnNull": null
+      },
+      "percentages": [
+        {
+          "denominator": [],
+          "multiplier": 1,
+          "numerator": [
+            {
+              "conditions": [
+                {
+                  "dimensionName": "NODE_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "POD_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "activityName",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "buildVersion",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "component",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "isActivityFailed",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "parentActivityName",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "region",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scaleUnit",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scenario",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "service",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                }
+              ],
+              "dataBlockType": 0,
+              "endTimeShift": null,
+              "isNegative": false,
+              "lookback": null,
+              "lookbackAggregation": 4,
+              "mdmAggregationConfiguration": null,
+              "multiTimeSeriesAggregation": 4,
+              "nullDataPointsHandling": {
+                "nullDataPointsPercentage": null,
+                "nullDataPointsSkipMode": 1,
+                "valueOnNull": null
+              },
+              "timeSeriesId": "3b5d7866-9e9d-4e58-b34a-8c6e2cf2ec55",
+              "timeSeriesType": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "endTimeShift": null,
+      "id": "863d76f8-73d9-46f4-a693-cd80cad96dc5",
+      "lookback": null,
+      "name": "Internal Duration",
+      "nullDataPointsHandling": {
+        "nullDataPointsPercentage": null,
+        "nullDataPointsSkipMode": 1,
+        "valueOnNull": null
+      },
+      "percentages": [
+        {
+          "denominator": [],
+          "multiplier": 1,
+          "numerator": [
+            {
+              "conditions": [],
+              "dataBlockType": 1,
+              "expressionId": "72f75a40-bf7c-43e1-b050-5b9135184249",
+              "isNegative": false
+            },
+            {
+              "conditions": [],
+              "dataBlockType": 1,
+              "expressionId": "95a5b949-e13c-4637-a286-393d46dea08e",
+              "isNegative": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "frequency": "00:05:00",
+  "id": "1140ac94-878d-4944-9a96-7ef055903b08",
+  "lastModifiedBy": "dylanhartono",
+  "lastModifiedTime": "2024-02-03T00:29:55.9261249Z",
+  "lookback": "00:20:00",
+  "name": "[SLO] Message Processing Duration",
+  "outlets": [],
+  "recoveryRules": [],
+  "resourceType": "ServiceHealthTemp",
+  "schemaVersion": 0,
+  "state": 1,
+  "tags": [
+    "SLO"
+  ],
+  "targetDimensions": [
+    {
+      "dimensionName": "EventTaskType",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "EventHubRawInputEventTask"
+          ]
+        },
+        {
+          "filterType": 1,
+          "values": [
+            "EventHubSingleInputEventTask"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "scaleUnit",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "abcsolution"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "region",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "westus3"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    }
+  ],
+  "tenant": "ARGDataLabs",
+  "timeSeries": [
+    {
+      "dimensions": [
+        "EventTaskType",
+        "IsRetry",
+        "NODE_NAME",
+        "POD_NAME",
+        "buildVersion",
+        "isActivityFailed",
+        "region",
+        "scaleUnit",
+        "service"
+      ],
+      "id": "f2db48cb-e99c-4fbf-977d-4a2cb48ee7c5",
+      "metric": "E2EDuration",
+      "name": "E2E Duration",
+      "namespace": "ARGDataLabs",
+      "samplingType": "95th percentile",
+      "tenant": "ARGDataLabs",
+      "timeSeriesType": 0
+    },
+    {
+      "dimensions": [
+        "NODE_NAME",
+        "POD_NAME",
+        "activityName",
+        "buildVersion",
+        "component",
+        "isActivityFailed",
+        "parentActivityName",
+        "region",
+        "scaleUnit",
+        "scenario",
+        "service"
+      ],
+      "id": "3b5d7866-9e9d-4e58-b34a-8c6e2cf2ec55",
+      "metric": "ActivityDuration",
+      "name": "Partner Duration",
+      "namespace": "ARGDataLabs",
+      "samplingType": "Average",
+      "tenant": "ARGDataLabs",
+      "timeSeriesType": 0
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+Name,AzureResourceGroupName,ConfigsScopeBindingName,AppName,Component
+RegionalResourceFetcherResourceGroup,DataLabsRFRG-$location(),ResourceFetcherConfigs,MonitorService,ResourceFetcher
+RegionalResourceFetcherResourceGroup,DataLabsRFRG-$location(),ResourceFetcherConfigs,ResourceFetcherService,ResourceFetcher
+RegionalResourceFetcherResourceGroup,DataLabsRFRG-$location(),ResourceFetcherConfigs,AdminService,ResourceFetcher
+RegionalPartnerResourceGroup,DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location(),PartnerConfigs,MonitorService,Partner
+RegionalPartnerResourceGroup,DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location(),PartnerConfigs,PartnerService,Partner
+RegionalPartnerResourceGroup,DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location(),PartnerConfigs,IOService,Partner
+RegionalPartnerResourceGroup,DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location(),PartnerConfigs,CacheService,Partner
+RegionalPartnerResourceGroup,DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location(),PartnerConfigs,PartnerCacheService,Partner
+RegionalPartnerResourceGroup,DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location(),PartnerConfigs,ResourceProxy,Partner
+RegionalPartnerResourceGroup,DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location(),PartnerConfigs,AdminService,Partner

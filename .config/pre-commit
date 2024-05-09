@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+powershell.exe -noprofile -F ./.config/Ev2JsonFormatting.ps1
+exit $?

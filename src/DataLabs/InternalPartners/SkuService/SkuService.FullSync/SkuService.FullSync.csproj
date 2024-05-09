@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<OutputType>Library</OutputType>
+		<Platforms>x64</Platforms>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="$(DataLabsRoot)\Common\Common.Core.csproj" />
+		<ProjectReference Include="$(DataLabsRoot)\PartnerCommon\Common.Partner.csproj" />
+		<ProjectReference Include="..\SkuService.Common\SkuService.Common.csproj" />
+	</ItemGroup>
+
+</Project>

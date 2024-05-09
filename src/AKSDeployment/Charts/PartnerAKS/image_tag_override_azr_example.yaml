@@ -1,0 +1,31 @@
+partnerConfig:    
+  pods:
+  - name: azr-solution
+    serviceName: azr-solution-service 
+    replicaCount: 3
+    partnerConfigMap:
+      name: azr-solution-config   
+    containers:
+     - name: azrpartnersolution
+       repository: datalabsintacr.azurecr.io/azorespartnersolution
+       tag: latest
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" :  "*" 
+                      }
+
+ioImage:
+  tag: latest
+
+resourceProxyImage:
+  tag: latest
+
+socat:
+  tag: latest
+
+cacheImage:
+  tag: latest
+
+cacheService:
+  enabled: true

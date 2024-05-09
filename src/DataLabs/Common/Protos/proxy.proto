@@ -1,0 +1,192 @@
+syntax = "proto3";
+
+package Microsoft.WindowsAzure.Governance.DataLabs.Common.Core.ResourceFetcherProxyService.V1;
+
+import "google/protobuf/wrappers.proto";
+
+service ResourceProxyService {
+    rpc GetResource (ResourceRequest) returns (ResourceResponse);
+    rpc GetCas (CasRequest) returns (ResourceResponse);
+    rpc GetManifestConfig (ManifestRequest) returns (ResourceResponse);
+    rpc GetConfigSpecs (ConfigSpecsRequest) returns (ResourceResponse);
+    rpc GetARMGenericResource (ARMGenericRequest) returns (ResourceResponse);
+    rpc GetCollection (ResourceRequest) returns (ResourceResponse);
+    rpc GetIdMappings (IdMappingRequest) returns (ResourceResponse);
+}
+
+enum ProxyDataFormat {
+    ARN = 0;
+    ARM = 1;
+    CAS = 2;
+    ARMADMIN = 3;
+    PACIFIC_COLLECTION = 4;
+    ID_MAPPING = 5;
+}
+
+message ManifestRequest {
+    string traceId = 1;
+    int32 retryCount = 2;
+    int64 requestEpochTime = 3;
+    google.protobuf.StringValue correlationId = 4;
+    string manifestProvider = 5;
+    map<string, string> req_attributes = 6;
+    bool skipCacheRead = 7;
+    bool skipCacheWrite = 8;
+}
+
+message ConfigSpecsRequest {
+    string traceId = 1;
+    int32 retryCount = 2;
+    int64 requestEpochTime = 3;
+    google.protobuf.StringValue correlationId = 4;
+    string apiExtension = 5;
+    map<string, string> req_attributes = 6;
+    bool skipCacheRead = 7;
+    bool skipCacheWrite = 8;
+}
+
+enum ProxyDataSource {
+    None = 0;
+    Cache = 1;
+    Arm = 2;
+    ArmAdmin = 3;
+    Qfd = 4;
+    Cas = 5;
+    ResourceFetcher_Arm = 6;
+    ResourceFetcher_Qfd = 7;
+    ResourceFetcher_ArmAdmin = 8;
+    ResourceFetcher_Cas = 9;
+    OutputSourceoftruth = 10;
+}
+
+message ResourceRequest {
+    string traceId = 1;
+    int32 retryCount = 2;
+    int64 requestEpochTime = 3;
+    google.protobuf.StringValue correlationId = 4;
+    string resourceId = 5;
+    string tenantId = 6;
+    map<string, string> req_attributes = 7;
+    bool skipCacheRead = 8;
+    bool skipCacheWrite = 9;
+    string regionName = 10;
+}
+
+message ResourceResponse {
+    int64 responseEpochTime = 1;
+    google.protobuf.StringValue correlationId = 2;
+    oneof result {
+        SuccessResponse success = 3;
+        ErrorResponse error = 4;
+    }
+    map<string, string> resp_attributes = 5;
+}
+
+message ARMGenericRequest {
+    string traceId = 1;
+    int32 retryCount = 2;
+    int64 requestEpochTime = 3;
+    google.protobuf.StringValue correlationId = 4;
+    string uriPath = 5;
+    map<string, string> queryParams = 6;
+    google.protobuf.StringValue tenantId = 7;
+    map<string, string> req_attributes = 8;
+    bool skipCacheRead = 9;
+    bool skipCacheWrite = 10;
+}
+
+message CasRequest {
+    string traceId = 1;
+    int32 retryCount = 2;
+    int64 requestEpochTime = 3;
+    google.protobuf.StringValue correlationId = 4;
+    map<string, string> req_attributes = 5;
+    CasProtoRequestBody casRequestBody = 6;
+    bool skipCacheRead = 7;
+    bool skipCacheWrite = 8;
+}
+
+message CasProtoRequestBody {
+  string subscriptionId = 1;
+  string provider = 2;
+  string offerCategory = 3;
+  string clientAppId = 4;
+  string subscriptionRegistrationDate = 5; //google.protobuf.Timestamp
+  string entitlementStartDate = 6; //google.protobuf.Timestamp
+  repeated SubscriptionLocationsAndZones subscriptionLocationsAndZones = 7;
+  BillingProperties billingProperties = 8; //google.protobuf.Struct
+  InternalSubscriptionPolicies internalSubscriptionPolicies = 9;
+}
+
+message InternalSubscriptionPolicies {
+  string subscriptionCostCategory = 1;
+  string subscriptionPcCode = 2;
+  string subscriptionEnvironment = 3;
+}
+
+message BillingProperties {
+  string channelType = 1;
+  string paymentType = 2;
+  string workloadType = 3;
+  string billingType = 4;
+  string tier = 5;
+  BillingAccount billingAccount = 6;
+}
+
+message BillingAccount {
+  string id = 1;
+}
+
+message CasInternalSubscriptionPolicies {
+  string subscriptionCostCategory = 1;
+  string subscriptionPcCode = 2;
+  string subscriptionEnvironment = 3;
+}
+
+message SubscriptionLocationsAndZones {
+  string location = 1;
+  repeated Zones zones = 2;
+}
+
+message Zones {
+  string logicalZone = 1;
+  string physicalZone = 2;
+}
+
+message IdMappingRequest {
+  string traceId = 1;
+  int32 retryCount = 2;
+  int64 requestEpochTime = 3;
+  google.protobuf.StringValue correlationId = 4;
+  map<string, string> req_attributes = 5;
+  string resourceType = 6;
+  IdMappingProtoRequestBody idMappingProtoRequestBody = 7;
+  bool skipCacheRead = 8;
+  bool skipCacheWrite = 9;
+}
+
+message IdMappingProtoRequestBody {
+  repeated string aliasResourceIds = 1;
+}
+
+message SuccessResponse {
+    ProxyDataFormat format = 1;
+    google.protobuf.BytesValue outputData = 2;
+    google.protobuf.StringValue etag = 3;
+    ProxyDataSource dataSource = 4;
+}
+
+enum ProxyErrorType {
+    DROP = 0;
+    RETRY = 1;
+    POISON = 2;
+}
+
+message ErrorResponse {
+    ProxyErrorType type = 1;
+    int32 retryAfter = 2;
+    int32 httpStatusCode = 3;
+    string message = 4;
+    string failedComponent = 5;
+    ProxyDataSource dataSource = 6;
+}

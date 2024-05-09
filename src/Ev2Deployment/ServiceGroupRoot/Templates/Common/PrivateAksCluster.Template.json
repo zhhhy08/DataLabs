@@ -1,0 +1,178 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string"
+        },
+        "dnsPrefix": {
+            "type": "string"
+        },
+        "agentpoolConfig": {
+            "type": "array"
+        },
+        "cachepoolConfig": {
+            "type": "array"
+        },
+        "maintenanceConfigurationsConfigs": {
+            "type": "object"
+        },
+        "location": {
+            "type": "string"
+        },
+        "adminGroupObjectIds": {
+            "type": "array"
+        }
+    },
+    /**
+    Below registration needed in Prod before using nodeOSUpgradeChannel - vulnerability S360 item
+    az feature register --namespace "Microsoft.ContainerService" --name "NodeOsUpgradeChannelPreview"
+    az feature show --namespace "Microsoft.ContainerService" --name "NodeOsUpgradeChannelPreview"
+    Wait until the above command shows registered before running below
+    az provider register --namespace Microsoft.ContainerService
+    */
+    "variables": {
+    "defaultAvailabilityZones": [ "1", "2", "3" ],
+        "defaultosSKU": "AzureLinux",
+        "lengthofPoolList": "[length(parameters('agentpoolConfig'))]",
+        "defaultMode": "System",
+        "defaultOsDiskSizeGB": 1024,
+        "defaultOsDiskSizeGBCachePool": 512,
+        "defaultMaxPods": 110,
+        "agentPoolProfiles": {
+            "copy": [
+                {
+                    "name": "finalAgentPoolList",
+                    "count": "[variables('lengthofPoolList')]",
+                    "input": {
+                        "name": "[parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')].name]",
+                        "count": "[parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')].minCountOfVm]",
+                        "minCount": "[parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')].minCountOfVm]",
+                        "maxCount": "[parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')].maxCountOfVm]",
+                        "vmSize": "[parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')].vmSize]",
+                        "availabilityZones": "[if(contains(parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')], 'azones'),parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')].azones,variables('defaultAvailabilityZones'))]",
+                        "osSKU": "[if(contains(parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')], 'osSKU'),parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')].osSKU,variables('defaultosSKU'))]",
+                        "osDiskSizeGB": "[if(contains(parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')], 'osDiskSizeGB'),parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')].osDiskSizeGB,variables('defaultOsDiskSizeGB'))]",
+                        "osType": "Linux",
+                        "enableAutoScaling": true,
+                        "type": "VirtualMachineScaleSets",
+                        "mode": "[if(contains(parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')], 'mode'),parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')].mode,variables('defaultMode'))]",
+                        "maxPods": "[if(contains(parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')], 'maxPods'),parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')].maxPods,variables('defaultMaxPods'))]",
+                        "upgradeSettings": {
+                            "maxSurge": "1",
+                            "nodeSoakDurationInMinutes": "[if(contains(parameters('agentpoolConfig')[copyIndex('finalAgentPoolList')].name, 'cache'),30,5)]"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "resources": [
+        {
+            "name": "[parameters('name')]",
+            "type": "Microsoft.ContainerService/managedClusters",
+            "apiVersion": "2024-01-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "dnsPrefix": "[parameters('dnsPrefix')]",
+                "aadProfile": {
+                    "managed": true,
+                    "adminGroupObjectIDs": "[parameters('adminGroupObjectIDs')]",
+                    "enableAzureRBAC": true
+                },
+                "agentPoolProfiles": "[variables('agentPoolProfiles').finalAgentPoolList]",
+                "securityProfile": {
+                    "imageCleaner": {
+                        "enabled": true,
+                        "intervalHours": 48
+                    },
+                    "workloadIdentity": {
+                        "enabled": true
+                    }
+                },
+                "apiServerAccessProfile": {
+                    "enablePrivateCluster": true
+                },
+                "oidcIssuerProfile": {
+                    "enabled": true
+                },
+                "addonProfiles": {
+                    "azureKeyvaultSecretsProvider": {
+                        "enabled": true,
+                        "config": {
+                            "enableSecretRotation": "true",
+                            "rotationPollInterval": "2m"
+                        }
+                    },
+                    "azurepolicy": {
+                        "enabled": true
+                    }
+                },
+                "autoUpgradeProfile": {
+                    "upgradeChannel": "stable",
+                    "nodeOSUpgradeChannel": "NodeImage"
+                },
+                "disableLocalAccounts": true,
+                "networkProfile": {
+                    "networkPlugin": "azure",
+                    "networkPolicy": "calico"
+                },
+            "identityProfile": {}
+            },
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "sku": {
+                "name": "Base",
+                "tier": "Standard"
+            },
+        "resources": []
+        },
+        {
+            "type": "Microsoft.ContainerService/managedClusters/agentPools",
+            "apiVersion": "2024-01-01",
+            "name": "[concat(parameters('name'), '/', parameters('cachepoolConfig')[copyIndex()].name)]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ContainerService/managedClusters', parameters('name'))]"
+            ],
+            "properties": {
+                "count": "[parameters('cachepoolConfig')[copyIndex()].minCountOfVm]",
+                "enableAutoScaling": true,
+                "minCount": "[parameters('cachepoolConfig')[copyIndex()].minCountOfVm]",
+                "maxCount": "[parameters('cachepoolConfig')[copyIndex()].maxCountOfVm]",
+                "availabilityZones": "[if(contains(parameters('cachepoolConfig')[copyIndex()], 'azones'),parameters('cachepoolConfig')[copyIndex()].azones,variables('defaultAvailabilityZones'))]",
+                "mode": "[if(contains(parameters('cachepoolConfig')[copyIndex()], 'mode'),parameters('cachepoolConfig')[copyIndex()].mode,variables('defaultMode'))]",
+                "osType": "Linux",
+                "vmSize": "[parameters('cachepoolConfig')[copyIndex()].vmSize]",
+                "osSKU": "[if(contains(parameters('cachepoolConfig')[copyIndex()], 'osSKU'),parameters('cachepoolConfig')[copyIndex()].osSKU,variables('defaultosSKU'))]",
+                "osDiskSizeGB": "[if(contains(parameters('cachepoolConfig')[copyIndex()], 'osDiskSizeGB'),parameters('cachepoolConfig')[copyIndex()].osDiskSizeGB,variables('defaultOsDiskSizeGBCachePool'))]",
+                "type": "VirtualMachineScaleSets",
+                "maxPods": "[if(contains(parameters('cachepoolConfig')[copyIndex()], 'maxPods'),parameters('cachepoolConfig')[copyIndex()].maxPods,variables('defaultMaxPods'))]",
+                "upgradeSettings": {
+                    "maxSurge": "1",
+                    "nodeSoakDurationInMinutes": "[if(contains(parameters('cachepoolConfig')[copyIndex()].name, 'cache'),30,5)]"
+                }
+            },
+            "copy": {
+                "name": "agentpoolcopy",
+                "count": "[length(parameters('cachepoolConfig'))]"
+            }
+        },
+        {
+            "type": "Microsoft.ContainerService/managedClusters/maintenanceConfigurations",
+            "apiVersion": "2024-01-01",
+            "name": "[concat(parameters('name'), '/aksManagedAutoUpgradeSchedule')]",
+            "properties": {
+                "maintenanceWindow": "[parameters('maintenanceConfigurationsConfigs').maintenanceWindow]"
+            }
+        },
+        {
+            "type": "Microsoft.ContainerService/managedClusters/maintenanceConfigurations",
+            "apiVersion": "2024-01-01",
+            "name": "[concat(parameters('name'), '/aksManagedNodeOSUpgradeSchedule')]",
+            "properties": {
+                "maintenanceWindow": "[parameters('maintenanceConfigurationsConfigs').nodeOSUpgradePolicy]"
+            }
+        }
+    ]
+}

@@ -1,0 +1,604 @@
+{
+  "advancedConfiguration": {
+    "combinationDeltaFetchLookback": null,
+    "combinationFullRefreshInterval": null,
+    "debug": false,
+    "distributionConfiguration": null,
+    "enableCostReporting": null,
+    "enableFullRefreshWhenMetricSourceCombinationsChangeV2": null,
+    "enableKustoLogsMonitorV2": null,
+    "enableMinHintsLookbackAsMonitorLookback": null,
+    "enableMonitorV2InheritOptimization": null,
+    "enableMonitorV2QueryInfoOptimizationToReduceMemoryUsage": null,
+    "enablePreviewBucketOffset": null,
+    "enableThresholdResultTypeChange": null,
+    "enableThrowInvalidSeriesExceptionInMetricFetch": null,
+    "handleNullDataInDTMonitorV2Training": null,
+    "ingestionDelayToSkip": null,
+    "limitsConfiguration": null,
+    "maxCombinationsForHintingRetrieval": null,
+    "monitorV2InheritOptimizationWhenNumberOfCombinations": null,
+    "skipMetricsDataLossValidation": null,
+    "skipMetricsDataQualityCheck": null,
+    "updateTimeSeriesMetadataForCompositeMetric": null,
+    "useExpressionEngineInBaselineAnomalyTraining": null,
+    "useLimitForHintingRetrieval": null
+  },
+  "alertConditions": [
+    {
+      "alertOutletIds": [],
+      "bucket": null,
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 1,
+          "expressionId": "04aada5f-dae1-4fb5-b782-ca527704f178",
+          "id": "68143336-6296-467f-90c6-7a5785aab543",
+          "type": 0,
+          "value": "20"
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 2,
+      "id": "3b5c2326-3b1a-4bde-9037-85e36f755e17",
+      "metadata": {},
+      "name": "High CacheClientSetFailures",
+      "severity": 3
+    },
+    {
+      "alertOutletIds": [],
+      "bucket": null,
+      "conditions": [
+        {
+          "bucket": null,
+          "comparator": 1,
+          "expressionId": "04aada5f-dae1-4fb5-b782-ca527704f178",
+          "id": "68143336-6296-467f-90c6-7a5785aab543",
+          "type": 0,
+          "value": "50"
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 1,
+      "id": "c721dd9d-f48d-4eec-87b6-a556a339783b",
+      "metadata": {},
+      "name": "Very High CacheClientSetFailures",
+      "severity": 3
+    }
+  ],
+  "alertEnrichmentConfiguration": {
+    "customLinks": [
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "Monitor.Tenant",
+          "activityName",
+          "component",
+          "isActivityFailed",
+          "region",
+          "scaleUnit",
+          "service"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "1.00:00:00",
+        "path": [
+          "Cache Calls"
+        ],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "Cache Calls Dashboard"
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "activityName",
+          "component",
+          "isActivityFailed",
+          "region",
+          "scaleUnit",
+          "service"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "1.00:00:00",
+        "path": [
+          "Resource Fetcher"
+        ],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "ResourceFetcher Dashboard"
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "activityName",
+          "component",
+          "isActivityFailed",
+          "region",
+          "scaleUnit",
+          "service"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "1.00:00:00",
+        "path": [
+          "IOService",
+          "DataFlow"
+        ],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "DataFlow Dashboard"
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DGrepJarvisLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "clientQuery": "groupby exception let count = count()\r\norderby count desc",
+        "dGrepEndpoint": "https://dgrepv2-frontend-prod.trafficmanager.net/",
+        "endpointAlias": "Diagnostics PROD",
+        "endTime": "{EndTime}",
+        "eventFilters": [
+          {
+            "isScrubbed": false,
+            "monikerRegex": null,
+            "nameRegex": "ActivityFailed",
+            "namespaceRegex": "ARGDataLabs",
+            "versionRegex": null
+          }
+        ],
+        "executionDelay": "00:00:00",
+        "identityColumns": {
+          "Region": [
+            "{Monitor.Dimension.region}"
+          ],
+          "ScaleUnit": [
+            "{Monitor.Dimension.scaleUnit}"
+          ]
+        },
+        "lookback": "00:15:00",
+        "maxResultRowCount": 15,
+        "maxRowCount": 500000,
+        "mdsEndpoint": "https://production.diagnostics.monitoring.core.windows.net/",
+        "preIncidentQueryTimeout": "00:00:50",
+        "serverQuery": "where activityName == \"CacheClient.SendKeyExpireAsync\" or activityName == \"CacheClient.SetValueIfGreaterThanWithExpiryAsync\" or activityName == \"CacheClient.SetValueWithExpiryAsync\"",
+        "startTime": null,
+        "stepback": "00:00:00",
+        "title": "CacheClient ActivityFailed Exceptions Count",
+        "uxParameters": [
+          {
+            "key": "aggregatesVisible",
+            "value": true
+          },
+          {
+            "key": "aggregates",
+            "value": []
+          },
+          {
+            "key": "chartsVisible",
+            "value": false
+          },
+          {
+            "key": "chartEditorVisible",
+            "value": true
+          },
+          {
+            "key": "chartType",
+            "value": "line"
+          },
+          {
+            "key": "chartLayers",
+            "value": [
+              [
+                "New Layer",
+                ""
+              ]
+            ]
+          },
+          {
+            "key": "UTC",
+            "value": true
+          }
+        ]
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.GenericCustomLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "executionDelay": "00:00:00",
+        "link": "https://eng.ms/docs/cloud-ai-platform/azure-core/azure-management-and-platforms/control-plane-bburns/fleet-inventory/azure-resource-builder/monitors/cachegetsetfailures",
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "CacheTSG"
+      }
+    ]
+  },
+  "autoMitigationConfiguration": {
+    "healthyCountToMitigateIncident": 10,
+    "shouldMitigateIncident": false
+  },
+  "customMetadata": {
+    "Icm.TsgId": "https://eng.ms/docs/cloud-ai-platform/azure-core/azure-management-and-platforms/control-plane-bburns/fleet-inventory/azure-resource-builder/monitors/cachegetsetfailures"
+  },
+  "description": "CacheClient is failing to Set values in the cache.",
+  "expressions": [
+    {
+      "endTimeShift": null,
+      "id": "04aada5f-dae1-4fb5-b782-ca527704f178",
+      "lookback": null,
+      "name": "CacheClientSetFailuresCount",
+      "nullDataPointsHandling": null,
+      "percentages": [
+        {
+          "denominator": [
+            {
+              "conditions": [
+                {
+                  "dimensionName": "NODE_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "POD_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "activityName",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "buildVersion",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "component",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "isActivityFailed",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "parentActivityName",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "region",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scaleUnit",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scenario",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "service",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                }
+              ],
+              "dataBlockType": 0,
+              "endTimeShift": null,
+              "expressionId": "",
+              "isNegative": false,
+              "lookback": null,
+              "lookbackAggregation": 0,
+              "multiTimeSeriesAggregation": 0,
+              "timeSeriesId": "654797d7-3ce5-43ab-b4bd-9f165b10e96e",
+              "timeSeriesType": 0
+            }
+          ],
+          "multiplier": 1,
+          "numerator": [
+            {
+              "conditions": [
+                {
+                  "dimensionName": "NODE_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "POD_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "activityName",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "buildVersion",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "component",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "isActivityFailed",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 0,
+                      "values": [
+                        "true"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "parentActivityName",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "region",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scaleUnit",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scenario",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "service",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                }
+              ],
+              "dataBlockType": 0,
+              "endTimeShift": null,
+              "isNegative": false,
+              "lookback": null,
+              "lookbackAggregation": 0,
+              "mdmAggregationConfiguration": null,
+              "multiTimeSeriesAggregation": 0,
+              "nullDataPointsHandling": null,
+              "timeSeriesId": "654797d7-3ce5-43ab-b4bd-9f165b10e96e",
+              "timeSeriesType": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "frequency": "00:05:00",
+  "id": "354f5975-0f39-44cc-8b6d-4ee9bcb1666b",
+  "lastModifiedBy": "dylanhartono",
+  "lastModifiedTime": "2024-02-03T00:24:43.6822569Z",
+  "lookback": "00:10:00",
+  "name": "[CacheService] Cache Set Failures",
+  "outlets": [],
+  "recoveryRules": [],
+  "resourceType": "ServiceHealth",
+  "schemaVersion": 0,
+  "state": 2,
+  "tags": [
+    "CacheService"
+  ],
+  "targetDimensions": [
+    {
+      "dimensionName": "activityName",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 0,
+          "values": [
+            "CacheClient.SendKeyExpireAsync",
+            "CacheClient.SetValueIfGreaterThanWithExpiryAsync",
+            "CacheClient.SetValueWithExpiryAsync"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "component",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "isActivityFailed",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "region",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "scaleUnit",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "service",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    }
+  ],
+  "tenant": "ARGDataLabs",
+  "timeSeries": [
+    {
+      "dimensions": [
+        "NODE_NAME",
+        "POD_NAME",
+        "activityName",
+        "buildVersion",
+        "component",
+        "isActivityFailed",
+        "parentActivityName",
+        "region",
+        "scaleUnit",
+        "scenario",
+        "service"
+      ],
+      "id": "654797d7-3ce5-43ab-b4bd-9f165b10e96e",
+      "metric": "ActivityDuration",
+      "name": "CacheClientSet",
+      "namespace": "ARGDataLabs",
+      "samplingType": "Count",
+      "tenant": "ARGDataLabs",
+      "timeSeriesType": 0
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+    "$schema": "http://schema.express.azure.com/schemas/2015-01-01-alpha/RolloutParameters.json",
+    "contentVersion": "1.0.0.0",
+    "extensions": [
+        {
+            "name": "publishoperation",
+            "type": "Microsoft.Geneva.Actions/PublishExtension",
+            "version": "2016-11-01",
+            "connectionProperties": {
+                "endpoint": "https://acis-test.engineering.core.windows.net/api/v2/ev2",
+                "maxExecutionTime": "PT3H",
+                "authentication": {
+                    "type": "DstsServiceClientCertificateAuthentication",
+                    "reference": {
+                        "provider": "AzureKeyVault",
+                        "parameters": {
+                            "secretId": "https://datalabsintgblkv.vault.azure.net:443/secrets/ev2-auth-int-datalabs"
+                        }
+                    },
+                    "properties": {
+                        "identificationType": "SubjectName"
+                    }
+                }
+            },
+            "payloadProperties": {
+                "ga-extension-name": {
+                    "value": "AzureResourceBuilder-DataLabs"
+                },
+                "ga-package-reference": {
+                    "reference":
+                    {
+                        "path":"GenevaActionsExtension_Test.Package"
+                    }
+                }
+            }
+        }
+    ]
+}

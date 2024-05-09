@@ -1,0 +1,122 @@
+# Values File for Capabilities in ${cloud} ${region} Environment
+agentpoolName: ${agentpoolName}
+primaryRegionName: ${region}
+backupRegionName: ${backup_region}
+
+solutionInfo:
+  solutionName: &solutionName capsolution
+  aksClusterName: cap${cloud}${region}aks
+  environment: ${uppercase_cloud}
+  region: ${region_longname}
+  scaleUnit: *solutionName
+
+ioService:
+  replicaCount: 5 # override from dataLabServices.yaml
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+#MI of cap partner
+  clientId: ${mi_service_account_clientid}
+  tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+
+ioConfigMap:
+  inputEventHubNameSpaceAndName: "cap${cloud}${region}pipehns0/cap${cloud}${region}pipeh;cap${cloud}${region}pipehns1/cap${cloud}${region}pipeh"
+  outputEventHubNameSpaceAndName: ""
+  eventHubStorageAccountName: "0cap${cloud}${region}ehcpsa"
+  blobStorageAccountNames: "0cap${cloud}${region}sotsa;1cap${cloud}${region}sotsa" # No source of truth
+  backupInputEventHubNameSpaceAndName: "cap${cloud}${region}bpipehns0/cap${cloud}${region}bpipeh/00:05:00;cap${cloud}${region}bpipehns1/cap${cloud}${region}bpipeh/00:05:00"
+  backupBlobStorageAccountNames: "0cap${cloud}${backup_region}sotsa;1cap${cloud}${backup_region}sotsa"
+  serviceBusNameSpaceAndName: "cap${cloud}${region}sb0/0cap${cloud}${region}sbq;cap${cloud}${region}sb1/0cap${cloud}${region}sbq"
+  outputDataset: 'resourcecapabilities'
+  useSourceOfTruth: 'true'
+  allowedOutputTypes: "microsoft.resources/capabilities"
+  arnPublishStorageAccountNames: "0cap${cloud}${region}arnpsa;1cap${cloud}${region}arnpsa;2cap${cloud}${region}arnpsa;3cap${cloud}${region}arnpsa;4cap${cloud}${region}arnpsa;5cap${cloud}${region}arnpsa"
+  arnPublishEventGridDomainIds: "/subscriptions/${subscription}/resourceGroups/DataLabscapRG-${region_longname}/providers/Microsoft.EventGrid/domains/cap${cloud}${region}apeg1;/subscriptions/${subscription}/resourceGroups/DataLabscapRG-${region_longname}/providers/Microsoft.EventGrid/domains/cap${cloud}${region}apeg2"
+  arnPublishEventGridDomainEndpoints: "https://cap${cloud}${region}apeg1.${region_longname}-1.eventgrid.azure.net/api/events;https://cap${cloud}${region}apeg2.${region_longname}-1.eventgrid.azure.net/api/events"
+  arnPublishEventGridTopics: "/subscriptions/${subscription}/resourceGroups/DataLabscapRG-${region_longname}/providers/Microsoft.EventGrid/domains/cap${cloud}${region}apeg1/topics/arnpublishtopic;/subscriptions/${subscription}/resourceGroups/DataLabscapRG-${region_longname}/providers/Microsoft.EventGrid/domains/cap${cloud}${region}apeg2/topics/arnpublishtopic"
+  outputChannelBufferDelay: "100"
+
+partnerConfig:    
+  pods:
+  - name: pol-cap-solution
+    serviceName: pol-cap-solution-service
+    replicaCount: 5
+    partnerConfigMap:
+      name: pol-cap-solution-config    
+    containers:
+     - name: cappartnersolution
+       repository: datalabs${cloud}acr.azurecr.io/cappartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" : "*"
+                      }
+
+resourceProxyConfigMap:
+  resourceFetcherServiceEndpoint: http://rf${cloud}${region}aks.sku.${cloud}.${region}aks/
+  resourceFetcherAADTokenResource: https://resourcefetcherservice-prod.msazurecloud.onmicrosoft.com
+  resourceFetcherAADHomeTenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+
+resourceProxyConfigMap:
+  callARMGenericRequestAllowedTypes:
+    "/providers/Microsoft.Authorization/policySetDefinitions:resourcefetcher_arm;
+    /providers/Microsoft.Authorization/policyDefinitions:resourcefetcher_arm;
+    /providers:resourcefetcher_arm"
+
+resourceProxyServiceAccount: 
+# MI of cap partner
+  clientId: ${mi_service_account_clientid}
+  tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+
+cacheService:
+  enabled: false
+  replicaCount: 5 # override from dataLabServices.yaml
+
+# Monitoring Information
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: false
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGDataLabs
+    gcs_region: ${region_longname}
+    gcs_namespace: ARGDataLabs
+    gcs_config_version: "3.1"
+    miResourceId: ${aks_id}
+  partner:
+    gcs_environment: DiagnosticsProd
+    gcs_account: GovernanceAKSLinux
+    gcs_region: ${region_longname}
+    gcs_namespace: GovernanceAKSLinux
+    gcs_config_version: "1.1"
+    miResourceId: ${aks_id}
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  # metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: ARGDataLabs
+      namespace: ARGDataLabs
+    Partner: 
+      account: GovernanceAKSLinux
+      namespace: GovernanceAKSLinux
+
+  # objectId of cap aks-agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "ARGDataLabs",
+          "objectId": "${aks_objectid}"
+        },
+        {
+          "account": "GovernanceAKSLinux",
+          "objectId": "${aks_objectid}"
+        }
+      ]
+    }

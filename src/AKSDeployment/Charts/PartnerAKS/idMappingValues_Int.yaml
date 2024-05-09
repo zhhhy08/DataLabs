@@ -1,0 +1,131 @@
+# Values File for IdMapping in INT Environment
+agentPoolName: agentpool2
+primaryRegionName: "p-eus"
+backupRegionName: "b-eus"
+
+solutionInfo:
+  solutionName: &solutionName idmapping
+  aksClusterName: idminteusaks
+  environment: INT
+  region: eastus
+  scaleUnit: *solutionName
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+# Replace Client Id with MI's Client Id
+  clientId: b92486bb-a96c-41c3-9499-b867697a3b56
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+ioService:
+  name: solution-io
+  replicaCount: 3
+
+ioConfigMap:
+  inputEventHubNameSpaceAndName: 'idminteusipehns0/0idminteusipeh;idminteuspremipehns0/idminteuspremipeh' 
+  outputEventHubNameSpaceAndName: 'idminteusopehns0/idminteusopeh'
+  eventHubStorageAccountName: '0idminteusehcpsa'
+  blobStorageAccountNames: ''
+  backupInputEventHubNameSpaceAndName: "idminteusbipehns0/idminteusbipeh/00:05:00"
+  backupBlobStorageAccountNames: ''
+  serviceBusNameSpaceAndName: 'idminteussb0/0idminteussbq'
+  outputDataset: 'idmapping'
+  useSourceOfTruth: 'false'
+  allowedOutputTypes: "microsoft.idmapping/identifiers"
+  arnPublishStorageAccountNames: "0idminteusarnpsa;1idminteusarnpsa"
+  arnPublishEventGridDomainIds: "/subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourceGroups/DataLabsidmRG-eastus/providers/Microsoft.EventGrid/domains/idminteusapeg1"
+  arnPublishEventGridDomainEndpoints: "https://idminteusapeg1.eastus-1.eventgrid.azure.net/api/events"
+  arnPublishEventGridTopics: "/subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourceGroups/DataLabsidmRG-eastus/providers/Microsoft.EventGrid/domains/idminteusapeg1/topics/arnpublishtopic"
+  pairedRegionArnPublishEventGridDomainIds: "/subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourceGroups/DataLabsidmRG-eastus/providers/Microsoft.EventGrid/domains/idminteusapeg1"
+  pairedRegionArnPublishEventGridDomainEndpoints: "https://idminteusapeg1.eastus-1.eventgrid.azure.net/api/events"
+  pairedRegionArnPublishEventGridTopics: "/subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourceGroups/DataLabsidmRG-eastus/providers/Microsoft.EventGrid/domains/idminteusapeg1/topics/arnpublishtopic"
+
+partnerConfig:    
+  pods:
+  - name: idmapping-solution
+    serviceName: idmapping-solution-service
+    partnerConfigMap:
+      name: idmapping-solution-config
+    containers:
+     - name: idmpartnersolution
+       repository: datalabsintacr.azurecr.io/idmpartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" : "*"
+                      }
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://rfinteusaks.idm.int.eusaks:6072
+  resourceFetcherTokenResource: https://resourcefetcherservice-int.microsoft.com
+  resourceFetcherHomeTenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+resourceProxyServiceAccount:
+  clientId: b92486bb-a96c-41c3-9499-b867697a3b56
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+cacheService:
+  enabled: false
+
+# Monitoring configurations
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner:  true
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: Test
+    gcs_account: DataLabs
+    gcs_region: eastus
+    gcs_namespace: DataLabs
+    gcs_config_version: "1.6" 
+    miResourceId: /subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourcegroups/MC_DataLabsidmRG-eastus_idminteusaks_eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/idminteusaks-agentpool
+  partner:
+    gcs_environment: Test
+    gcs_account: ARGIdMapping
+    gcs_region: eastus
+    gcs_namespace: ARGIdMapping
+    gcs_config_version: '1.6' # parametrized in the future
+    miResourceId: /subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourcegroups/MC_DataLabsidmRG-eastus_idminteusaks_eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/idminteusaks-agentpool
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: DataLabs
+      namespace: DataLabs
+    Partner: # Change accountInfo for Partner (can be the same as DataLabs)
+      account: ARGIdMapping
+      namespace: ARGIdMapping
+
+  # objectId of idminteusaks-agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "DataLabs", 
+          "objectId": "07a3eb00-fd32-4c30-918b-b124fc7430fd"
+        },
+        {
+          "account": "ARGIdMapping", 
+          "objectId": "07a3eb00-fd32-4c30-918b-b124fc7430fd"
+        }
+      ]
+    }
+
+keyVault:
+  name: idminteuskv
+  clientId: 19f12f10-23b6-4322-a240-9aa17c045951
+
+adminService:
+  isEnabled: true
+  sslSecretProvider:
+    certificateName: idminteusaks-ssl
+
+adminServiceConfigMap:
+  dstsRealm: realm://dsts.core.azure-test.net/
+  dstsName: co2agg04-dsts.dsts.core.azure-test.net
+  serviceDns: int.datalabs.core.windows.net
+  allowedActors: GenevaActionsTest,acisTestTodSMSTest,GenevaActionsDelegatedAuthNonProd

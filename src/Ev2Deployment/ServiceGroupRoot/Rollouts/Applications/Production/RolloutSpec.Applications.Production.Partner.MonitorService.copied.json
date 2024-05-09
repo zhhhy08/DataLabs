@@ -1,0 +1,50 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-04-01/RegionAgnosticRolloutSpecification.json",
+    "contentVersion": "1.0.0.0",
+    "rolloutMetadata": {
+        "serviceModelPath": "Rollouts\\Applications\\Production\\DataLabs.ServiceModel.Applications.Partner.MonitorService.generated.json",
+        "scopeBindingsPath": "ScopeBindings.json",
+        "name": "Datalabs.AppDeploy",
+        "rolloutType": "Major",
+        "buildSource": {
+            "parameters": {
+                "versionFile": "BuildVer.txt"
+            }
+        },
+        "Notification": {
+            "Email": {
+                "To": "earc@microsoft.com"
+            },
+            "incident": {
+                "providerType": "IcM",
+                "properties": {
+                    "connectorId": "80fcf79d-1483-4d33-b4fc-675f40fa7298",
+                    "routingId": "AIMS://GOV_ART:AzureResourceTopology/Ev2Deployment"
+                }
+            }
+        },
+        "Configuration": {
+            "serviceGroupScope": {
+                "specPath": "ConfigurationSpecification\\Configuration.Production.json"
+            }
+        }
+    },
+    "orchestratedSteps": [
+        {
+            "name": "EmptyServiceResource",
+            "targetType": "ServiceResourceDefinition",
+            "targetName": "EmptyServiceResource",
+            "actions": [
+                "Deploy"
+            ]
+        },
+        {
+            "name": "AppDeployPartnerMonitorService",
+            "targetType": "ServiceResourceDefinition",
+            "targetName": "AppDeployPartnerMonitorService",
+            "actions": [
+                "Shell/Run"
+            ]
+        }
+    ]
+}

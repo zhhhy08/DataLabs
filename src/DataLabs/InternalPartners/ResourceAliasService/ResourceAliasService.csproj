@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Platforms>x64</Platforms>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(DataLabsRoot)\PartnerCommon\Common.Partner.csproj" />
+    <ProjectReference Include="..\..\Common\Common.Core.csproj" />
+  </ItemGroup>
+
+</Project>

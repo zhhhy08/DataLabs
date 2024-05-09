@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.resourceFetcherService.name }}
+  namespace: {{ .Values.resourceFetcherNameSpace }}
+spec:
+  replicas: {{ .Values.resourceFetcherService.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  minReadySeconds: {{ .Values.resourceFetcherService.minReadySeconds }}
+  selector:
+    matchLabels:
+      app: {{ .Values.resourceFetcherService.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.resourceFetcherService.name }}
+        azure.workload.identity/use: "true"
+    spec:
+      serviceAccountName: {{ .Values.resourceFetcherServiceAccount.name }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values: 
+                - {{ .Values.resourceFetcherService.name }}
+            topologyKey: kubernetes.io/hostname
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ .Values.resourceFetcherConfigMap.name }}
+      - name: secrets-store-inline
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: {{ .Values.resourceFetcherService.secretProviderClassName }}           
+      - name: mdsd-run-vol  # connects with monitor pod for logs/traces
+        hostPath:
+          path: {{ .Values.mdsd.hostPathPath | quote }}
+      - name: ifx-path      # connects with monitor pod for metrics
+        hostPath:
+          path: {{ .Values.mdm.ifxmetrics_socket_folder_hostPath | quote }}
+      containers:
+      - name: {{ .Values.resourceFetcherImage.name }}
+        image: {{ .Values.resourceFetcherImage.repository }}:{{ .Values.resourceFetcherImage.tag }}
+        imagePullPolicy: {{ .Values.resourceFetcherImage.pullPolicy }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: "/config"
+          readOnly: true
+        - name: secrets-store-inline
+          mountPath: "/secrets-store"
+          readOnly: true
+        - name: mdsd-run-vol
+          mountPath: {{ .Values.mdsd.run_dir_path | quote }}
+        - name: ifx-path
+          mountPath: {{ .Values.mdm.ifxmetrics_socket_folder_path | quote }}
+        env:
+        - name: scaleUnit
+          value: "{{ .Values.solutionInfo.scaleUnit }}"
+        - name: service
+          value: "ResourceFetcherService"
+        - name: region
+          value: "{{ .Values.solutionInfo.region }}"
+        - name: buildVersion
+          value: "{{ .Values.resourceFetcherImage.tag }}"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP 
+        - name: DOTNET_EnableDiagnostics
+          value: "1"
+        - name: DOTNET_RUNNING_IN_CONTAINER
+          value: "true"
+        - name: DOTNET_USE_POLLING_FILE_WATCHER
+          value: "true"
+        - name: CONFIGMAP_DIR
+          value: "/config"
+        - name: SECRETS_STORE_DIR
+          value: "/secrets-store"
+        - name: LOGGER_MIN_LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.resourceFetcherConfigMap.name }}
+              key: LOGGER_MIN_LOG_LEVEL
+        # Monitoring endpoint values
+        - name: OTLP_EXPORTER_TYPE
+          value: {{ .Values.monitorInfo.exporterType }}
+        - name: MDSD_DATALABS_ENDPOINT
+          value: {{ include "otlp_endpoint.mdsd" .Values.mdsd | trim | quote }}
+        - name: MDM_DATALABS_ENDPOINT
+          value: {{ include "otlp_endpoint.mdm" (dict "info" .Values.mdm.accountInfo.DataLabs "Values" .Values) | trim | quote }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.resourceFetcherService.name }}-pdb
+  namespace: {{ .Values.resourceFetcherNameSpace }}
+  annotations:
+    meta.helm.sh/release-name: {{ .Values.helmInfo.resourcefetcherserviceRelease }}
+    meta.helm.sh/release-namespace: default
+  labels:
+    app.kubernetes.io/managed-by: Helm
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.resourceFetcherService.name }}
+

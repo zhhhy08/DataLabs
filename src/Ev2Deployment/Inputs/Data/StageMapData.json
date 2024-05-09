@@ -1,0 +1,83 @@
+[
+    {
+        "Version": "1.0.0.5",
+        "StageEnvironment": "Prod",
+        "StageCloud": "Production",
+        "Sequence": "1",
+        "StageName": "Prod_Canary",
+        "Region": "eastus2euap",
+        "Stamps": "1-2-3"
+    },
+    {
+        "Version": "1.0.0.5",
+        "StageEnvironment": "Prod",
+        "StageCloud": "Production",
+        "Sequence": "2",
+        "StageName": "Prod_Region1",
+        "Region": "westus3",
+        "Stamps": "1-2-3-4-5"
+    },
+    {
+        "Version": "1.0.0.5",
+        "StageEnvironment": "Prod",
+        "StageCloud": "Production",
+        "Sequence": "3",
+        "StageName": "Prod_Region2",
+        "Region": "northeurope",
+        "Stamps": "1-2-3-4-5"
+    },
+    {
+        "Version": "1.0.0.5",
+        "StageEnvironment": "Prod",
+        "StageCloud": "Production",
+        "Sequence": "4",
+        "StageName": "Prod_Region3",
+        "Region": "southeastasia",
+        "Stamps": "2-3-4-5"
+    },
+    {
+        "Version": "1.0.0.5",
+        "StageEnvironment": "Prod",
+        "StageCloud": "Production",
+        "Sequence": "5",
+        "StageName": "Prod_Region4",
+        "Region": "eastus",
+        "Stamps": "1-2-3-4-5"
+    },
+    {
+        "Version": "1.0.0.5",
+        "StageEnvironment": "Prod",
+        "StageCloud": "Production",
+        "Sequence": "6",
+        "StageName": "Prod_Region5",
+        "Region": "swedencentral",
+        "Stamps": "1-2-3-4-5"
+    },
+    {
+        "Version": "1.0.0.5",
+        "StageEnvironment": "Prod",
+        "StageCloud": "Production",
+        "Sequence": "7",
+        "StageName": "Prod_Region6",
+        "Region": "eastasia",
+        "Stamps": "2-3-4-5"
+    },
+    {
+        "Version": "1.0.0.6",
+        "StageEnvironment": "Test",
+        "StageCloud": "Int",
+        "Sequence": "1",
+        "StageName": "Test_Int_eastus",
+        "Region": "eastus",
+        "Stamps": "1:2:4:5"
+    },
+    {
+        "Version": "1.0.0.6",
+        "StageEnvironment": "Test",
+        "StageCloud": "Int",
+        "Sequence": "2",
+        "StageName": "Test_Int_eastus2",
+        "Region": "eastus2",
+        "Stamps": "3"
+    }
+]

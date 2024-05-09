@@ -1,0 +1,28 @@
+commonConfig:
+  notificationReceiverEnvironment: "Dogfood"
+
+ioImage:
+  repository: datalabsintacr.azurecr.io/inputoutputservice
+
+ioConfigMap:
+  isArnClientLogDebugEnabled: "true"
+  isArnClientLogInfoEnabled: "true"
+  
+resourceProxyImage:
+  repository: datalabsintacr.azurecr.io/resourcefetcherproxyservice
+
+cacheImage:
+  repository: datalabsintacr.azurecr.io/garnetserver
+
+partnerCacheImage:
+  repository: datalabsintacr.azurecr.io/garnetserver
+
+socat:
+  repository: datalabsintacr.azurecr.io/socat
+
+adminServiceImage:
+  repository: datalabsintacr.azurecr.io/adminservice
+
+azureProfiler:
+  repository: azureprofilertest.azurecr.io/azureprofilermariner
+  tag: 1.0.02076.8

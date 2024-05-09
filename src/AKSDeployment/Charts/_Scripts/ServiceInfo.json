@@ -1,0 +1,126 @@
+{
+    "ACRONYM_TO_REGIONS": [
+        {
+            "acronym": "ea",
+            "region": "eastasia"
+        },
+        {
+            "acronym": "sea",
+            "region": "southeastasia"
+        },
+        {
+            "acronym": "wu3",
+            "region": "westus3"
+        },
+        {
+            "acronym": "eus",
+            "region": "eastus"
+        },
+        {
+            "acronym": "eu2",
+            "region": "eastus2"
+        },
+        {
+            "acronym": "neu",
+            "region": "northeurope"
+        },
+        {
+            "acronym": "sdc",
+            "region": "swedencentral"
+        }
+    ],
+    "PARTNER_VALUES_FILE_MAPPING": [
+        {
+            "acronym": "abc",
+            "valuesFileAcronym": "bcdr"
+        },
+        {
+            "acronym": "idm",
+            "valuesFileAcronym": "idMapping"
+        },
+        {
+            "acronym": "sku",
+            "valuesFileAcronym": "sku"
+        },
+        {
+            "acronym": "pol",
+            "valuesFileAcronym": "capabilities"
+        },
+        {
+            "acronym": "cap",
+            "valuesFileAcronym": "capabilities"
+        },
+        {
+            "acronym": "ras",
+            "valuesFileAcronym": "resourceAlias"
+        }
+    ],
+    "SERVICE_TO_FOLDER_INFO": [
+        {
+            "ServiceName": "IOService",
+            "ProjectNames": [ "InputOutputService" ] 
+        },
+        {
+            "ServiceName": "PartnerService",
+            "ProjectNames": [
+                {
+                    "PartnerAcronym": "abc",
+                    "ProjectNames": [ "ABCPartnerSolutionService" ]
+                },
+                {
+                    "PartnerAcronym": "idm",
+                    "ProjectNames": [ "IdMappingPartnerSolutionService" ]
+                },
+                {
+                    "PartnerAcronym": "pol",
+                    "ProjectNames": [ "CapabilitiesPartnerSolutionService" ]
+                },
+                {
+                    "PartnerAcronym": "cap",
+                    "ProjectNames": [ "CapabilitiesPartnerSolutionService" ]
+                },
+                {
+                    "PartnerAcronym": "sku",
+                    "ProjectNames": [ "SkuPartnerFullSyncSolutionService", "SkuPartnerSolutionService" ]
+                }
+            ]
+        },
+        {
+            "ServiceName": "ResourceProxy", 
+            "ProjectNames": [ "ResourceFetcherProxyService" ]
+        },
+        {
+            "ServiceName": "ResourceFetcherService",
+            "ProjectNames": [ "ResourceFetcherService" ]
+        }
+    ],
+    "SERVICE_TO_APPINFO": [
+        {   
+            "ServiceName": "IOService",
+            "AppName": "solution-io",
+            "Namespace": "solution-namespace",
+            "ConfigMap": "solution-io-config"
+        },
+        {
+            "ServiceName": "PartnerService",
+            "Namespace": "partner-namespace"
+        },
+        {
+            "ServiceName": "ResourceProxy",
+            "AppName": "resource-proxy",
+            "Namespace": "solution-namespace",
+            "ConfigMap": "resourceproxy-config"
+        },
+        {
+            "ServiceName": "ResourceFetcherService",
+            "AppName": "resource-fetcher",
+            "Namespace": "resource-fetcher-namespace",
+            "ConfigMap": "resource-fetcher-config"
+        },
+        {
+            "ServiceName": "MonitorService",
+            "AppName": "geneva-services",
+            "Namespace": "monitor-namespace"
+        }
+    ]
+}

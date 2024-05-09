@@ -1,0 +1,20 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "paths": [
+        {
+            "parameterReference": "managedIdentityTemplateUri"
+        }
+    ],
+    "parameters": {
+        "cloudName": {
+            "value": "__CLOUD_NAME__"
+        },
+        "managedIdentityConfigs": {
+            "value": "__MANAGED_IDENTITY_PREFIX_LIST__"
+        },
+        "managedIdentityTemplateUri": {
+            "value": "Templates\\Common\\ManagedIdentity.Template.json"
+        }
+    }
+}

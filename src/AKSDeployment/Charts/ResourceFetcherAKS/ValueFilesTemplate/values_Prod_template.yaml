@@ -1,0 +1,66 @@
+# Values File for Resource Fetcher in ${cloud} ${region} Environment
+
+solutionInfo:
+  aksClusterName: rf${cloud}${region}aks
+  environment: ${uppercaseCloud}
+  region: ${region_longname}
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+resourceFetcherServiceAccount: 
+# MI of resource fetcher
+  clientId: ${rf_serviceAccount_clientId}
+
+keyVault:
+  clientId: ${azurekeyvaultsecretsprovider_clientId}
+
+abcSolutionConfigMap: 
+# MI of ABC partner
+  clientId: ${abc_serviceAccount_clientId}
+
+idMappingConfigMap:
+# MI of IDM partner
+  clientId: ${idm_serviceAccount_clientId}
+
+capsolutionConfigMap:
+# MI of Cap partner
+  clientId: ${cap_serviceAccount_clientId}
+
+resourceFetcherImage:
+  repository: datalabs${cloud}acr.azurecr.io/resourcefetcherservice
+
+# Monitoring configurations
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGDataLabs
+    gcs_region: ${region_longname}
+    gcs_namespace: ARGDataLabs
+    gcs_config_version: '1.5'
+    miResourceId: /subscriptions/${subscription}/resourceGroups/MC_DataLabsRFRG-${region_longname}_rf${cloud}${region}aks_${region_longname}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/rf${cloud}${region}aks-agentpool
+
+    # volumes, will use hostPath
+    mdsdVolumeName: &mdsdVolumeName mdsd-run-vol
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  # metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: ARGDataLabs
+      namespace: ARGDataLabs
+
+
+# objectId of rf aks agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "ARGDataLabs",
+          "objectId": "${aks_objectId}"
+        }
+      ]
+    }

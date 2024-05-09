@@ -1,0 +1,241 @@
+# Values File for ABC in INT Local Environment
+agentPoolName: agentpool2
+primaryRegionName: "p-eus"
+backupRegionName: "b-eus"
+
+solutionInfo:
+  solutionName: &solutionName abcsolution
+  aksClusterName: abc-test-eastus
+  environment: INT
+  region: eastus
+  scaleUnit: *solutionName
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+  # Replace Client Id with MI's Client Id
+  clientId: 08075ae8-6c3c-4581-967e-301aa65d1a1a
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+ioConfigMap:
+  inputEventHubNameSpaceAndName: "abc-test-eastus-input-1/abc-test-eastus-input-1"
+  backupInputEventHubNameSpaceAndName : "abc-test-eastus-input-1/abc-test-eastus-input-1/00:05:00"
+  outputEventHubNameSpaceAndName: "abc-test-eastus-output-1/abc-test-eastus-output-1"
+  eventHubStorageAccountName: "abctesteastusehcp1"
+  blobStorageAccountNames: "abctesteastussot1;abctesteastussot2"
+  backupBlobStorageAccountNames: "abctesteastussot1;abctesteastussot2"
+  serviceBusNameSpaceAndName: "abc-test-eastus-1/abc-test-eastus-1;abc-test-eastus-1/abc-test-eastus-2"
+  outputDataset: "RecoveryServices"
+  globalConcurrency: "2000"
+  inputChannelConcurrency: "100"
+  allowedOutputTypes: "microsoft.azurebusinesscontinuity/unifiedprotecteditems;microsoft.azurebusinesscontinuity/deletedunifiedprotecteditems"
+  trafficTuner:
+    "allowalltenants: false;
+    stopalltenants: false;
+    includedregions:;
+    includedsubscriptions:
+      72f988bf-86f1-41af-91ab-2d7cd011db47 = 1a2311d9-66f5-47d3-a9fb-7a37da63934b, 62b829ee-7936-40c9-a1c9-47a93f9f3965, 7c943c1b-5122-4097-90c8-861411bdd574, b364ed8d-4279-4bf8-8fd1-56f8fa0ae05c, 6c48fa17-39c7-45f1-90ac-47a587128ace, b8aef8e1-37df-4f17-a537-f10e183c8eca;
+    excludedsubscriptions:;
+    excludedresourcetypes:;
+    messageretrycutoffcount: 12"
+  partnerTrafficTuner:
+    "allowalltenants: false;
+    stopalltenants: false;
+    includedregions:;
+    includedsubscriptions:
+      72f988bf-86f1-41af-91ab-2d7cd011db47 = 1a2311d9-66f5-47d3-a9fb-7a37da63934b, 62b829ee-7936-40c9-a1c9-47a93f9f3965, 7c943c1b-5122-4097-90c8-861411bdd574, b364ed8d-4279-4bf8-8fd1-56f8fa0ae05c, 6c48fa17-39c7-45f1-90ac-47a587128ace, b8aef8e1-37df-4f17-a537-f10e183c8eca;
+    excludedsubscriptions:;
+    excludedresourcetypes:;
+    messageretrycutoffcount: 12"
+  backupProviderInputTrafficTunerRule:
+    "allowalltenants: false;
+    stopalltenants: false;
+    includedregions:;
+    includedsubscriptions:
+      72f988bf-86f1-41af-91ab-2d7cd011db47 = 1a2311d9-66f5-47d3-a9fb-7a37da63934b, 62b829ee-7936-40c9-a1c9-47a93f9f3965, 7c943c1b-5122-4097-90c8-861411bdd574, b364ed8d-4279-4bf8-8fd1-56f8fa0ae05c, 6c48fa17-39c7-45f1-90ac-47a587128ace, b8aef8e1-37df-4f17-a537-f10e183c8eca;
+    excludedsubscriptions:;
+    excludedresourcetypes:;
+    messageretrycutoffcount: 12"
+  backupProviderPartnerTrafficTunerRule:
+    "allowalltenants: false;
+    stopalltenants: true;
+    includedregions:;
+    includedsubscriptions:
+      72f988bf-86f1-41af-91ab-2d7cd011db47 = 1a2311d9-66f5-47d3-a9fb-7a37da63934b, 62b829ee-7936-40c9-a1c9-47a93f9f3965, 7c943c1b-5122-4097-90c8-861411bdd574, b364ed8d-4279-4bf8-8fd1-56f8fa0ae05c, 6c48fa17-39c7-45f1-90ac-47a587128ace, b8aef8e1-37df-4f17-a537-f10e183c8eca;
+    excludedsubscriptions:;
+    excludedresourcetypes:;
+    messageretrycutoffcount: 12"
+  arnPublishStorageAccountNames: "0abcinteusarnpsa;1abcinteusarnpsa"
+  arnPublishEventGridDomainIds: "/subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourceGroups/DataLabsabcRG-eastus/providers/Microsoft.EventGrid/domains/abcinteusapeg1"
+  arnPublishEventGridDomainEndpoints: "https://abcinteusapeg1.eastus-1.eventgrid.azure.net/api/events"
+  arnPublishEventGridTopics: "/subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourceGroups/DataLabsabcRG-eastus/providers/Microsoft.EventGrid/domains/abcinteusapeg1/topics/arnpublishtopic"
+  publishOutputToArn: "false"
+  inputCacheTypes: microsoft.recoveryservices/vaults/replicationpolicies;microsoft.compute/virtualmachines;microsoft.storage/storageaccounts;microsoft.resources/subscriptions/resourcegroups;microsoft.resources/subscriptions;microsoft.compute/disks;microsoft.containerservice/managedclusters;microsoft.storage/storageaccounts/blobservices;microsoft.dbforpostgresql/servers;microsoft.dbforpostgresql/flexibleservers;microsoft.recoveryservices/vaults;microsoft.dataprotection/backupvaults;microsoft.classiccompute/virtualmachines
+  defaultInputCacheTTL: "2.00:00:00"
+  defaultOutputCacheTTL: "01:00:00"
+  defaultNotFoundEntryCacheTTL: "01:00:00"
+  resourceTypeCacheTTLMappings:
+    "microsoft.recoveryservices/vaults/replicationpolicies|2.00:00:00;
+    microsoft.compute/virtualmachines|2.00:00:00;
+    microsoft.storage/storageaccounts|2.00:00:00;
+    microsoft.resources/subscriptions/resourcegroups|2.00:00:00;
+    microsoft.resources/subscriptions|2.00:00:00;
+    microsoft.compute/disks|2.00:00:00;
+    microsoft.containerservice/managedclusters|2.00:00:00;
+    microsoft.storage/storageaccounts/blobservices|2.00:00:00;
+    microsoft.dbforpostgresql/servers|2.00:00:00;
+    microsoft.dbforpostgresql/flexibleservers|2.00:00:00;
+    microsoft.recoveryservices/vaults|2.00:00:00;
+    microsoft.dataprotection/backupvaults|2.00:00:00;
+    microsoft.classiccompute/virtualmachines|2.00:00:00"
+  enableBlobPayloadRouting: "false"
+  blobPayloadRoutingTypes:
+    "microsoft.recoveryservices/vaults/replicationfabrics/replicationprotectioncontainers/replicationprotecteditems;
+    microsoft.recoveryservices/vaults/backupfabrics/protectioncontainers/protecteditems;
+    microsoft.dataprotection/backupvaults/backupinstances;
+    microsoft.DataProtection/backupVaults/deletedBackupInstances"
+
+cacheService:
+  enabled: true
+  requestMemory: 1Gi
+  requestStorage: 4Gi
+  requestCPU: 100m
+  storageClassName: managed-csi
+  volumeClaimName: data
+  maxMainStoreMemory: 2g
+  maxHashIndexMemory: 1g
+  maxCompactionSegments: 2
+  cacheConfigMap:
+    checkPointIntervalDuration: "00:15:00"
+  cachePools:
+  - cacheName: iocache1
+    readEnabled: true
+    writeEnabled: true
+    nodePoolName: cachepool1
+    nodeCount: 1
+    port: 3278
+    nodeReplication:
+    startOffset: 0
+  - cacheName: iocache2
+    readEnabled: true
+    writeEnabled: true
+    nodePoolName: cachepool2
+    nodeCount: 1
+    port: 3279
+    nodeReplication:
+    startOffset: 0
+  - cacheName: iocache3
+    readEnabled: true
+    writeEnabled: true
+    nodePoolName: cachepool3
+    nodeCount: 1
+    port: 3280
+    nodeReplication:
+    startOffset: 0
+
+cacheImage:
+  tag: latest
+
+partnerConfig:    
+  pods:
+  - name: bcdr-solution
+    serviceName: bcdr-solution-service
+    partnerConfigMap:
+      name: bcdr-solution-config  
+    containers:
+     - name: abcpartnersolution
+       repository: datalabsintacr.azurecr.io/abcpartnersolution
+       tag: latest
+       port: 5072
+       multiResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" :  "*" 
+                      }
+
+ioImage:
+  tag: latest
+
+resourceProxyImage:
+  tag: latest
+
+socat:
+  tag: latest
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://resourcefetcher-test-eastus.abc.test.eastus:6072
+  resourceFetcherTokenResource: https://resourcefetcherservice-int.microsoft.com
+  resourceFetcherHomeTenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+resourceProxyConfigMap:
+  getResourceAllowedTypes:
+    "microsoft.azurebusinesscontinuity/unifiedprotecteditems:outputsourceoftruth;
+     microsoft.azurebusinesscontinuity/deletedunifiedprotecteditems:outputsourceoftruth;
+     microsoft.azurebusinesscontinuity/idtodeletedupimappings:outputsourceoftruth;
+     microsoft.azurebusinesscontinuity/idtoupimappings:outputsourceoftruth;
+     microsoft.recoveryservices/vaults/replicationpolicies:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.compute/virtualmachines:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.storage/storageaccounts:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.resources/subscriptions/resourcegroups:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.resources/subscriptions:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.compute/disks:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.containerservice/managedclusters:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.storage/storageaccounts/blobservices:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.dbforpostgresql/servers:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.dbforpostgresql/flexibleservers:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.recoveryservices/vaults:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.dataprotection/backupvaults:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.classiccompute/virtualmachines:cache|write|addNotFound,resourcefetcher_arm"
+
+resourceProxyServiceAccount:
+  clientId: 2b463c85-d826-4cb8-ae2e-170d68fe7284
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+# Monitoring configurations
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: false
+
+genevaAccounts:
+  partner:
+    gcs_environment: Test
+    gcs_account: abctestacc1
+    gcs_region: eastus
+    gcs_namespace: abccenter
+    gcs_config_version: "1.13" # TODO Change to respective config version
+    miResourceId: /subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourcegroups/ABC/providers/Microsoft.ManagedIdentity/userAssignedIdentities/abc-test-acrpush
+
+  datalabs:
+    gcs_environment: Test
+    gcs_account: abctestacc1
+    gcs_region: eastus
+    gcs_namespace: abccenter
+    gcs_config_version: "1.13" # TODO Change to respective config version
+    miResourceId: /subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourcegroups/ABC/providers/Microsoft.ManagedIdentity/userAssignedIdentities/abc-test-acrpush
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  metricEndpoint: https://global.ppe.microsoftmetrics.com/
+  
+  accountInfo:
+    DataLabs:
+      account: abctestacc1
+      namespace: abctestacc1-abc-int
+    Partner: # Change accountInfo for Partner (can be the same as DataLabs)
+      account: abctestacc1
+      namespace: abctestacc1-abc-int
+    Customer:
+      account: abctestacc2
+      namespace: abctestacc2
+
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "abctestacc1",
+          "objectId": "7456a0d2-6e9d-4137-938a-eb2eed0b9aae"
+        },
+        {
+          "account": "abctestacc2",
+          "objectId": "7456a0d2-6e9d-4137-938a-eb2eed0b9aae"
+        }
+      ]
+    }

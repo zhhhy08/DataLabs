@@ -1,0 +1,160 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.resourceFetcherConfigMap.name }}
+  namespace: {{ .Values.resourceFetcherNameSpace }}
+data:
+  AADTokenIssuer: {{ .Values.resourceFetcherService.aadTokenIssuer | quote }}
+  AADAuthority: {{ .Values.resourceFetcherService.aadAuthority | quote }}
+  AADTokenAudience: {{ .Values.resourceFetcherService.aadTokenAudience | quote }}
+  DefaultTenantId: {{ .Values.resourceFetcherService.tenantId | quote }}
+  OpenIdConfigurationURI: {{ .Values.resourceFetcherService.openIdConfigurationURI | quote }}
+  SigningTokensRefreshDuration: {{ .Values.resourceFetcherService.signingTokensRefreshDuration | default "1.00:00:00" | quote }}
+  SigningTokensFailedRefreshDuration: {{ .Values.resourceFetcherService.signingTokensFailedRefreshDuration | default "00:10:00" | quote }}
+    
+# Partner Related
+  PartnerNames: {{ .Values.resourceFetcherConfigMap.partnerNames | default "" | quote }}
+
+  # ABC Partner
+  {{- if $.Values.abcsolutionConfigMap.clientIds }}
+  # clientId
+  abcsolution-ClientIds: {{ $.Values.abcsolutionConfigMap.clientIds }}
+  # armAllowedResourceTypes
+  abcsolution-ArmAllowedResourceTypes: {{ $.Values.abcsolutionConfigMap.armAllowedResourceTypes | default "" | quote }}
+  # armAllowedGenericURIPaths
+  abcsolution-ArmAllowedGenericURIPaths: {{ $.Values.abcsolutionConfigMap.armAllowedGenericURIPaths | default "" | quote }}
+  # qfdAllowedResourceTypes
+  abcsolution-QfdAllowedResourceTypes: {{ $.Values.abcsolutionConfigMap.qfdAllowedResourceTypes | default "" | quote }}
+  # armAdminAllowedCalls
+  abcsolution-ArmAdminAllowedCalls: {{ $.Values.abcsolutionConfigMap.armAdminAllowedCalls | default "" | quote }}
+  # casAllowedCalls
+  abcsolution-CasAllowedCalls: {{ $.Values.abcsolutionConfigMap.casAllowedCalls | default "" | quote }}
+  {{- end }}
+
+  {{- if $.Values.idmappingConfigMap.clientIds }}
+  # Policy Partner
+  # clientId
+  idmapping-ClientIds: {{ $.Values.idmappingConfigMap.clientIds }}
+  # armAllowedResourceTypes
+  idmapping-ArmAllowedResourceTypes: {{ $.Values.idmappingConfigMap.armAllowedResourceTypes | default "" | quote }}
+  # armAllowedGenericURIPaths
+  idmapping-ArmAllowedGenericURIPaths: {{ $.Values.idmappingConfigMap.armAllowedGenericURIPaths | default "" | quote }}
+  # qfdAllowedResourceTypes
+  idmapping-QfdAllowedResourceTypes: {{ $.Values.idmappingConfigMap.qfdAllowedResourceTypes | default "" | quote }}
+  # armAdminAllowedCalls
+  idmapping-ArmAdminAllowedCalls: {{ $.Values.idmappingConfigMap.armAdminAllowedCalls | default "" | quote }}
+  # casAllowedCalls
+  idmapping-CasAllowedCalls: {{ $.Values.idmappingConfigMap.casAllowedCalls | default "" | quote }}
+  {{- end }}
+
+  # SKU Partner
+  {{- if $.Values.skuConfigMap.clientIds }}
+  # clientId
+  sku-ClientIds: {{ $.Values.skuConfigMap.clientIds }}
+  # armAllowedResourceTypes
+  sku-ArmAllowedResourceTypes: {{ $.Values.skuConfigMap.armAllowedResourceTypes | default "" | quote }}
+  # armAllowedGenericURIPaths
+  sku-ArmAllowedGenericURIPaths: {{ $.Values.skuConfigMap.armAllowedGenericURIPaths | default "" | quote }}
+  # qfdAllowedResourceTypes
+  sku-QfdAllowedResourceTypes: {{ $.Values.skuConfigMap.qfdAllowedResourceTypes | default "" | quote }}
+  # armAdminAllowedCalls
+  sku-ArmAdminAllowedCalls: {{ $.Values.skuConfigMap.armAdminAllowedCalls | default "" | quote }}
+  # casAllowedCalls
+  sku-CasAllowedCalls: {{ $.Values.skuConfigMap.casAllowedCalls | default "" | quote }}
+  {{- end }}
+
+  {{- if $.Values.capsolutionConfigMap.clientIds }}
+  # Capability Policy Partner
+  # clientId
+  capsolution-ClientIds: {{ $.Values.capsolutionConfigMap.clientIds }}
+  # armAllowedResourceTypes
+  capsolution-ArmAllowedResourceTypes: {{ $.Values.capsolutionConfigMap.armAllowedResourceTypes | default "" | quote }}
+  # armAllowedGenericURIPaths
+  capsolution-ArmAllowedGenericURIPaths: {{ $.Values.capsolutionConfigMap.armAllowedGenericURIPaths | default "" | quote }}
+  # qfdAllowedResourceTypes
+  capsolution-QfdAllowedResourceTypes: {{ $.Values.capsolutionConfigMap.qfdAllowedResourceTypes | default "" | quote }}
+  # armAdminAllowedCalls
+  capsolution-ArmAdminAllowedCalls: {{ $.Values.capsolutionConfigMap.armAdminAllowedCalls | default "" | quote }}
+  # casAllowedCalls
+  capsolution-CasAllowedCalls: {{ $.Values.capsolutionConfigMap.casAllowedCalls | default "" | quote }}
+  {{- end }}
+
+  {{- if $.Values.azrsolutionConfigMap.clientIds }}
+  # Policy Partner
+  # clientId
+  azrsolution-ClientIds: {{ $.Values.azrsolutionConfigMap.clientIds }}
+  # armAllowedResourceTypes
+  azrsolution-ArmAllowedResourceTypes: {{ $.Values.azrsolutionConfigMap.armAllowedResourceTypes | default "" | quote }}
+  # armAllowedGenericURIPaths
+  azrsolution-ArmAllowedGenericURIPaths: {{ $.Values.azrsolutionConfigMap.armAllowedGenericURIPaths | default "" | quote }}
+  # qfdAllowedResourceTypes
+  azrsolution-QfdAllowedResourceTypes: {{ $.Values.azrsolutionConfigMap.qfdAllowedResourceTypes | default "" | quote }}
+  # armAdminAllowedCalls
+  azrsolution-ArmAdminAllowedCalls: {{ $.Values.azrsolutionConfigMap.armAdminAllowedCalls | default "" | quote }}
+  # casAllowedCalls
+  azrsolution-CasAllowedCalls: {{ $.Values.azrsolutionConfigMap.casAllowedCalls | default "" | quote }}
+  {{- end }}
+
+# ARM client Related
+  {{- if .Values.resourceFetcherService.armClient.endpoints }}
+  ARMEndpoints: {{ .Values.resourceFetcherService.armClient.endpoints | default "" | quote }}
+  ARMBackupEndpoints: {{ .Values.resourceFetcherService.armClient.backupEndpoints | default "" | quote }}
+  ARMFirstPartyAppId: {{ .Values.resourceFetcherService.armClient.firstPartyAppId | default "" | quote }}
+  ARMFirstPartyAppCertName: {{ .Values.resourceFetcherService.armClient.certificateName | default "" | quote }}
+  ARMTokenResource: {{ .Values.resourceFetcherService.armClient.armTokenResource | default ""| quote }}
+  ARMClientOption: {{ .Values.resourceFetcherService.armClient.clientOption | default "" | quote }}
+  DefaultArmClientGetResourceTimeOutInSec: {{ .Values.resourceFetcherService.armClient.defaultArmClientGetResourceTimeOutInSec | default "5/20" | quote }}
+  DefaultArmClientGenericApiTimeOutInSec: {{ .Values.resourceFetcherService.armClient.defaultArmClientGenericApiTimeOutInSec | default "20/40" | quote }}
+  ArmClientResourceTimeOutMappings: {{ .Values.resourceFetcherService.armClient.armClientResourceTimeOutMappings | default "" | quote }}
+  ArmClientGenericApiTimeOutMappings: {{ .Values.resourceFetcherService.armClient.armClientGenericApiTimeOutMappings | default "" | quote }}
+  {{- end }}
+
+# CAS Client Related
+  {{- if .Values.resourceFetcherService.casClient.endpoints }}
+  CasEndpoints: {{ .Values.resourceFetcherService.casClient.endpoints | default "" | quote }}
+  CasBackupEndpoints: {{ .Values.resourceFetcherService.casClient.backupEndpoints | default "" | quote }}
+  CasDstsCertificateName: {{ .Values.resourceFetcherService.casClient.certificateName | default "" | quote }}  
+  CasDstsSkipServerCertificateValidation: {{ .Values.resourceFetcherService.casClient.dstsSkipServerCertificateValidation | default false | quote }}  
+  CasDstsClientId: {{ .Values.resourceFetcherService.casClient.dstsClientId | default "" | quote }}
+  CasDstsServerId: {{ .Values.resourceFetcherService.casClient.dstsServerId | default "" | quote }}
+  CasDstsClientHome: {{ .Values.resourceFetcherService.casClient.dstsClientHome | default "" | quote }}
+  CasDstsServerHome: {{ .Values.resourceFetcherService.casClient.dstsServerHome | default "" | quote }}
+  CasDstsServerRealm: {{ .Values.resourceFetcherService.casClient.dstsServerRealm | default "" | quote }}
+  CasClientOption: {{ .Values.resourceFetcherService.casClient.clientOption | default "" | quote }}
+  DefaultCasClientTimeOutInSec: {{ .Values.resourceFetcherService.casClient.defaultCasClientTimeOutInSec | default "10/20" | quote }}
+  CasClientTimeOutMappings: {{ .Values.resourceFetcherService.casClient.casClientTimeOutMappings | default "" | quote }}
+  {{- end }}
+
+# ARG Query FrontDoor Client Related
+  {{- if .Values.resourceFetcherService.qfdClient.endpoints }}
+  QfdEndpoints: {{ .Values.resourceFetcherService.qfdClient.endpoints | default "" | quote }}
+  QfdBackupEndpoints: {{ .Values.resourceFetcherService.qfdClient.backupEndpoints | default "" | quote }}
+  QfdDstsCertificateName: {{ .Values.resourceFetcherService.qfdClient.certificateName | default "" | quote }}  
+  QfdDstsSkipServerCertificateValidation: {{ .Values.resourceFetcherService.qfdClient.dstsSkipServerCertificateValidation | default false | quote }}  
+  QfdDstsClientId: {{ .Values.resourceFetcherService.qfdClient.dstsClientId | default "" | quote }}
+  QfdDstsServerId: {{ .Values.resourceFetcherService.qfdClient.dstsServerId | default "" | quote }}
+  QfdDstsClientHome: {{ .Values.resourceFetcherService.qfdClient.dstsClientHome | default "" | quote }}
+  QfdDstsServerHome: {{ .Values.resourceFetcherService.qfdClient.dstsServerHome | default "" | quote }}
+  QfdDstsServerRealm: {{ .Values.resourceFetcherService.qfdClient.dstsServerRealm | default "" | quote }}
+  QfdClientOption: {{ .Values.resourceFetcherService.qfdClient.clientOption | default "" | quote }}
+  DefaultQFDClientTimeOutInSec: {{ .Values.resourceFetcherService.qfdClient.defaultQFDClientTimeOutInSec | default "5/20" | quote }}
+  QfdClientTimeOutMappings: {{ .Values.resourceFetcherService.qfdClient.qfdClientTimeOutMappings | default "" | quote }}
+  {{- end }}
+
+# ARM Admin Client Related
+  {{- if .Values.resourceFetcherService.armAdminClient.endpoints }}
+  ArmAdminEndpoints:  {{ .Values.resourceFetcherService.armAdminClient.endpoints | default "" | quote }}
+  ArmAdminBackupEndpoints:  {{ .Values.resourceFetcherService.armAdminClient.backupEndpoints | default "" | quote }}
+  ArmAdminCertificateName:  {{ .Values.resourceFetcherService.armAdminClient.certificateName | default ""| quote }}
+  ArmAdminClientOption:  {{ .Values.resourceFetcherService.armAdminClient.clientOption | default ""| quote }}
+  DefaultArmAdminClientTimeOutInSec: {{ .Values.resourceFetcherService.armAdminClient.defaultArmAdminClientTimeOutInSec | default "10/20" | quote }}
+  ArmAdminClientTimeOutMappings: {{ .Values.resourceFetcherService.armAdminClient.armAdminClientTimeOutMappings | default "" | quote }}
+  {{- end }}
+
+# Logging Related  
+  LOGGER_MIN_LOG_LEVEL: {{ .Values.resourceFetcherConfigMap.minLogLevel | default "Information" | quote }}
+  EnableGrpcTrace: {{ .Values.resourceFetcherConfigMap.enableGrpcTrace | default false | quote }}
+  EnableHttpClientTrace: {{ .Values.resourceFetcherConfigMap.enableHttpClientTrace | default false | quote }}
+  EnableAzureSDKActivity: {{ .Values.resourceFetcherConfigMap.enableAzureSDKActivity | default false | quote }}
+  IncludeRunTimeMetrics: {{ .Values.resourceFetcherConfigMap.includeRunTimeMetrics | default true | quote }}
+  IncludeHttpClientMetrics: {{ .Values.resourceFetcherConfigMap.includeHttpClientMetrics | default false | quote }}

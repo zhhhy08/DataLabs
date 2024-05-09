@@ -1,0 +1,10 @@
+- name: Infra/Deployments
+  href: infra/
+- name: TroubleShooting Guides
+  href: tsgs/
+- name: Monitors
+  href: monitors/
+- name: Operations
+  href: operations/
+- name: Onboardings
+  href: onboarding/  

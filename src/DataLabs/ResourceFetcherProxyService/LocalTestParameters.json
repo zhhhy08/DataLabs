@@ -1,0 +1,49 @@
+{
+  "Debug_DoNotUseMeters": "true",
+
+  // Environtment variables like scaleUnit should be defined in the launchSettings.json file under Properties folder
+  // scaleUnit in launchsettings.json should be same as SolutionName in this file
+  // If you want to change the scaleUnit name, please change it in both launchsettings.json and SolutionName in this file
+  // "scaleUnit": "testsolution"
+
+  "SolutionName": "testsolution",
+  "PrimaryRegionName": "testprimary",
+  "BackupRegionName": "testbackup",
+  "UseSourceOfTruth": "false",
+
+  "EnableGrpcTrace": "true",
+  "EnableHttpClientTrace": "true",
+  "EnableAzureSDKActivity": "true",
+
+  "ResourceFetcherProxyMaxTimeOutInSec": "120/240",
+
+  "GetResourceAllowedTypes": "microsoft.compute/virtualmachines:cache|write/00:10:00|addNotFound/00:03:00,resourcefetcher_arm",
+  //"GetResourceAllowedTypes": "microsoft.compute/virtualmachines:cache|write/00:10:00|addNotFound/00:03:00,arm|2022-11-01",
+
+  "CallARMGenericRequestAllowedTypes": "",
+  "GetCollectionAllowedTypes": "",
+  "GetManifestConfigAllowedTypes": "",
+  "GetConfigSpecsAllowedTypes": "",
+  "GetCasResponseAllowedTypes": "",
+  "GetIdMappingAllowedTypes": "",
+
+  "DefaultTenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+  "AADTokenIssuer": "https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/",
+  "AADAuthority": "https://login.microsoftonline.com",
+
+  // ARM Client Related
+  "ARMTokenResource": "https://management.core.windows.net",
+  "ARMEndpoints": "https://management.azure.com",
+  "UseCredentialTokenForArmClient": "true",
+
+  // Resource Fetcher Client Related
+  "ResourceFetcherEndpoints": "http://localhost:6072",
+  "ResourceFetcherTokenResource": "https://resourcefetcherservice-int.microsoft.com",
+  "ResourceFetcherHomeTenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+
+  "CachePoolDomain": "localhost",
+  "CacheNumPools": "1",
+  "CachePool-0": "CacheName=test;ReadEnabled=true;WriteEnabled=true;NodeCount=1;Port=3278;StartOffset=0;NodeSelectionMode=JumpHash",
+  "CachePoolNodeReplicationMapping-0": ""
+}
+

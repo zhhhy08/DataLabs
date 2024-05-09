@@ -1,0 +1,138 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "deployAADApp": {
+            "type": "bool",
+            "metadata": {
+                "description": "true to deploy the AAD app. switch is needed as this ARM template resource is not supported in Microsoft Tenant"
+            }
+        },
+        "appName": {
+            "type": "string"
+        },
+        "publisherDomain": {
+            "type": "string"
+        },
+        "identifierUri": {
+            "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "condition": "[parameters('deployAADApp')]",
+            "type": "Microsoft.Identity/applications",
+            "apiVersion": "2020-03-31-preview",
+            "name": "[parameters('appName')]",
+            "properties": {
+                "displayName": "[parameters('appName')]",
+                "uniqueName": "[parameters('appName')]",
+                "publisherDomain": "[parameters('publisherDomain')]",
+                "identifierUris": [
+                    "[parameters('identifierUri')]"
+                ],
+            "keyCredentials": [],
+                "api": {
+                "knownClientApplications": [],
+                "oauth2PermissionScopes": [], // TODO: may need to be updated based on ARG repo entrie
+                "preAuthorizedApplications": []
+                },
+                "web": {
+                    "homePageUrl": null,
+                    "logoutUrl": null,
+                "redirectUrls": []
+                },
+                "publicClient": {
+                "redirectUris": []
+                },
+                "requiredResourceAccess": [
+                    {
+                        // Microsoft Graph (app ID 00000003-0000-0000-c000-000000000000) - https://eng.ms/docs/microsoft-security/identity/identity-authentication-and-authorization-authnz-teams/auth-sts-protocols/ests/ests-troubleshooting-guides/tsgs/3p-apps-build-out-automation/3p-apps-build-out-automation-public-us-gov-usnat-ussec#grant-admin-consent
+                        "resourceAppId": "00000003-0000-0000-c000-000000000000",
+                        "resourceAccess": [
+                            {
+                                // User.Read	e1fe6dd8-ba31-4d61-89e7-88639da4683d
+                                "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                                "type": "Scope"
+                            }
+                        ]
+                    }
+                ],
+            "appRoles": [],
+                "signInAudience": "AzureADMyOrg"
+            }
+        },
+        {
+            "condition": "[parameters('deployAADApp')]",
+            "name": "servicePrincipalProvisioning",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "properties": {
+                "mode": "Incremental",
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "parameters": {
+                    "appId": {
+                        "value": "[if(parameters('deployAADApp'),reference(resourceId('Microsoft.Identity/applications', parameters('appName')), '2020-03-31-preview').appId, '')]"
+                    },
+                    "provisionAppServicePrincipal": {
+                        "value": "[parameters('deployAADApp')]"
+                    }
+                },
+                "template": {
+                    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "appId": {
+                            "type": "string"
+                        },
+                        "provisionAppServicePrincipal": {
+                            "type": "bool"
+                        }
+                    },
+                    "variables": {
+                        "identityApiVersion": "2020-03-31-preview"
+                    },
+                    "resources": [
+                        {
+                            "condition": "[parameters('provisionAppServicePrincipal')]",
+                            "type": "Microsoft.Identity/servicePrincipals",
+                            "apiVersion": "[variables('identityApiVersion')]",
+                            "name": "[parameters('appId')]",
+                            "properties": {
+                                "appId": "[parameters('appId')]",
+                                "accountEnabled": "true",
+                            "alternativeNames": [],
+                                "appRoleAssignmentRequired": false,
+                            "keyCredentials": [],
+                            "replyUrls": [],
+                            "tags": []
+                            }
+                        }
+                    ],
+                    "outputs": {
+                        "appId": {
+                            "type": "string",
+                            "value": "[parameters('appId')]"
+                        },
+                        "servicePrincipalObjectId": {
+                            "type": "string",
+                            "value": "[if(parameters('provisionAppServicePrincipal'), reference(resourceId('Microsoft.Identity/servicePrincipals', parameters('appId')), variables('identityApiVersion')).Id, '')]"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "appId": {
+            "type": "string",
+            "value": "[if(parameters('deployAADApp'), reference('servicePrincipalProvisioning').outputs.appId.value, '')]"
+        },
+        "spObjectId": {
+            "type": "string",
+            "value": "[if(parameters('deployAADApp'), reference('servicePrincipalProvisioning').outputs.servicePrincipalObjectId.value, '')]"
+        }
+    }
+}

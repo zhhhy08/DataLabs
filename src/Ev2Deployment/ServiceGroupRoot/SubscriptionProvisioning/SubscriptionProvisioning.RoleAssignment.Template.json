@@ -1,0 +1,53 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "principalIds": {
+            "type": "array",
+            "metadata": {
+                "description": "The principal to assign the role to"
+            }
+        }
+    },
+    "variables": {
+        // RBAC built in role
+        "AzureServiceDeployReleaseManagementContributor": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '6572f2b3-e27a-4b1e-9ae4-6ae7bc27e7f0')]",
+        "Reader": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
+        "TMResourceTopologyPrincipalId": "2214c35c-b4ac-431d-ad89-6a9fbbc6c8b3",
+        "copy": [
+            {
+                "name": "roleNameGuids",
+                "count": "[length(parameters('principalIds'))]",
+                "input": "[guid(subscription().subscriptionId, parameters('principalIds')[copyIndex('roleNameGuids')], 'AzureServiceDeployReleaseManagementContributor')]"
+            }
+        ]
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2022-04-01",
+            //Make sure the role assignment template is idempotent by using a constant guid for the 'name' property of resource 'Microsoft.Authorization/roleAssignments' in your ARM template. If newGuid() function is used instead of a constant value, a new GUID is generated on each deployment and subsequent deployments will fail with Conflict: RoleAssignmentExists error.
+            "name": "[variables('roleNameGuids')[copyIndex()]]",
+            "properties": {
+                "roleDefinitionId": "[variables('AzureServiceDeployReleaseManagementContributor')]",
+                "principalId": "[parameters('principalIds')[copyIndex()]]",
+                "scope": "[subscription().id]"
+            },
+            "copy": {
+                "name": "roleNameGuidsCopy",
+                "count": "[length(variables('roleNameGuids'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2022-04-01",
+            //Make sure the role assignment template is idempotent by using a constant guid for the 'name' property of resource 'Microsoft.Authorization/roleAssignments' in your ARM template. If newGuid() function is used instead of a constant value, a new GUID is generated on each deployment and subsequent deployments will fail with Conflict: RoleAssignmentExists error.
+            "name": "[guid(subscription().subscriptionId, variables('TMResourceTopologyPrincipalId'), 'Reader')]",
+            "properties": {
+                "roleDefinitionId": "[variables('Reader')]",
+                "principalId": "[variables('TMResourceTopologyPrincipalId')]",
+                "scope": "[subscription().id]"
+            }
+        }
+    ]
+}

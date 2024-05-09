@@ -1,0 +1,101 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "paths": [
+        {
+            "parameterReference": "privateAKSClusterTemplateUri"
+        },
+        {
+            "parameterReference": "eventHubNamespaceTemplateUri"
+        },
+        {
+            "parameterReference": "serviceBusTemplateUri"
+        },
+        {
+            "parameterReference": "storageAccountTemplateUri"
+        },
+        {
+            "parameterReference": "eventGridTemplateUri"
+        },
+        {
+            "parameterReference": "keyvaultTemplateUri"
+        },
+        {
+            "parameterReference": "cnameTemplateUri"
+        }
+    ],
+    "parameters": {
+        "cloudName": {
+            "value": "__CLOUD_NAME__"
+        },
+        "location": {
+            "value": "__LOCATION__"
+        },
+        "regionAcronym": {
+            "value": "__REGION_ACRONYM__"
+        },
+        "partnerAcronym": {
+            "value": "__PARTNER_ACRONYM__"
+        },
+        "maintenanceConfigurationsConfigs": {
+            "value": "__MAINTENANCE_CONFIGURATIONS_CONFIGS__"
+        },
+        "adminGroupObjectIds": {
+            "value": "__ADMIN_GROUP_OBJECT_IDS__"
+        },
+        "agentpoolConfig": {
+            "value": "__PRIVATE_AKS_AGENTPOOL__"
+        },
+        "cachepoolConfig": {
+            "value": "__PRIVATE_AKS_CACHEPOOL__"
+        },
+        "eventHubNamespaceConfigs": {
+            "value": "__EVENTHUBNAMESPACE_CONFIGS__"
+        },
+        "serviceBusConfigs": {
+            "value": "__SERVICEBUS_CONFIGS__"
+        },
+        "storageAccountConfigs": {
+            "value": "__STORAGEACCOUNT_CONFIGS__"
+        },
+        "eventGridConfigs": {
+            "value": "__EVENTGRID_CONFIGS__"
+        },
+        "availabilityZonesInRegion": {
+            "value": "__AVAILABILITY_ZONE_COUNT__"
+        },
+        "enableAdminService": {
+            "value": "__ENABLE_ADMIN_SERVICE__"
+        },
+        "dnsZoneName": {
+            "value": "__DNS_ZONE_NAME__"
+        },
+        "cnameSuffix": {
+            "value": "__CNAME_SUFFIX__"
+        },
+        "datalabsSubId": {
+            "value": "__DATALABS_SUB_ID__"
+        },
+        "privateAKSClusterTemplateUri": {
+            "value": "Templates\\Common\\PrivateAksCluster.Template.json"
+        },
+        "eventHubNamespaceTemplateUri": {
+            "value": "Templates\\Common\\EventHubNamespace.Template.json"
+        },
+        "serviceBusTemplateUri": {
+            "value": "Templates\\Common\\ServiceBus.Template.json"
+        },
+        "storageAccountTemplateUri": {
+            "value": "Templates\\Common\\StorageAccount.Template.json"
+        },
+        "eventGridTemplateUri": {
+            "value": "Templates\\Common\\EventGrid.Template.json"
+        },
+        "keyvaultTemplateUri": {
+            "value": "Templates\\Common\\KeyVault.Template.json"
+        },
+        "cnameTemplateUri": {
+            "value": "Templates\\Common\\Cname.Template.json"
+        }
+    }
+}

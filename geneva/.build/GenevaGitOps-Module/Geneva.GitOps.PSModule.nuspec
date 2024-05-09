@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>Geneva.GitOps.PSModule</id>
+    <version>0.1.13</version>
+    <authors>genevaev2@microsoft.com</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <!-- <icon>icon.png</icon> -->
+    <projectUrl>https://eng.ms/docs/products/geneva/connectors/source_control/gettingstartedv2</projectUrl>
+    <description>Powershell module containing functions used to generate Geneva account configuration artifacts for use by the Ev2 extensions associated with those accounts.</description>
+    <releaseNotes>
+      Initial release for consumption
+
+      0.1.9 - Bug fix for duplicate resource files, such as Metrics configuration, match may not always work as expected.
+      0.1.10 - Make duplicate resource file detection less greedy.
+      0.1.11 - Minor bug fixes.
+      0.1.12 - Fix uniqueness issue with Write-LogsScopeBindings, renamed to Update-Ev2ArtifactsForLogs to make the intended functionality more clear. Write-LogsScopeBindings is now an alias for Update-Ev2ArtifactsForLogs.
+      0.1.13 - Initial support for Dashboards.
+    </releaseNotes>
+    <copyright>2023-2024 Microsoft Corporation</copyright>
+    <tags>Geneva GitOps Ev2 Logs Metrics Health Monitor</tags>
+  </metadata>
+</package>

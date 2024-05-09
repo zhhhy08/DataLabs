@@ -1,0 +1,143 @@
+# Values File for Resource Alias in prod wu3 Environment
+primaryRegionName: "wu3"
+backupRegionName: "eus"
+
+solutionInfo:
+  solutionName: &solutionName rassolution
+  aksClusterName: rasprodwu3aks
+  environment: Prod
+  region: westus3
+  scaleUnit: *solutionName
+
+ioService:
+  replicaCount: 5 # override from dataLabServices.yaml
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+#MI of ras partner
+  clientId: 908fde98-51a3-4584-96ff-6308559e9eee
+  tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+
+ioConfigMap:
+  inputEventHubNameSpaceAndName: "rasprodwu3pipehns0/rasprodwu3pipeh;rasprodwu3pipehns1/rasprodwu3pipeh"
+  outputEventHubNameSpaceAndName: "rasprodwu3opehns0/rasprodwu3opeh;rasprodwu3opehns1/rasprodwu3opeh"
+  eventHubStorageAccountName: "0rasprodwu3ehcpsa"
+  blobStorageAccountNames: "" # No source of truth
+  backupInputEventHubNameSpaceAndName: "rasprodwu3bpipehns0/rasprodwu3bpipeh/00:05:00;rasprodwu3bpipehns1/rasprodwu3bpipeh/00:05:00"
+  backupBlobStorageAccountNames: ""
+  serviceBusNameSpaceAndName: "rasprodwu3sb0/0rasprodwu3sbq;rasprodwu3sb1/1rasprodwu3sbq"
+  outputDataset: "rassolution"
+  useSourceOfTruth: "false"
+  allowedOutputTypes: "microsoft.maintenance/scheduledevents;microsoft.aliases/namespaces/types/identifiers/values"
+  arnPublishStorageAccountNames: "0rasprodwu3arnpsa;1rasprodwu3arnpsa;2rasprodwu3arnpsa;3rasprodwu3arnpsa;4rasprodwu3arnpsa;5rasprodwu3arnpsa"
+  arnPublishEventGridDomainIds: "/subscriptions/8956daf3-20ca-419f-bb01-aab21c6a63f4/resourceGroups/DataLabsrasRG-westus3/providers/Microsoft.EventGrid/domains/rasprodwu3apeg1;/subscriptions/8956daf3-20ca-419f-bb01-aab21c6a63f4/resourceGroups/DataLabsrasRG-westus3/providers/Microsoft.EventGrid/domains/rasprodwu3apeg2"
+  arnPublishEventGridDomainEndpoints: "https://rasprodwu3apeg1.westus3-1.eventgrid.azure.net/api/events;https://rasprodwu3apeg2.westus3-1.eventgrid.azure.net/api/events"
+  arnPublishEventGridTopics: "/subscriptions/8956daf3-20ca-419f-bb01-aab21c6a63f4/resourceGroups/DataLabsrasRG-westus3/providers/Microsoft.EventGrid/domains/rasprodwu3apeg1/topics/arnpublishtopic;/subscriptions/8956daf3-20ca-419f-bb01-aab21c6a63f4/resourceGroups/DataLabsrasRG-westus3/providers/Microsoft.EventGrid/domains/rasprodwu3apeg2/topics/arnpublishtopic"
+  pairedRegionArnPublishEventGridDomainIds: "/subscriptions/8956daf3-20ca-419f-bb01-aab21c6a63f4/resourceGroups/DataLabsrasRG-eastus/providers/Microsoft.EventGrid/domains/rasprodeusapeg1;/subscriptions/8956daf3-20ca-419f-bb01-aab21c6a63f4/resourceGroups/DataLabsrasRG-eastus/providers/Microsoft.EventGrid/domains/rasprodeusapeg2"
+  pairedRegionArnPublishEventGridDomainEndpoints: "https://rasprodeusapeg1.eastus-1.eventgrid.azure.net/api/events;https://rasprodeusapeg2.eastus-1.eventgrid.azure.net/api/events"
+  pairedRegionArnPublishEventGridTopics: "/subscriptions/8956daf3-20ca-419f-bb01-aab21c6a63f4/resourceGroups/DataLabsrasRG-eastus/providers/Microsoft.EventGrid/domains/rasprodeusapeg1/topics/arnpublishtopic;/subscriptions/8956daf3-20ca-419f-bb01-aab21c6a63f4/resourceGroups/DataLabsrasRG-eastus/providers/Microsoft.EventGrid/domains/rasprodeusapeg2/topics/arnpublishtopic"
+
+partnerConfig:    
+  pods:
+  - name: ras-solution
+    serviceName: ras-solution-service
+    replicaCount: 5
+    partnerConfigMap:
+      name: ras-solution-config    
+    containers:
+     - name: raspartnersolution
+       repository: datalabsprodacr.azurecr.io/raspartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" : "*"
+                      }
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://rfprodwu3aks.ras.prod.wu3aks:6072
+  partnerCertificates:
+    isEnabled: true
+    tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+    aadAuthority: https://login.microsoftonline.com
+    aadTokenIssuer: https://sts.windows.net/33e01921-4d64-4f8c-a055-5bdaffd5e33d/
+    qfdClient:
+      endpoints: https://arg-prod-rp.arg.core.windows.net
+      certificateName: datalabs-ras-dsts-client-prod-westus3-gov-rp-art
+      dstsSkipServerCertificateValidation: false
+      dstsClientId: ccef0cde-1511-4675-9911-af5613741e77
+      dstsServerId: bce8590f-51bd-4560-b478-9cfb5aab0500
+      dstsClientHome: "https://uswest3-passive-dsts.dsts.core.windows.net/dstsv2/7a433bfc-2514-4697-b467-e0933190487f"
+      dstsServerHome: "https://prod-passive-dsts.dsts.core.windows.net/dstsv2/7a433bfc-2514-4697-b467-e0933190487f"
+      dstsServerRealm: "realm://dsts.core.windows.net/7a433bfc-2514-4697-b467-e0933190487f/"
+
+resourceProxyServiceAccount: 
+# MI of ras partner
+  clientId: 908fde98-51a3-4584-96ff-6308559e9eee
+
+resourceProxyConfigMap:
+  getIdMappingAllowedTypes:
+    "*:qfd|2016-09-01"
+
+# Monitoring Information
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: true
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGDataLabs
+    gcs_region: westus3
+    gcs_namespace: ARGDataLabs
+    gcs_config_version: "1.6"
+    miResourceId: /subscriptions/8956daf3-20ca-419f-bb01-aab21c6a63f4/resourcegroups/MC_DataLabsrasRG-westus3_rasprodwu3aks_westus3/providers/Microsoft.ManagedIdentity/userAssignedIdentities/rasprodwu3aks-agentpool
+  partner:
+    gcs_environment: DiagnosticsProd
+    gcs_account: AliasDatalabsSlnProd
+    gcs_region: westus3
+    gcs_namespace: AliasDatalabsSlnProd
+    gcs_config_version: "1.1"
+    miResourceId: /subscriptions/8956daf3-20ca-419f-bb01-aab21c6a63f4/resourcegroups/MC_DataLabsrasRG-westus3_rasprodwu3aks_westus3/providers/Microsoft.ManagedIdentity/userAssignedIdentities/rasprodwu3aks-agentpool
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  # metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: ARGDataLabs
+      namespace: ARGDataLabs
+    Partner: 
+      account: AliasDatalabsSlnProd
+      namespace: AliasDatalabsSlnProd
+
+  # objectId of ras aks-agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "ARGDataLabs",
+          "objectId": "c991fc64-6147-40f7-8643-f08962ef73c9"
+        },
+        {
+          "account": "AliasDatalabsSlnProd", 
+          "objectId": "c991fc64-6147-40f7-8643-f08962ef73c9"
+        }
+      ]
+    }
+
+keyVault:
+  name: rasprodwu3kv
+  clientId: 7f272ced-62f1-4d39-a81b-f8252ab98e9d
+
+adminService:
+  isEnabled: true
+  sslSecretProvider:
+    certificateName: rasprodwu3aks-ssl
+
+adminServiceConfigMap:
+  dstsRealm: realm://dsts.core.windows.net/
+  dstsName: prod-dsts.dsts.core.windows.net
+  serviceDns: prod.datalabs.core.windows.net
+  allowedActors: GenevaActionsPublicPrimary,GenevaActionsPublicSecondary,GenevaActionsPublicWestUs

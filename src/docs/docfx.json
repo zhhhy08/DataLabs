@@ -1,0 +1,49 @@
+{
+  "build": {
+    "content": [
+      {
+        "files": [ "**/*.yml", "**/*md" ]
+      },
+      {
+        "files": [
+          ".{md,yml}",          
+          "infra/**/*.{md,yml}",
+          "monitors/**/*.{md,yml}",
+          "operations/**/*.{md,yml}",
+          "tsgs/**/*.{md,yml}",
+          "onboarding/**/*.{md,yml}"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+		      ".attachments/**"
+        ],
+        "exclude": [
+          "obj/**",
+          "_site/**"
+        ]
+      }
+    ],
+    "dest": "_site",
+    "globalMetadata": {
+      "_appTitle": "ARB Troubleshooting Guides",
+      "_enableSearch": "true",
+      "_enableNewTab": "true",
+      "_gitContribute": {
+        "branch": "main"
+      }
+      },
+    "fileMetadataFiles": [],
+    "template": [
+      "default"
+    ],
+    "postProcessors": [],
+    "markdownEngineName": "markdig",
+    "noLangKeyword": false,
+    "keepFileLink": false,
+    "cleanupCacheHistory": false,
+    "disableGitFeatures": false
+  }
+}

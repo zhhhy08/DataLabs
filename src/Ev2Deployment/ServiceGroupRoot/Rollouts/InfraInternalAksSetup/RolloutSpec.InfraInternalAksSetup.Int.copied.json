@@ -1,0 +1,64 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-04-01/RegionAgnosticRolloutSpecification.json",
+    "contentVersion": "1.0.0.0",
+    "rolloutMetadata": {
+        "serviceModelPath": "Rollouts\\InfraInternalAksSetup\\DataLabs.ServiceModel.InfraInternalAksSetup.Int.json",
+        "scopeBindingsPath": "ScopeBindings.json",
+        "name": "Datalabs.InfraInternalAksSetup",
+        "rolloutType": "Major",
+        "buildSource": {
+            "parameters": {
+                "versionFile": "BuildVer.txt"
+            }
+        },
+        "Notification": {
+            "Email": {
+                "To": "earc@microsoft.com"
+            },
+            "incident": {
+                "providerType": "IcM",
+                "properties": {
+                    "connectorId": "80fcf79d-1483-4d33-b4fc-675f40fa7298",
+                    "routingId": "AIMS://GOV_ART:AzureResourceTopology/Ev2Deployment"
+                }
+            }
+        },
+        "Configuration": {
+            "serviceGroupScope": {
+                "specPath": "ConfigurationSpecification\\Configuration.Int.json"
+            }
+        }
+    },
+    "orchestratedSteps": [
+        {
+            "name": "RoleAssignmentScripts",
+            "targetType": "ServiceResourceDefinition",
+            "targetName": "RoleAssignmentScripts",
+            "actions": [
+                "wait/ManualStep"
+            ]
+        },
+        {
+            "name": "InfraInternalAksSetupResourceFetcher",
+            "targetType": "ServiceResourceDefinition",
+            "targetName": "InfraInternalAksSetupResourceFetcher",
+            "actions": [
+                "Shell/Run"
+            ],
+            "dependsOn": [
+                "RoleAssignmentScripts"
+            ]
+        },
+        {
+            "name": "InfraInternalAksSetupPartner",
+            "targetType": "ServiceResourceDefinition",
+            "targetName": "InfraInternalAksSetupPartner",
+            "actions": [
+                "Shell/Run"
+            ],
+            "dependsOn": [
+                "InfraInternalAksSetupResourceFetcher"
+            ]
+        }
+    ]
+}

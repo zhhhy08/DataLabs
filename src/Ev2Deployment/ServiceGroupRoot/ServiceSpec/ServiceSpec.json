@@ -1,0 +1,9 @@
+{
+    "providerType": "ServiceTree",
+    "identifier": "00df9fbf-c722-42e4-9acd-bc7125483b22",
+    "description": "Azure Resource Graph - DataLabs",
+    "ownerGroupObjectId": "2214c35c-b4ac-431d-ad89-6a9fbbc6c8b3",
+    "ownerGroupContactEmail": "argserviceowners@microsoft.com",
+    "policyCheckEnabled": true,
+    "contentVersion": "1.0.0.0"
+}

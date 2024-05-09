@@ -1,0 +1,160 @@
+{
+  "$schema": "http://schema.express.azure.com/schemas/2015-01-01-alpha/ServiceModel.json",
+  "contentVersion": "0.0.0.1",
+  "ServiceMetadata": {
+    // Specify Service Group Name that can be used to identify your Geneva Metrics account for easy debugging with Ev2 emails like: ServiceConfig for ARGDataLabs 
+    "ServiceGroup": "ServiceConfig for ARGDataLabs",
+    "Environment": "Prod"
+  },
+  "ServiceResourceGroupDefinitions": [
+    {
+      "Name": "ServiceResourceDefinitionLogs",
+      "ServiceResourceDefinitions": [
+        {
+          "Name": "ServiceWebAppLogs",
+          "ComposedOf": {
+            "Arm": {
+              "TemplatePath": "Templates\\Empty.json"
+            },
+            "extension": {
+              "rolloutParametersPath": "RolloutParameters\\Geneva.Logs.RolloutParameters.json"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "Name": "ServiceResourceDefinitionMetricConfigs",
+      "ServiceResourceDefinitions": [
+        {
+          "Name": "ServiceWebAppMetricsConfigs",
+          "ComposedOf": {
+            "Arm": {
+              "TemplatePath": "Templates\\Empty.json"
+            },
+            "extension": {
+              "rolloutParametersPath": "RolloutParameters\\Geneva.MetricsConfig.RolloutParameters.json"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "Name": "ServiceResourceDefinitionHealthConfigs",
+      "ServiceResourceDefinitions": [
+        {
+          "Name":"ServiceWebAppHealthConfigs",
+          "ComposedOf": {
+              "Arm": {
+                "TemplatePath": "Templates\\Empty.json"
+              },
+              "extension": {
+                "rolloutParametersPath": "RolloutParameters\\Geneva.Health.RolloutParameters.json"
+          }
+          }
+        }
+      ]
+    },
+    {
+      "Name": "ServiceResourceDefinitionDashboards",
+      "ServiceResourceDefinitions": [
+        {
+          "Name":"ServiceWebAppDashboards",
+          "ComposedOf": {
+              "Arm": {
+                "TemplatePath": "Templates\\Empty.json"
+              },
+              "extension": {
+                "rolloutParametersPath": "RolloutParameters\\Geneva.Dashboard.RolloutParameters.json"
+          }
+          }
+        }
+      ]
+    }
+    //{ 
+    //  "Name": "SLOHubExtensionSample", 
+    //  "ServiceResourceDefinitions": [ 
+    //      { 
+    //          "Name": " ValidateAndSaveSloDefinition", 
+    //          "composedOf": { 
+    //            "extension": { 
+    //              "rolloutParametersPath": "RolloutParameters\\SLO.Extension.RolloutParameters.json"
+    //            }  
+    //          } 
+    //      } 
+    //  ] 
+    //}
+  ],
+  "ServiceResourceGroups": [
+    {
+      "AzureResourceGroupName": "GenevaLogs",
+      "Location": "westus2",
+      "InstanceOf": "ServiceResourceDefinitionLogs",
+      "AzureSubscriptionId": "68d38d95-0964-447c-8840-f381378f9253",
+      // Consider repeatOver functionality for multiple namespaces. Sample below is for 2 namespaces.
+      "ServiceResources": [
+        {
+          "Name": "GenevaLogConfig",
+          "InstanceOf": "ServiceWebAppLogs",
+          "ArmParametersPath": "Parameters\\ArmParams.json",
+          "scopeTags": [
+            {
+              "name": "DataLabsEv2AccountScope"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "AzureResourceGroupName": "GenevaMetricConfigs",
+      "Location": "westus2",
+      "InstanceOf": "ServiceResourceDefinitionMetricConfigs",
+      "AzureSubscriptionId": "68d38d95-0964-447c-8840-f381378f9253",
+      "ServiceResources": [
+        {
+          "Name": "DeployMetricConfigs",
+          "InstanceOf": "ServiceWebAppMetricsConfigs",
+          "ArmParametersPath": "Parameters\\ArmParams.json"
+        }
+      ]
+    },
+    {
+        "AzureResourceGroupName": "GenevaHealthConfigs",
+        "Location": "westus2",
+        "InstanceOf": "ServiceResourceDefinitionHealthConfigs",
+        "AzureSubscriptionId": "68d38d95-0964-447c-8840-f381378f9253",
+        "ServiceResources": [
+            {
+            "Name": "DeployMonitorConfigs",
+            "InstanceOf": "ServiceWebAppHealthConfigs",
+            "ArmParametersPath": "Parameters\\ArmParams.json"
+            }
+        ]
+    },
+    {
+      "AzureResourceGroupName": "GenevaDashboardConfigs",
+      "Location": "westus2",
+      "InstanceOf": "ServiceResourceDefinitionDashboards",
+      "AzureSubscriptionId": "68d38d95-0964-447c-8840-f381378f9253",
+      "ServiceResources": [
+        {
+          "Name": "DeployDashboardConfigs",
+          "InstanceOf": "ServiceWebAppDashboards",
+          "ArmParametersPath": "Parameters\\ArmParams.json"
+        }
+      ]
+    }
+    // { 
+    //  "azureResourceGroupName": "GenvevaSLOConfigs", 
+    //  "location": "East US", 
+    //  "instanceOf": "SLOHubExtensionSample", 
+    //  "azureSubscriptionId": "68d38d95-0964-447c-8840-f381378f9253", 
+    //  "serviceResources": [ 
+    //    { 
+    //      "name": "ValidateAndSaveSloDefinition",
+    //      "instanceOf": " ValidateAndSaveSloDefinition" 
+    //    } 
+    //  ] 
+    // } 
+  ]
+}

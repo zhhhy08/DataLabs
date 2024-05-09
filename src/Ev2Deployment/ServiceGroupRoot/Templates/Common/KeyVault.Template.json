@@ -1,0 +1,80 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "keyVaultName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "metadataSaName": {
+            "type": "string",
+            "metadata": {
+                "description": "optional, leave empty to not create the audit logs"
+            }
+        }
+    },
+    "variables": {
+        "keyVaultTenant": "[subscription().tenantId]",
+        "defaultKeyVaultAudit": [
+            {
+                "category": "AuditEvent",
+                "enabled": true,
+                "retentionPolicy": {
+                    "days": 0,
+                    "enabled": false
+                }
+            }
+        ]
+    },
+    /*
+    enableRbacAuthorization needs Owner permissions on the first update to enable RBAC based access control on the keyvault
+    */
+    "resources": [
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "name": "[parameters('keyVaultName')]",
+            "apiVersion": "2022-07-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "enabledForDeployment": false,
+                "enabledForTemplateDeployment": false,
+                "enabledForDiskEncryption": false,
+                "enableSoftDelete": true,
+                "enableRbacAuthorization": true,
+                "tenantId": "[variables('keyVaultTenant')]",
+                "sku": {
+                    "family": "A",
+                    "name": "Standard"
+                },
+            "accessPolicies": []
+            },
+            "resources": [
+                {
+                    "type": "providers/diagnosticSettings",
+                    "condition": "[greater(length(parameters('metadataSaName')), 0)]",
+                    "name": "[concat('Microsoft.Insights/', parameters('keyVaultName'), '-KvAudit')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+                    ],
+                    "apiVersion": "2017-05-01-preview",
+                    "properties": {
+                        "logs": "[variables('defaultKeyVaultAudit')]",
+                        "metrics": [
+                            {
+                                "enabled": false,
+                                "retentionPolicy": {
+                                    "days": 0,
+                                    "enabled": false
+                                },
+                                "category": "AllMetrics"
+                            }
+                        ],
+                        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts/', parameters('metadataSaName'))]"
+                    }
+                }
+            ]
+        }
+    ]
+}

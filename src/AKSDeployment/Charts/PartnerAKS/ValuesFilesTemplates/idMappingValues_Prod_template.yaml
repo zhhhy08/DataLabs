@@ -1,0 +1,115 @@
+# Values File for IDMapping in ${cloud} ${region} Environment
+agentpool: ${agentpool}
+primaryRegionName: ${region}
+backupRegionName: ${backup_region}
+
+solutionInfo:
+  solutionName: &solutionName idmapping
+  aksClusterName: idm${cloud}${region}aks
+  environment: ${uppercase_cloud}
+  region: ${region_longname}
+  scaleUnit: *solutionName
+
+ioService:
+  replicaCount: 5 # override from dataLabServices.yaml
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+#MI of idm partner
+  clientId: ${mi_service_account_clientid}
+
+ioConfigMap:
+  inputEventHubNameSpaceAndName: "idm${cloud}${region}pipehns0/idm${cloud}${region}pipeh;idm${cloud}${region}pipehns1/idm${cloud}${region}pipeh"
+  outputEventHubNameSpaceAndName: "idm${cloud}${region}opehns0/idm${cloud}${region}opeh"
+  eventHubStorageAccountName: "0idm${cloud}${region}ehcpsa"
+  blobStorageAccountNames: "" # No source of truth
+  backupInputEventHubNameSpaceAndName: "idm${cloud}${region}bpipehns0/idm${cloud}${region}bpipeh/00:05:00;idm${cloud}${region}bpipehns1/idm${cloud}${region}bpipeh/00:05:00"
+  backupBlobStorageAccountNames: ""
+  serviceBusNameSpaceAndName: "idm${cloud}${region}sb0/0idm${cloud}${region}sbq"
+  outputDataset: 'idmapping'
+  useSourceOfTruth: 'false'
+  allowedOutputTypes: "microsoft.idmapping/identifiers"
+  arnPublishStorageAccountNames: "0idm${cloud}${region}arnpsa;1idm${cloud}${region}arnpsa;2idm${cloud}${region}arnpsa;3idm${cloud}${region}arnpsa;4idm${cloud}${region}arnpsa;5idm${cloud}${region}arnpsa"
+  arnPublishEventGridDomainIds: "/subscriptions/${subscription}/resourceGroups/DataLabsidmRG-${region_longname}/providers/Microsoft.EventGrid/domains/idm${cloud}${region}apeg1;/subscriptions/${subscription}/resourceGroups/DataLabsidmRG-${region_longname}/providers/Microsoft.EventGrid/domains/idm${cloud}${region}apeg2"
+  arnPublishEventGridDomainEndpoints: "https://idm${cloud}${region}apeg1.${region_longname}-1.eventgrid.azure.net/api/events;https://idm${cloud}${region}apeg2.${region_longname}-1.eventgrid.azure.net/api/events"
+  arnPublishEventGridTopics: "/subscriptions/${subscription}/resourceGroups/DataLabsidmRG-${region_longname}/providers/Microsoft.EventGrid/domains/idm${cloud}${region}apeg1/topics/arnpublishtopic;/subscriptions/${subscription}/resourceGroups/DataLabsidmRG-${region_longname}/providers/Microsoft.EventGrid/domains/idm${cloud}${region}apeg2/topics/arnpublishtopic"
+  pairedRegionArnPublishEventGridDomainIds: "/subscriptions/${subscription}/resourceGroups/DataLabsidmRG-${backup_region_longname}/providers/Microsoft.EventGrid/domains/idm${cloud}${backup_region}apeg1;/subscriptions/${subscription}/resourceGroups/DataLabsidmRG-${backup_region_longname}/providers/Microsoft.EventGrid/domains/idm${cloud}${backup_region}apeg2"
+  pairedRegionArnPublishEventGridDomainEndpoints: "https://idm${cloud}${backup_region}apeg1.${backup_region_longname}-1.eventgrid.azure.net/api/events;https://idm${cloud}${backup_region}apeg2.${backup_region_longname}-1.eventgrid.azure.net/api/events"
+  pairedRegionArnPublishEventGridTopics: "/subscriptions/${subscription}/resourceGroups/DataLabsidmRG-${backup_region_longname}/providers/Microsoft.EventGrid/domains/idm${cloud}${backup_region}apeg1/topics/arnpublishtopic;/subscriptions/${subscription}/resourceGroups/DataLabsidmRG-${backup_region_longname}/providers/Microsoft.EventGrid/domains/idm${cloud}${backup_region}apeg2/topics/arnpublishtopic"
+  outputChannelBufferDelay: "100"
+
+partnerConfig:    
+  pods:
+  - name: idmapping-solution
+    serviceName: idmapping-solution-service
+    replicaCount: 5
+    partnerConfigMap:
+      name: idmapping-solution-config    
+    containers:
+     - name: idmpartnersolution
+       repository: datalabs${cloud}acr.azurecr.io/idmpartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" : "*"
+                      }
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://rf${cloud}${region}aks.idm.${cloud}.${region}aks:6072
+
+resourceProxyServiceAccount: 
+# MI of idm partner
+  clientId: ${mi_service_account_clientid}
+
+cacheService:
+  enabled: false
+  replicaCount: 5 # override from dataLabServices.yaml
+
+# Monitoring Information
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: true
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGDataLabs
+    gcs_region: ${region_longname}
+    gcs_namespace: ARGDataLabs
+    gcs_config_version: "1.6"
+    miResourceId: ${aks_id}
+  partner:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGIdMapping
+    gcs_region: ${region_longname}
+    gcs_namespace: ARGIdMapping
+    gcs_config_version: "3.1"
+    miResourceId: ${aks_id}
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  # metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: ARGDataLabs
+      namespace: ARGDataLabs
+    Partner: 
+      account: ARGIdMapping
+      namespace: ARGIdMapping
+
+  # objectId of idm aks-agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "ARGDataLabs",
+          "objectId": "${aks_objectid}"
+        },
+        {
+          "account": "ARGIdMapping", 
+          "objectId": "${aks_objectid}"
+        }
+      ]
+    }

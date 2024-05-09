@@ -1,0 +1,302 @@
+{
+  "Microsoft.Cache/redis": {
+    "Paths": [
+      {
+        "Name": "hostName",
+        "Path": "properties.hostName"
+      }
+    ]
+  },
+  "Microsoft.ClassicCompute/VirtualMachines": {
+    "Paths": [
+      {
+        "Name": "DeploymentId",
+        "Path": "properties.hardwareProfile.deploymentId"
+      },
+      {
+        "Name": "Name",
+        "Path": "name"
+      }
+    ],
+    "Delimiter": ":",
+    "OverrideManifest": "true"
+  },
+  "Microsoft.ClassicCompute/DomainName": {
+    "paths": [
+      {
+        "Name": "hostName",
+        "Path": "properties.hostName"
+      }
+    ]
+  },
+  // TODO add Microsoft.ContainerServices/managedClusters
+  "Microsoft.Compute/CloudServices": {
+    "paths": [
+      {
+        "Name": "UniqueId",
+        "Path": "properties.uniqueId"
+      }
+    ]
+  },
+  "Microsoft.Compute/HostGroups/Hosts": {
+    "paths": [
+      {
+        "Name": "HostId",
+        "Path": "properties.hostId"
+      }
+    ]
+  },
+  "Microsoft.Compute/VirtualMachines": {
+    "paths": [
+      {
+        "Name": "VmId",
+        "Path": "properties.vmId"
+      },
+      {
+        "Name": "VmssId", // TODO consider if this name makes sense
+        "Path": "properties.vmId",
+        "ArmIdPath": "properties.virtualMachineScaleSet.id",
+        "IsOptional": "true"
+      },
+      {
+        "Name": "VmssIdOrVmId", // TODO consider if this name makes sense
+        "Path": "properties.vmId",
+        "ArmIdPath": "properties.virtualMachineScaleSet.id",
+        "FallbackToResourceArmId": "true"
+      }
+    ]
+  },
+  "Microsoft.Compute/VirtualMachineScaleSets": {
+    "paths": [
+      {
+        "Name": "VmssId", //this name isn't intuitive, but matches what is used existing IdMapping
+        "Path": "properties.uniqueId"
+      }
+    ]
+  },
+  "Microsoft.Compute/VirtualMachineScaleSets/VirtualMachines": {
+    "paths": [
+      {
+        "Name": "VmId",
+        "Path": "properties.vmId"
+      },
+      {
+        "Name": "VmssIdOrVmId", // TODO consider if this name makes sense, name must match equivalent entry under Microsoft.Conmpute/VirtualMachines
+        "Path": "properties.vmId",
+        "OverrideResourceTypeIndex": "Microsoft.Compute/VirtualMachines"
+      }
+    ]
+  },
+  "Microsoft.DataLakeAnalytics/Accounts": {
+    "paths": [
+      {
+        "Name": "AccountId",
+        "Path": "properties.accountId"
+      }
+    ]
+  },
+  "Microsoft.DataBricks/Workspaces": {
+    "paths": [
+      {
+        "Name": "WorkspaceId",
+        "Path": "properties.workspaceId"
+      }
+    ]
+  },
+  "Microsoft.DataLakeStore/Accounts": {
+    "paths": [
+      {
+        "Name": "AccountId",
+        "Path": "properties.accountId"
+      }
+    ]
+  },
+  "Microsoft.DocumentDB/DatabaseAccounts": {
+    "paths": [
+      {
+        "Name": "Name",
+        "Path": "name"
+      },
+      {
+        "Name": "documentEndpoint",
+        "Path": "properties.documentEndpoint"
+      },
+      {
+        "Name": "sqlEndpoint",
+        "Path": "properties.sqlEndpoint"
+      }
+    ]
+  },
+  "Microsoft.Eventhub/Namespaces": {
+    "Paths": [
+      {
+        "Name": "serviceBusEndpoint",
+        "Path": "properties.serviceBusEndpoint"
+      }
+    ]
+  },
+  "Microsoft.HDInsights/Clusters": {
+    "paths": [
+      {
+        "Name": "Name",
+        "Path": "name"
+      }
+    ]
+  },
+  "Microsoft.Insights/Components": {
+    "paths": [
+      {
+        "Name": "AppId",
+        "Path": "properties.appId"
+      }
+    ]
+  },
+  "Microsoft.Keyvault/Vaults": {
+    "paths": [
+      {
+        "Name": "vaultUri",
+        "Path": "properties.vaultUri"
+      }
+    ]
+  },
+  "Microsoft.Kusto/clusters": {
+    "paths": [
+      {
+        "Name": "uri",
+        "Path": "properties.uri"
+      },
+      {
+        "Name": "dataIngestionUri",
+        "Path": "properties.dataIngestionUri"
+      }
+    ]
+  },
+  "Microsoft.Monitor/Accounts": {
+    "paths": [
+      {
+        "Name": "internalId",
+        "Path": "properties.metrics.internalId"
+      }
+    ]
+  },
+  // TODO add Microsoft.Network/Connection 
+  "Microsoft.Network/LoadBalancers": {
+    "paths": [
+      {
+        "Name": "ResourceGuid",
+        "Path": "properties.resourceGuid"
+      }
+    ]
+  },
+  "Microsoft.Network/NatGateways": {
+    "paths": [
+      {
+        "Name": "ResourceGuid",
+        "Path": "properties.resourceGuid"
+      }
+    ]
+  },
+  "Microsoft.Network/NetworkInterfaces": {
+    "Paths": [
+      {
+        "Name": "MacAddress",
+        "Path": "properties.macAddress"
+      }
+      // TODO add in vnetId once exposed in payload
+      /*{
+        "Name": "vnetId",
+        "Path": "properties.vnetId"
+      }*/
+    ]
+    //"Delimiter": ":",
+  },
+  "Microsoft.Network/PublicIPAddresses": {
+    "paths": [
+      {
+        "Name": "ResourceGuid",
+        "Path": "properties.resourceGuid"
+      }
+    ]
+  },
+  "Microsoft.Network/VirtualNetworkGateways": {
+    "paths": [
+      {
+        "Name": "ResourceGuid",
+        "Path": "properties.resourceGuid"
+      }
+    ]
+  },
+  "Microsoft.ServiceBus/Namespaces": {
+    "paths": [
+      {
+        "Name": "metricId",
+        "Path": "properties.metricId"
+      },
+      {
+        "Name": "serviceBusEndpoint",
+        "Path": "properties.serviceBusEndpoint"
+      }
+    ]
+  },
+  "Microsoft.ServiceFabric/Clusters": {
+    "paths": [
+      {
+        "Name": "clusterEndpoint",
+        "Path": "properties.clusterEndpoint"
+      }
+    ]
+  },
+  //TODO add Microsoft.Sql/Servers/Databases
+  "Microsoft.Storage/StorageAccounts": {
+    "paths": [
+      {
+        "Name": "dfsPrimaryEndpoint",
+        "Path": "properties.primaryEndpoints.dfs"
+      },
+      {
+        "Name": "webPrimaryEndpoint",
+        "Path": "properties.primaryEndpoints.web"
+      },
+      {
+        "Name": "blobPrimaryEndpoint",
+        "Path": "properties.primaryEndpoints.blob"
+      },
+      {
+        "Name": "queuePrimaryEndpoint",
+        "Path": "properties.primaryEndpoints.queue"
+      },
+      {
+        "Name": "tablePrimaryEndpoint",
+        "Path": "properties.primaryEndpoints.table"
+      },
+      {
+        "Name": "filePrimaryEndpoint",
+        "Path": "properties.primaryEndpoints.file"
+      }
+    ]
+  },
+  "Microsoft.Web/ServerFarms": {
+    "paths": [
+      {
+        "Name": "MDMId",
+        "Path": "properties.mdmId"
+      }
+    ]
+  },
+  "Microsoft.Web/Sites": {
+    "paths": [
+      {
+        "Name": "DefaultHostName",
+        "Path": "properties.defaultHostName"
+      }
+    ]
+  },
+  "Microsoft.Web/Sites/Slots": {
+    "paths": [
+      {
+        "Name": "DefaultHostName",
+        "Path": "properties.defaultHostName"
+      }
+    ]
+  }
+}

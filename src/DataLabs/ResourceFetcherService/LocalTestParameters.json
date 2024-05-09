@@ -1,0 +1,34 @@
+{
+  "Debug_DoNotUseMeters": "true",
+
+  "SolutionName": "testsolution",
+  "PrimaryRegionName": "testprimary",
+  "BackupRegionName": "testbackup",
+  "UseSourceOfTruth": "false",
+
+  "EnableGrpcTrace": "true",
+  "EnableHttpClientTrace": "true",
+  "EnableAzureSDKActivity": "true",
+
+  "DefaultArmClientGetResourceTimeOutInSec": "120/240",
+  "DefaultArmClientGenericApiTimeOutInSec": "120/240",
+  "DefaultArmAdminClientTimeOutInSec": "120/240",
+  "DefaultQFDClientTimeOutInSec": "120/240",
+
+  "DefaultTenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+
+  // ARM Client Related
+  "ARMTokenResource": "https://management.core.windows.net",
+  "ARMEndpoints": "https://management.azure.com",
+  "UseCredentialTokenForArmClient": "true",
+
+  // Partner Authorization Related
+  "partnerNames": "testsolution",
+  "testsolution-ClientIds": "testClientId",
+  "testsolution-ArmAllowedResourceTypes": "microsoft.compute/virtualmachines|2022-11-01",
+  "testsolution-armAllowedGenericURIPaths": "",
+  "testsolution-qfdAllowedResourceTypes": "",
+  "testsolution-armAdminAllowedCalls": "",
+  "testsolution-casAllowedCalls": ""
+}
+

@@ -1,0 +1,205 @@
+# Values File for Sku in ${cloud} ${region} Environment
+primaryRegionName: ${region}
+backupRegionName: ${backup_region}
+
+solutionInfo:
+  solutionName: &solutionName sku
+  aksClusterName: sku${cloud}${region}aks
+  environment: ${uppercase_cloud}
+  region: ${region_longname}
+  scaleUnit: *solutionName
+
+ioService:
+  replicaCount: 5 # override from dataLabServices.yaml
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+#MI of sku partner
+  clientId: ${mi_service_account_clientid}
+  tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+
+ioConfigMap:
+  inputEventHubNameSpaceAndName: "sku${cloud}${region}pipehns0/sku${cloud}${region}pipeh;sku${cloud}${region}pipehns1/sku${cloud}${region}pipeh"
+  eventHubStorageAccountName: "0sku${cloud}${region}ehcpsa"
+  blobStorageAccountNames: "" # No source of truth
+  backupInputEventHubNameSpaceAndName: "sku${cloud}${region}bpipehns0/sku${cloud}${region}bpipeh/00:05:00;sku${cloud}${region}bpipehns1/sku${cloud}${region}bpipeh/00:05:00"
+  backupBlobStorageAccountNames: ""
+  serviceBusNameSpaceAndName: "sku${cloud}${region}sb0/0sku${cloud}${region}sbq;sku${cloud}${region}sb1/1sku${cloud}${region}sbq"
+  outputDataset: 'subscriptionsku'
+  useSourceOfTruth: 'false'
+  allowedOutputTypes: "microsoft.resourcegraph/skuproviders/resourcetypes/locations/skus"
+  arnPublishStorageAccountNames: "0sku${cloud}${region}arnpsa;1sku${cloud}${region}arnpsa;2sku${cloud}${region}arnpsa;3sku${cloud}${region}arnpsa;4sku${cloud}${region}arnpsa;5sku${cloud}${region}arnpsa"
+  arnPublishEventGridDomainIds: "/subscriptions/${subscription}/resourceGroups/DataLabsskuRG-${region_longname}/providers/Microsoft.EventGrid/domains/sku${cloud}${region}apeg1;/subscriptions/${subscription}/resourceGroups/DataLabsskuRG-${region_longname}/providers/Microsoft.EventGrid/domains/sku${cloud}${region}apeg2"
+  arnPublishEventGridDomainEndpoints: "https://sku${cloud}${region}apeg1.${region_longname}-1.eventgrid.azure.net/api/events;https://sku${cloud}${region}apeg2.${region_longname}-1.eventgrid.azure.net/api/events"
+  arnPublishEventGridTopics: "/subscriptions/${subscription}/resourceGroups/DataLabsskuRG-${region_longname}/providers/Microsoft.EventGrid/domains/sku${cloud}${region}apeg1/topics/arnpublishtopic;/subscriptions/${subscription}/resourceGroups/DataLabsskuRG-${region_longname}/providers/Microsoft.EventGrid/domains/sku${cloud}${region}apeg2/topics/arnpublishtopic"
+  pairedRegionArnPublishEventGridDomainIds: "/subscriptions/${subscription}/resourceGroups/DataLabsskuRG-${backup_region_longname}/providers/Microsoft.EventGrid/domains/sku${cloud}${backup_region}apeg1;/subscriptions/${subscription}/resourceGroups/DataLabsskuRG-${backup_region_longname}/providers/Microsoft.EventGrid/domains/sku${cloud}${backup_region}apeg2"
+  pairedRegionArnPublishEventGridDomainEndpoints: "https://sku${cloud}${backup_region}apeg1.${backup_region_longname}-1.eventgrid.azure.net/api/events;https://sku${cloud}${backup_region}apeg2.${backup_region_longname}-1.eventgrid.azure.net/api/events"
+  pairedRegionArnPublishEventGridTopics: "/subscriptions/${subscription}/resourceGroups/DataLabsskuRG-${backup_region_longname}/providers/Microsoft.EventGrid/domains/sku${cloud}${backup_region}apeg1/topics/arnpublishtopic;/subscriptions/${subscription}/resourceGroups/DataLabsskuRG-${backup_region_longname}/providers/Microsoft.EventGrid/domains/sku${cloud}${backup_region}apeg2/topics/arnpublishtopic"
+partnerConfig:
+  pods:
+  - name: sku-partialsync
+    serviceName: sku-partialsync-service 
+    replicaCount: 10
+    partnerConfigMap:
+      name: sku-partialsync-config
+      minLogLevel: Information
+      enableGrpcTrace: false
+      enableHttpClientTrace: false
+      enableAzureSDKActivity: false
+      customConfig: |
+        { 
+          "subjobBatchSize" : "1000",
+          "configFetchIntervalInHours" : "6",
+          "globalSkuBatchSize": "1000"
+        }
+    containers:
+     - name: sku-partialsync-container
+       repository: datalabs${cloud}acr.azurecr.io/skupartialsyncpartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5072 
+       multiResponseResourcesMatchTypes: | 
+                      {
+                      "eventTypes" :  "Microsoft.Inventory/skuProviders/resourceTypes/locations/globalSkus/write,Microsoft.Inventory/subscriptionInternalProperties/write,Microsoft.Resources/subscriptionZoneMappings/write,Microsoft.Features/featureProviders/subscriptionFeatureRegistrations/write,Microsoft.CapacityAllocation/capacityRestrictions/restrictionsChanged/event" 
+                      }
+  - name: sku-fullsync-solution
+    serviceName: sku-fullsync-service 
+    replicaCount: 10
+    partnerConfigMap:
+      name: sku-fullsync-service-config
+      minLogLevel: Information
+      enableGrpcTrace: false
+      enableHttpClientTrace: false
+      enableAzureSDKActivity: false
+      customConfig: |
+         { 
+          "subjobBatchSize" : "1000",
+          "configFetchIntervalInHours" : "6",
+          "globalSkuBatchSize": "1000"
+         }
+    containers:
+     - name: sku-fullsync-container
+       repository: datalabs${cloud}acr.azurecr.io/skufullsyncpartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5080 
+       multiResponseResourcesMatchTypes: | 
+                      {
+                      "eventTypes" :  "Microsoft.ResourceGraph/skuFullSyncTriggerEvents/write" 
+                      }
+  - name: cache-ingestion
+    serviceName: cache-ingestion-service
+    replicaCount: 5
+    partnerConfigMap:
+      name: cache-ingestion-service-config
+    containers:
+     - name: cache-ingestion-container
+       repository: datalabs${cloud}acr.azurecr.io/armdatacachepartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5078
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" : "Microsoft.Inventory/subscriptionInternalProperties,Microsoft.Inventory/skuProviders/resourceTypes/locations/globalSkus"
+                      }
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://rf${cloud}${region}aks.sku.${cloud}.${region}aks:6072
+
+resourceProxyServiceAccount: 
+# MI of sku partner
+  clientId: ${mi_service_account_clientid}
+  tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+
+cacheService:
+  enabled: true
+  cachePools:
+  - cacheName: iocache
+    readEnabled: true
+    nodePoolName: cachepool
+    nodeCount: 5
+    port: 3278
+    nodeReplication:
+    startOffset: 0
+
+partnerCacheService:
+  enabled: true
+  cachePools:
+  - cacheName: partnercache
+    readEnabled: true
+    nodePoolName: cachepool
+    nodeCount: 3
+    port: 4278
+    nodeReplicationMapping:
+    startOffset: 0
+
+keyVault:
+  name: # TODO: Add logic to add kv name
+  clientId: # TODO: Add logic to add kv clientId
+
+resourceProxyConfigMap:
+  getConfigSpecsAllowedTypes: "*:cache|write/01:00:00,resourcefetcher_armadmin"
+  getManifestConfigAllowedTypes: "*:cache|write/01:00:00,resourcefetcher_armadmin"
+  getCasResponseAllowedTypes: "*:cache|write/01:00:00,cas|2016-12-01"
+  getCollectionAllowedTypes: "microsoft.features/featureProviders/subscriptionFeatureRegistrations:cache|write/01:00:00,qfd|2022-10-01"
+  getResourceAllowedTypes:
+    "Microsoft.Inventory/subscriptionInternalProperties:cache,qfd;
+    Microsoft.Resources/subscriptionZoneMappings:cache,qfd;
+    Microsoft.Resources/subscriptionRegistrations:cache,qfd"
+  partnerCertificates:
+    isEnabled: true
+    tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+    aadAuthority: https://login.microsoftonline.com
+    aadTokenIssuer: https://sts.windows.net/33e01921-4d64-4f8c-a055-5bdaffd5e33d/
+    casClient:
+      endpoints: https://global.capacity.azure.com
+      backupEndpoints:
+      certificateName:
+      dstsSkipServerCertificateValidation: false
+      dstsClientId:
+      dstsServerId: https://capacity.azure.com
+      dstsClientHome:
+      dstsServerHome: https://prod-passive-dsts.dsts.core.windows.net/dstsv2/7a433bfc-2514-4697-b467-e0933190487f
+      dstsServerRealm: realm://dsts.core.windows.net/7a433bfc-2514-4697-b467-e0933190487f/
+
+    
+# Monitoring Information
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: true
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGDataLabs
+    gcs_region: ${region_longname}
+    gcs_namespace: ARGDataLabs
+    gcs_config_version: "1.5"
+    miResourceId: ${aks_id}
+  # partner:
+  #   gcs_environment: DiagnosticsProd
+  #   gcs_account: ARGIdMapping
+  #   gcs_region: ${region_longname}
+  #   gcs_namespace: ARGIdMapping
+  #   gcs_config_version: "3.1"
+  #   miResourceId: ${aks_id}
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  # metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: ARGDataLabs
+      namespace: ARGDataLabs
+    Partner: 
+      account: ARGDataLabs
+      namespace: ARGDataLabs
+
+  # objectId of sku aks-agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "ARGDataLabs",
+          "objectId": "${aks_objectid}"
+        }
+      ]
+    }

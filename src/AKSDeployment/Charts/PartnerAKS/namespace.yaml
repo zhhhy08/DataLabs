@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: partner-namespace
+  labels:
+    name: partner-namespace
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: latest
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: solution-namespace
+  labels:
+    name: solution-namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitor-namespace
+  labels:
+    name: monitor-namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cache-namespace
+  labels:
+    name: cache-namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: admin-namespace
+  labels:
+    name: admin-namespace

@@ -1,0 +1,116 @@
+{{- if .Values.adminService.isEnabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.adminService.deployment.labels.name }}
+  namespace: {{ .Values.adminServiceNameSpace }}
+spec:
+  replicas: {{ .Values.adminService.deployment.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  minReadySeconds: {{ .Values.adminService.deployment.minReadySeconds }}
+  selector:
+    matchLabels:
+      app: {{ .Values.adminService.deployment.labels.app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.adminService.deployment.labels.app }}
+    spec:
+      nodeSelector:
+        "agentpool": {{ .Values.agentPoolName }}
+      serviceAccountName: {{ .Values.adminService.serviceAccount.name }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values: 
+                - {{ .Values.adminService.deployment.labels.app }}
+            topologyKey: kubernetes.io/hostname
+      containers:
+        - image: {{ .Values.adminServiceImage.repository }}:{{ .Values.adminServiceImage.tag }}
+          imagePullPolicy: {{ .Values.adminServiceImage.pullPolicy }}
+          name: {{ .Values.adminServiceImage.name }}
+          env:
+          - name: CLUSTER_NAME
+            value: {{ $.Values.solutionInfo.aksClusterName }}
+          - name: scaleUnit
+            value: {{ .Values.solutionInfo.scaleUnit | quote }}
+          - name: service
+            value: {{ .Values.adminService.name | quote }}
+          - name: region
+            value: {{ .Values.solutionInfo.region | quote }}
+          - name: buildVersion
+            value: {{ .Values.adminServiceImage.tag | quote }}
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: OTLP_EXPORTER_TYPE
+            value: {{ .Values.monitorInfo.exporterType }}
+          - name: MDSD_DATALABS_ENDPOINT
+            value: {{ include "otlp_endpoint.mdsd" .Values.mdsd | trim | quote }}
+          - name: MDM_DATALABS_ENDPOINT
+            value: {{ include "otlp_endpoint.mdm" (dict "info" .Values.mdm.accountInfo.DataLabs "Values" .Values) | trim | quote }}
+          - name: CONFIGMAP_DIR
+            value: "/config"
+          - name: ENVIRONMENT
+            value: {{ .Values.solutionInfo.environment }}
+          - name: SECRETS_STORE_DIR
+            value: "/secrets-store"
+          ports:
+          - containerPort: {{ .Values.adminService.service.targetPort }}
+          volumeMounts:
+          - name: ssl-secret-store-inline
+            mountPath: /secrets-store
+            readOnly: true
+          - name: config-volume
+            mountPath: "/config"
+            readOnly: true
+          - name: mdsd-run-vol
+            mountPath: {{ .Values.mdsd.run_dir_path | quote }}
+          - name: ifx-path
+            mountPath: {{ .Values.mdm.ifxmetrics_socket_folder_path | quote }}
+      volumes:
+        - name: ssl-secret-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ .Values.adminService.sslSecretProvider.className | quote }}
+        - name: config-volume
+          configMap:
+            name: {{ .Values.adminServiceConfigMap.name }}
+        - name: mdsd-run-vol  # connects with monitor pod for logs/traces
+          hostPath:
+            path: {{ .Values.mdsd.hostPathPath | quote }}
+        - name: ifx-path      # connects with monitor pod for metrics
+          hostPath:
+            path: {{ .Values.mdm.ifxmetrics_socket_folder_hostPath | quote }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.adminService.deployment.labels.name }}-pdb
+  namespace: {{ .Values.adminServiceNameSpace }}
+  annotations:
+    meta.helm.sh/release-name: {{ .Values.helmInfo.adminserviceRelease }}
+    meta.helm.sh/release-namespace: default
+  labels:
+    app.kubernetes.io/managed-by: Helm
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.adminService.deployment.labels.app }}
+{{- end }}

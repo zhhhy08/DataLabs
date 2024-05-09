@@ -1,0 +1,605 @@
+adminServiceNameSpace: admin-namespace
+solutionNameSpace: solution-namespace
+partnerNameSpace: partner-namespace
+monitorNameSpace: monitor-namespace
+cacheNameSpace: cache-namespace
+dedicatedPartnerAKS: true
+agentPoolName: agentpool
+
+helmInfo:
+  adminserviceRelease: adminservice
+  partnerserviceRelease: partnerservice
+  ioserviceRelease: ioservice
+  cacheserviceReleasePrefix: cacheservice
+  partnercacheserviceReleasePrefix: partnercacheservice
+
+ioImage:
+  name: io-container
+  repository: datalabscanaryacr.azurecr.io/inputoutputservice
+  tag: [[<BUILD_VERSION>]]
+  pullPolicy: Always
+  requestMemory: 1Gi
+  maxMemorySize: 12Gi
+
+commonConfig:
+  storageSuffix: "core.windows.net" # test/df/canary/public clouds
+  notificationReceiverEnvironment: "AzureCloud" # canary/public cloud
+
+ioService:
+  name: solution-io
+  replicaCount: 3
+  minReadySeconds: 10
+
+ioServiceAccount:
+  name: solution-io-identity
+
+ioConfigMap:
+  name: solution-io-config
+# Input Task timeout
+  inputEventHubTaskTimeOutDuration: "00:01:00"
+# EventHub Message elpased Duration without checkpoint
+  inputEventHubMessageMaxDurationWithoutCheckPoint: "00:02:00"
+# Retry Task timeout
+  serviceBusRetryQueueTaskTimeOutDuration: "00:02:00"
+# SubJob Task timeout
+  serviceBusSubJobQueueTaskTimeOutDuration: "00:03:00"
+# Service Bus max Auto Renewal duration. This is hard limit before service bus trigger MessageLockLostException
+  serviceBusMaxAutoRenewDuration: "00:05:00"
+# Partner Blob call Timeout (timeout in non retry flow / timeout in retry flow)
+  # ARG uses 5 sec timeout for partner Blob call
+  partnerBlobCallMaxTimeOutInSec: "5/20"
+# Output Blob Client Timeout (timeout in non retry flow / timeout in retry flow)
+  outputBlobUploadMaxTimeOutInSec: "5/15"
+  outputBlobDownloadMaxTimeOutInSec: "5/15"
+###
+  inputEventHubPartitions: "60"
+  inputEventHubConsumerGroup: "$Default"
+  inputEventHubCheckPointIntervalInSec: "20"
+  inputEventHubCheckPointTimeoutInSec: "10"
+  eventHubWriteFailRetryDelayInMsec: "1000"
+  eventHubWriterMaxRetry: "2"
+  eventHubWriterDelayInMsec: "500"
+  eventHubWriterMaxDelayPerAttempInSec: "3"
+  eventHubWriterMaxTimePerAttempInSec: "3"
+  eventHubMaxOutputSize: "512000"
+  eventHubConnectionRefreshDuration: "00:00:30"
+  serviceBusRetryQueueConcurrency: "20"
+  serviceBusRetryQueuePrefetchCount: "300"
+  serviceBusSubJobQueueName: "subjob"
+  serviceBusSubJobQueueConcurrency: "10"
+  serviceBusSubJobQueuePrefetchCount: "100"
+ # Like ARG, Disabling SB SDK internal retries as it is too relaxed
+  serviceBusWriterMaxRetry: "0"
+  serviceBusWriterDelayInMsec: "800"
+  serviceBusWriterMaxDelayPerAttempInSec: "10"
+  serviceBusWriterMaxTimePerAttempInSec: "10"
+# Batch Writer Related
+  eventHubBatchWriterTimeOutInSec: "10"
+  retryQueueBatchWriterTimeOutInSec: "15"
+  poisonQueueBatchWriterTimeOutInSec: "15"
+  arnPublishBatchWriterTimeOutInSec: "15"
+  subJobQueueBatchWriterTimeOutInSec: "15"
+  eventHubBatchMaxSize: "200"
+  retryQueueBatchMaxSize: "200"
+  poisonQueueBatchMaxSize: "200"
+  subJobQueueBatchMaxSize: "200"
+###
+  serviceBusConnectionRefreshDuration: "00:00:30"
+  chainedRetryBackOffInfo: "6;00:00:01;1.00:00:00;00:00:30;6;01:00:00;05:20:00;01:00:00"
+  minLogLevel: "Information"
+  enableGrpcTrace: "true"
+  enableHttpClientTrace: "false"
+  enableAzureSDKActivity: "false"
+  blobStorageLogsEnabled: "false"
+  blobStorageTraceEnabled: "false"
+  includeRunTimeMetrics: "true"
+  includeHttpClientMetrics: "true"
+  globalConcurrency: "5000"
+  rawInputChannelConcurrency: "100"
+  inputChannelConcurrency: "500"
+  sourceOfTruthChannelConcurrency: "100"
+  sourceOfTruthChannelConcurrencyTimeoutInSec: "0"
+  outputChannelNumBufferQueue: "5"
+  outputChannelBufferDelay: "0"
+  outputChannelBufferQueueLength: "2000"
+  outputChannelMaxBufferedSize: "500"
+  blobPayloadRoutingChannelNumBufferQueue: "5"
+  blobPayloadRoutingChannelBufferDelay: "0"
+  blobPayloadRoutingChannelBufferQueueLength: "2000"
+  blobPayloadRoutingChannelMaxBufferedSize: "500"
+  blobPayloadRoutingChannelPartitionKey: "SCOPEID"
+  enableBlobPayloadRouting: "false"
+  blobPayloadRoutingTypes: ""
+  retryChannelNumBufferQueue: "10"
+  retryChannelBufferDelay: "0"
+  retryChannelBufferQueueLength: "2000"
+  retryChannelMaxBufferedSize: "500"
+  poisonChannelNumBufferQueue: "10"
+  poisonChannelBufferDelay: "0"
+  poisonChannelBufferQueueLength: "2000"
+  poisonChannelMaxBufferedSize: "500"
+  dropPoisonMessage: "false"
+  partnerStreamingThresholdForRetry: "20"
+  partnerStreamingInputRetryDelayMS: "200"
+  partnerStreamingTaskTimeOutInSec: "30"
+  partnerSolutionGrpcOption:
+    "LBPolicy=ROUND_ROBIN;
+     MaxReceiveMessageSizeMB=8;
+     UseMultiConnections=true;
+     ConnectTimeout=00:00:05"
+  useSourceOfTruth: "true"
+  sourceOfTruthConflictRetryDelayInMsec: "100"
+  sourceOfTruthUseOutputTimeTagCondition: "false"
+  partnerBlobClientOption: "ConnectTimeout=00:00:05"
+  partnerBlobNonRetryableCodes: "401;403"
+  maxBatchedChildBeforeMoveToRetryQueue: "100"
+  useOutputCache: "false"
+  useSyncOutputCache: "false"
+  deleteCacheAfterETagConflict: "true"
+  useOutputTimeStampInCache: "false"
+  isArnClientLogDebugEnabled: "false"
+  isArnClientLogInfoEnabled: "false"
+  arnPublishMaxBatchSize: "-1"
+  arnPublisherInfo: "Microsoft.DataLabs"
+  publishOutputToArn: "true"
+  arnPublishWriteFailRetryDelayInMsec: "1000"
+  arnPublishPercentage: "100"
+# IO Cache Related
+# 00:00:00 means NO TTL set. So the cache entry will be there until cache is full.
+# When cache is full, garnet delete older entries. 
+  useHashForResourceCacheKey: "true"
+  resourceCacheReadQuorum: "2"
+  defaultInputCacheTTL: "2.00:00:00"
+  defaultOutputCacheTTL: "01:00:00"
+  defaultNotFoundEntryCacheTTL: "01:00:00"
+  resourceTypeCacheTTLMappings:
+#    "microsoft.compute/virtualmachines|01:00:00;
+#    microsoft.storage/storageaccounts|00:10:00"
+  dstsNotificationReceiver:
+    isEnabled: false
+
+partnerConfigMap:
+  minLogLevel: Information
+  enableGrpcTrace: "true"
+  enableHttpClientTrace: "true"
+  enableAzureSDKActivity: "false"
+  includeRunTimeMetrics: "true"
+  includeHttpClientMetrics: "true"
+  resourceProxyGrpcOption: 
+    "LBPolicy=LOCAL;
+     MaxAttempts=2;
+     MaxReceiveMessageSizeMB=8;
+     UseMultiConnections=true;
+     ConnectTimeout=00:00:05"
+  useCacheLookupInProxyClient: "true"
+# Resource Proxy Client -> Resource Proxy Pod call Timeout (timeout in non retry flow / timeout in retry flow)
+  resourceProxyCallMaxTimeOutInSec: "20/60"
+  partnerCacheMGetMaxBatchSize: "500"
+  
+networkPolicy:
+  clusterIpBlock: 10.224.0.0/16
+
+partnerApp:
+  replicaCount: 3
+  minReadySeconds: 10
+  fsGroup: 65534
+  runAsUser: 65534
+  runAsGroup: 65534
+
+partnerImage:
+  pullPolicy: Always
+  maxMemorySize: 12Gi
+
+keyVault:
+  isEnabled: false
+  name:
+  clientId:
+  tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+
+resourceProxyService:
+  enabled: true
+  name: resource-proxy
+  serviceName: resource-proxy-service
+  adminPortServiceName: resource-proxy-admin-service
+  port: 5073
+  minReadySeconds: 10
+  resourceFetcherEndpoints:
+  resourceFetcherTokenResource: https://resourcefetcherservice-prod.msazurecloud.onmicrosoft.com
+  resourceFetcherHomeTenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+  resourceFetcherClientOption: "ConnectTimeout=00:00:05;PooledConnectionIdleTimeout=00:05:00;EnableMultipleHttp2Connections=false"
+  #  Client using partner Own certificate
+  partnerCertificates:
+    isEnabled: false
+    secretProviderClassName: dsts-secret-provider
+    tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+    aadAuthority: https://login.microsoftonline.com
+    aadTokenIssuer: https://sts.windows.net/33e01921-4d64-4f8c-a055-5bdaffd5e33d/
+    # ARM Client Related
+    armClient:
+      endpoints:
+      backupEndpoints:
+      firstPartyAppId:
+      certificateName:
+      armTokenResource:
+      clientOption: "HttpRequestVersion=2.0;ConnectTimeout=00:00:05;EnableMultipleHttp2Connections=false"
+
+      # Default TimeOut
+      # ARG uses 5 secs ARM timeout,
+      defaultArmClientGetResourceTimeOutInSec: "5/20"
+      defaultArmClientGenericApiTimeOutInSec: "20/40"
+
+      # ARM Resource Type TimeOut Mapping
+      armClientResourceTimeOutMappings:
+      # armClientResourceTimeOutMappings: <resource type>|30/60
+      # e.g.)
+      #   "microsoft.compute/disks|30/60;
+      #    microsoft.compute/virtualmachines|30/60"
+
+      # ARM Generic API Time outMappings
+      armClientGenericApiTimeOutMappings:  
+      # armClientGenericApiTimeOutMappings: <uriPath>|30/60
+      # e.g.)
+      #   "/providers/Microsoft.Authorization/policySetDefinitions|30/60"
+
+    # Cas Client Related
+    casClient:
+      endpoints:
+      backupEndpoints:
+      certificateName:
+      dstsSkipServerCertificateValidation:
+      dstsClientId:
+      dstsServerId:
+      dstsClientHome:
+      dstsServerHome:
+      dstsServerRealm:
+      clientOption: "HttpRequestVersion=1.1;ConnectTimeout=00:00:05;EnableMultipleHttp2Connections=false"
+
+      # Default TimeOut
+      defaultCasClientTimeOutInSec: "10/20"
+    
+      # Cas Client Call TimeOut Mapping
+      casClientTimeOutMappings:
+      # casClientTimeOutMappings:  <method>|30/60
+      # e.g.)
+      #   "GetCasCapacityCheckAsync|30/60"
+
+    # ARG Query FrontDoor Client Related
+    qfdClient:
+      endpoints:
+      backupEndpoints:
+      certificateName:
+      dstsSkipServerCertificateValidation:
+      dstsClientId:
+      dstsServerId:
+      dstsClientHome:
+      dstsServerHome:
+      dstsServerRealm:
+      clientOption: "HttpRequestVersion=2.0;ConnectTimeout=00:00:05;EnableMultipleHttp2Connections=true"
+
+      # Default TimeOut
+      defaultQFDClientTimeOutInSec: "5/20"
+    
+      # Query Front Door Call TimeOut Mapping
+      qfdClientTimeOutMappings: "GetIdMappingsAsync|30/60"
+      # qfdClientTimeOutMappings:  <method>|30/60
+      # e.g.)
+      #   "GetPacificResourceAsync|30/60;
+      #    GetPacificCollectionAsync|30/60;
+      #    GetIdMappingsAsync|30/60"
+
+    # ARM Admin Client Related
+    armAdminClient:
+      endpoints:
+      backupEndpoints:
+      certificateName:
+      clientOption: "HttpRequestVersion=1.1;ConnectTimeout=00:00:05;EnableMultipleHttp2Connections=false"
+
+      # Default TimeOut
+      defaultArmAdminClientTimeOutInSec: "10/20"
+
+      # ARM Admin Client Call Mapping
+      armAdminClientTimeOutMappings:
+      # armAdminClientTimeOutMappings: <method>|30/60
+      # e.g.)
+      #   "GetManifestConfigAsync|30/60;
+      #    GetConfigSpecsAsync|30/60"
+
+resourceProxyImage:
+  name: resourceproxy-container
+  repository: datalabscanaryacr.azurecr.io/resourcefetcherproxyservice
+  tag: [[<BUILD_VERSION>]]
+  pullPolicy: Always
+  requestMemory: 1Gi
+  maxMemorySize: 7Gi
+
+resourceProxyServiceAccount:
+  name: resourcefetcherproxy-identity
+  tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+
+resourceProxyConfigMap:
+  name: resourceproxy-config
+  enableGrpcTrace: "true"
+  enableHttpClientTrace: "true"
+  enableAzureSDKActivity: "false"
+  blobStorageLogsEnabled: "false"
+  blobStorageTraceEnabled: "false"
+  includeRunTimeMetrics: "true"
+  includeHttpClientMetrics: "true"
+  minLogLevel: Information
+  useCacheInResourceFetcherProxy: true
+  useOutputCacheForRetry: false
+  useInputCacheForRetry: true
+  resourceFetcherProxyMaxTimeOutInSec: "40/60"
+  subscriptionARMReadSafeLimit: 5000
+  subscriptionARMReadSafeLimit_BackoffMilliseconds: 600000  # 10 min
+# Resource Proxy Call Allowed Types
+  getResourceAllowedTypes:
+#    "<resourceType>:(cache|<cacheOptions>),(outputsourceoftruth, arm,qfd,resourcefetcher_arm, resourcefetcher_qfd)|<optional apiVersion>"  
+#    "microsoft.compute/type1:resourcefetcher_arm"                                                // Cache Read Only, No Cache Write
+#    "microsoft.compute/type2:cache|write/00:30:00|addNotFound,resourcefetcher_arm|2022-12-01"    // Cache Read, Write and Add NotFound
+#    "microsoft.compute/type3:cache|write/00:30:00,arm|2022-12-01"                                // Cache Read, Write
+#    "microsoft.compute/type4:cache|read/00:30:00,qfd|2022-12-01"                                 // Cache Read Only with TTL
+#    "microsoft.azurebusinesscontinuity/unifiedprotecteditems:cache|read/00:00:00|write/00:30:00|addNotFound,outputsourceoftruth"
+  callARMGenericRequestAllowedTypes:
+#    "<URIPath>:(cache|<cacheOptions>),(arm,resourcefetcher_arm)|<optional apiVersion>"
+#    "uripath1:resourcefetcher_arm"
+#    "uripath2:cache,resourcefetcher_arm|2021-06-01"
+#    "uripath3:cache,arm|2021-06-01"
+  getCollectionAllowedTypes:
+#    "<resourceType>:(cache|<cacheOptions>),(qfd,resourcefetcher_qfd)|<optional apiVersion>"  
+#    "microsoft.features/featureproviders/type1:resourcefetcher_qfd"
+#    "microsoft.features/featureproviders/type2:cache,resourcefetcher_qfd|2021-07-01"
+#    "microsoft.features/featureproviders/type3:cache,qfd|2021-07-01"
+  getManifestConfigAllowedTypes:
+#    "*:(cache|<cacheOptions>),(armadmin,resourcefetcher_armadmin)|<optional apiVersion>"
+#    "*:resourcefetcher_armadmin"
+  getConfigSpecsAllowedTypes:
+#    "*:(cache|<cacheOptions>),(armadmin,resourcefetcher_armadmin)|<optional apiVersion>"
+#    "*:resourcefetcher_armadmin|2021-07-01;
+  getCasResponseAllowedTypes:
+#    "*:(cache|<cacheOptions>),(cas,resourcefetcher_cas)|<optional apiVersion>"  
+#    "*:resourcefetcher_cas"
+  getIdMappingAllowedTypes:
+#    "*:(cache|<cacheOptions>),(qfd,resourcefetcher_qfd)|<optional apiVersion>"  
+#    "*:resourcefetcher_qfd"
+
+# cacheOptions format:
+#   read/00:10:00|write/00:30:00|addNotFound/00:10:00
+#   1. write TTL is used when new cache entry is added. If write TTL is not specified, then Cache TTL config for IO(resourceTypeCacheTTLMappings) will be used
+#   2. read TTL is used to compare cache entry is too old. If it is too old, then it will be considered as not found
+#      cacheEntry could be added by IO or cache entry might be already in cache for some reason. like cache deletion/update fail. So readTTL can be used to consider those already existing cache entry as stale entry.
+#      if read TTL is not specified and writeTTL is specified, then writeTTL will be used as readTTL
+#   3. AddNotFound is used when source client returns NotFound and we want to add it to cache with this TTL.
+#      if addNotFound TTL is not specified and writeTTL is specified, then writeTTL will be used as addNotFound TTL
+#   4. addNotFound is supported in OutputSourceOfTruth but cache write is not supported in OutputSourceoftruth. OutputSourceOfTruth content cache writing is done inside IOService
+
+cacheService:
+  enabled: false
+  minReadySeconds: 10
+  gracePeriod: 2
+  requestMemory: 100Gi    # It should at least be more than maxMainStoreMemory + maxHashIndexMemory
+  requestCPU: 1000m
+  requestStorage: 2048Gi
+  storageClassName: managed-csi-premium
+  volumeClaimName: premiumdata
+  maxMainStoreMemory: 90g
+  maxHashIndexMemory: 8g
+  maxCompactionSegments: 1600
+  compactionFreqInSec: 0  # Disabled by default with checkPoint
+  garnetArgs: '"--storage-tier","true","-l","/data/log","-c","/data/checkpoint","--no-obj","--compaction-type","Shift","--recover"'
+  connectionsOption:
+    "NumConnections=2;ConnectRetry=0;ConnectTimeout=00:00:05;OperationTimeout=00:00:05"
+  cacheConfigMap:
+    minLogLevel: "Information"
+    includeRunTimeMetrics: "true"
+    threadPoolNumThreads: 8192
+    networkSendThrottleMax: 64
+    checkPointIntervalDuration: "00:30:00"
+    useBackgroundSave: "true"
+  cachePools:  #Under each cache pool, key/value defined under cacheService can be overwritten  
+  - cacheName: iocache
+    readEnabled: true
+    writeEnabled: true
+    nodePoolName: cachepool
+    nodeCount: 3
+    port: 3278
+    nodeReplicationMapping:    # e.g.) 0=2;6=8 This is used to replicate the cache data across the nodes in the same cache pool. This could be used to reduce skewness
+    startOffset: 0      # This offset value is added to calculate the node number after applying the Cache Node Selection strategy
+  
+cacheImage:
+  name: garnet-container
+  tag: [[<BUILD_VERSION>]]
+  pullPolicy: Always
+
+partnerCacheService:
+  enabled: false
+  minReadySeconds: 10
+  gracePeriod: 2
+  requestMemory: 38Gi   # It should at least be more than maxMainStoreMemory + maxHashIndexMemory
+  requestCPU: 1000m
+  requestStorage: 128Gi  
+  storageClassName: ultra-disk-sc
+  volumeClaimName: data
+  maxMainStoreMemory: 32g
+  maxHashIndexMemory: 4g
+  maxCompactionSegments: 60
+  compactionFreqInSec: 0  # Disabled by default with checkPoint
+  garnetArgs: '"--storage-tier","true","-l","/data/log","-c","/data/checkpoint","--obj-memory","128m", "--obj-page", "1m", "--obj-segment", "64m","--compaction-type","Shift","--recover","--aof","--aof-commit-wait","false","--aof-commit-freq","1000"'
+  connectionsOption:
+    "NumConnections=2;ConnectRetry=0;ConnectTimeout=00:00:05;OperationTimeout=00:00:10"
+  cachePoolDenyList:
+  cacheConfigMap:
+    minLogLevel: "Information"
+    includeRunTimeMetrics: "true"
+    threadPoolNumThreads: 8192
+    networkSendThrottleMax: 64
+    checkPointIntervalDuration: "00:30:00"
+    useBackgroundSave: "true"
+  cachePools:  #Under each cache pool, key/value defined under partnerCacheService can be overwritten  
+  - cacheName: partnercache
+    readEnabled: true
+    writeEnabled: true
+    nodePoolName: cachepool
+    nodeCount: 3
+    port: 4278
+    nodeReplicationMapping:    # e.g.) 0=2;6=8 This is used to replicate the cache data across the nodes in the same cache pool. This could be used to reduce skewness
+    startOffset: 0      # This offset value is added to calculate the node number after applying the Cache Node Selection strategy
+
+partnerCacheImage:
+  name: garnet-container
+  tag: [[<BUILD_VERSION>]]
+  pullPolicy: Always
+
+# AdminService Info
+adminService:
+  name: AdminService
+  isEnabled: false
+  adminPort: 7072
+  deployment:
+    replicas: 2
+    minReadySeconds: 10
+    labels:
+      name: admin-service
+      app: admin-service
+  service:
+    labels:
+      name: admin-service
+    port: 443
+    targetPort: 443
+  serviceAccount:
+    name: admin-service-account
+    role: kube-admin-role
+    rolebinding: kube-admin-role-binding
+  sslSecretProvider:
+    className: ssl-cert-provider
+    certificateName:
+
+adminServiceImage:
+  name: adminservice
+  tag: [[<BUILD_VERSION>]]
+  pullPolicy: Always
+
+adminServiceConfigMap:
+  name: adminservice-configmap
+  serviceName: GenevaAction
+  dstsRealm:
+  dstsName:
+  serviceDns:
+  allowedActors:
+
+# Monitoring Info
+monitorInfo:
+  name: geneva-services
+  hostNetwork: true
+  minReadySeconds: 10
+
+genevaAccounts:
+  datalabs:
+    # volumes, will use hostPath
+    mdsdVolumeName: &mdsdVolumeName mdsd-run-vol
+  partner: 
+    # volumes, will use emptyDir
+    mdsdVolumeName: &mdsdPartnerVolume partner-vol
+
+mdsd:
+  # follow format to enable dependabot https://eng.ms/docs/products/dependabot/automatic_container_updates
+  image:
+    repository: linuxgeneva-microsoft.azurecr.io/distroless/genevamdsd
+    tag: recommended@sha256:c53e0e22db1e8f2a304177358a202a8ef53d1d343f0a74b4ccc9637c2a578279
+  containerName: mdsd
+  docker_logging: true
+
+  # Authentication
+  monitoring_gcs_auth_id_type: AuthMSIToken
+  monitoring_gcs_auth_id_miAuthType: mi_res_id
+
+  # Volumes
+  hostPathName: *mdsdVolumeName
+  hostPathPath: &mdsdHostPath /var/run/mdsd
+  run_dir_path: /var/run/mdsd
+  applicationEndpoint: &mdsdApplicationEndpoint /var/run/mdsd/default_fluent.socket
+
+  # Unused environment variables in mdsd
+  envUnused: "unused"
+
+mdm:
+  # follow format to enable dependabot https://eng.ms/docs/products/dependabot/automatic_container_updates
+  image:
+    repository: linuxgeneva-microsoft.azurecr.io/distroless/genevamdm
+    tag: recommended@sha256:ecdb2f6671e718ed233f232f4dc72832f992fd4f6fd25b494b2e81cae11b7a07
+  containerName: mdm
+
+  # Input types
+  mdm_input: ifx_local,ifx_abstract,influxdb_udp
+  mdm_log_level: Info
+
+  # Volumes
+  hostPathName: &mdmHostVolumeName ifx-path
+  ifxmetrics_socket_folder_hostPath: &mdmHostPath /var/etw
+  ifxmetrics_socket_folder_path: /var/etw
+  ifxmetrics_socket_path: /var/etw/mdm_ifx.socket
+
+  # Connection Type
+  applicationEndpoint: &mdmApplicationEndpoint /var/etw/mdm_ifx.socket
+
+socat:
+  partnerVolumePath: /socat
+  volumeMountName: socat-volume
+  repository: datalabscanaryacr.azurecr.io/socat
+  tag: [[<BUILD_VERSION>]]
+  pullPolicy: Always
+  startPort: 2000
+  endPort: 2002
+
+  # Refer: templates/_helpers.tpl socat.*.* for building socat command arguments
+  # - Found in MonitorService and PartnerService
+  diagnosticEndpoints:
+    mdsdDatalabs:
+      containerName: socat-mdsd-datalabs
+      partnerSocketPath: /socat/mdsd-datalabs.socket
+      monitorSocketPath: *mdsdApplicationEndpoint
+      monitorVolumeName: *mdsdVolumeName
+      monitorMountPath: *mdsdHostPath
+      port: 2000
+      serviceName: socat-mdsd-datalabs
+
+    mdsdPartner:
+      containerName: socat-mdsd-partner
+      partnerSocketPath: /socat/mdsd-partner.socket
+      monitorSocketPath: *mdsdApplicationEndpoint
+      monitorVolumeName: *mdsdPartnerVolume
+      monitorMountPath: *mdsdHostPath
+      port: 2001
+      serviceName: socat-mdsd-partner
+
+    mdmCombined:
+      containerName: socat-mdm
+      partnerSocketPath: /socat/mdm.socket
+      monitorSocketPath: *mdmApplicationEndpoint
+      monitorVolumeName: *mdmHostVolumeName
+      monitorMountPath: *mdmHostPath
+      port: 2002
+      serviceName: socat-mdm
+
+telegraf:
+  containerName: telegraf
+  repository: mcr.microsoft.com/mirror/docker/library/telegraf # https://mcr.microsoft.com/en-us/product/mirror/docker/library/telegraf/tags
+  tag: 1.28
+  service: platform
+  component: platform
+
+  configMapName: telegraf-kubernetes-conf
+  
+  kubernetesVolume:
+    name: telegraf-conf-vol
+    path: /etc/telegraf
+  limits:
+    cpu: 300m
+    memory: 2Gi
+  requests:
+    cpu: 40m
+    memory: 500Mi
+
+azureProfiler:
+  image: azureprofilerame.azurecr.io/azureprofilermariner
+  tag: 1.0.02076.8

@@ -1,0 +1,187 @@
+# Values File for SKU in INT Environment
+
+solutionInfo:
+  solutionName: &solutionName sku
+  aksClusterName: nitinSkuTestAKS
+  environment: INT
+  region: eastus
+  scaleUnit: *solutionName
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+  # Replace Client Id with MI's Client Id
+  clientId: 66db9ecf-dbb3-4586-bfd1-7ab04c903106
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+ioConfigMap:
+  # Replace Input EH, Output EH, Storage Account
+  inputEventHubNameSpaceAndName: "sku-service-eh/sku-input-eh"
+  outputEventHubNameSpaceAndName: "sku-service-eh/sku-output-eh"
+  eventHubStorageAccountName: "skuservicestorage"
+  blobStorageAccountNames: "skuservicestorage"
+  serviceBusNameSpaceAndName: "sku-service/sku-service-queue"
+  outputDataset: "newpartner"
+  useSourceOfTruth: "false"
+  inputCacheTypes: Microsoft.Inventory/subscriptionInternalProperties;Microsoft.Resources/subscriptionZoneMappings;Microsoft.Features/featureProviders/subscriptionFeatureRegistrations
+  allowedOutputTypes: "Microsoft.Inventory/skuProviders/resourceTypes/locations/globalskus;Microsoft.Compute/virtualMachines/locations"
+
+ioImage:
+  tag: latest
+
+socat:
+  tag: latest
+
+partnerConfig:    
+  pods:
+  - name: sku-solution
+    serviceName: sku-solution-service 
+    replicaCount: 2
+    partnerConfigMap:
+      name: sku-service-config
+      minLogLevel: Information
+      enableGrpcTrace: false
+      enableHttpClientTrace: false
+      enableAzureSDKActivity: false
+      customConfig: "rpList:Microsoft.Compute|
+        featureFlagsForAz:Microsoft.Resources/AZ_southafricanorth#South Africa North;Microsoft.Resources/AZ_indiacentral#Central India;Microsoft.Resources/AZ_koreacentral#Korea Central;Microsoft.Resources/AZ_norwaye#Norway East;Microsoft.Resources/AZ_asiaeast#East Asia;Microsoft.Resources/AZ_qatarc#Qatar Central;Microsoft.Resources/AZ_swedenc#Sweden Central;Microsoft.Resources/AZ_switzerlandn#Switzerland North|
+        allowedAzMapping:East US 2#useast2-AZ01@1,useast2-AZ02@2,useast2-AZ03@3;Central US#uscentral-AZ01@1,uscentral-AZ02@2,uscentral-AZ03@3;West Europe#europewest-AZ01@1,europewest-AZ02@2,europewest-AZ03@3;East US 2 EUAP#useast2euap-AZ01@1,useast2euap-AZ02@2,useast2euap-AZ03@3;Central US EUAP#uscentraleuap-AZ01@1,uscentraleuap-AZ02@2;France Central#francec-AZ01@1,francec-AZ02@2,francec-AZ03@3;Southeast Asia#asiasoutheast-AZ01@1,asiasoutheast-AZ02@2,asiasoutheast-AZ03@3;West US 2#uswest2-AZ01@1,uswest2-AZ02@2,uswest2-AZ03@3;North Europe#europenorth-AZ01@1,europenorth-AZ02@2,europenorth-AZ03@3;East US#useast-AZ01@1,useast-AZ02@2,useast-AZ03@3;UK South#uksouth-AZ01@1,uksouth-AZ02@2,uksouth-AZ03@3;Japan East#japaneast-AZ01@1,japaneast-AZ02@2,japaneast-AZ03@3;Australia East#australiaeast-AZ01@1,australiaeast-AZ02@2,australiaeast-AZ03@3;South Africa North#southafrican-AZ01@1,southafrican-AZ02@2,southafrican-AZ03@3;South Central US#ussouth-AZ01@1,ussouth-AZ02@2,ussouth-AZ03@3;Canada Central#canadacentral-AZ01@1,canadacentral-AZ02@2,canadacentral-AZ03@3;Germany West Central#germanywc-AZ01@1,germanywc-AZ02@2,germanywc-AZ03@3;Brazil South#brazilsouth-AZ01@1,brazilsouth-AZ02@2,brazilsouth-AZ03@3;Central India#indiacentral-AZ01@1,indiacentral-AZ02@2,indiacentral-AZ03@3;Korea Central#koreacentral-AZ01@1,koreacentral-AZ02@2,koreacentral-AZ03@3;West US 3#uswest3-AZ01@1,uswest3-AZ02@2,uswest3-AZ03@3;Norway East#norwaye-AZ01@1,norwaye-AZ02@2,norwaye-AZ03@3;East Asia#asiaeast-AZ01@1,asiaeast-AZ02@2,asiaeast-AZ03@3;Qatar Central#qatarc-AZ01@1,qatarc-AZ02@2,qatarc-AZ03@3;Sweden Central#swedenc-AZ01@1,swedenc-AZ02@2,swedenc-AZ03@3;Switzerland North#switzerlandn-AZ01@1,switzerlandn-AZ02@2,switzerlandn-AZ03@3|
+        allowedProviderRegistrationLocations:;DevFabric;DBELocal;Northwest US;France Central;Germany West Central;West US 3;Qatar Central;Switzerland North;Sweden Central;Norway East;South Africa North;East Asia;Southeast Asia;East US;East US 2;West US;West US 2;North Central US;South Central US;West Central US;Central US;North Europe;West Europe;Japan East;Japan West;Brazil South;South India;Central India;West India;Canada Central;Canada East;UK North;UK South 2;UK South;UK West;Korea Central;Korea South;MSFT West US;MSFT East US;MSFT East Asia;MSFT North Europe;Australia East;Australia Southeast;East US 2 EUAP;Central US EUAP;East Asia (Stage);Southeast Asia (Stage);East US (Stage);West US (Stage);Central US (Stage);East US 2 (Stage);North Central US (Stage);South Central US (Stage);West US (Partner);United States;Europe;Asia Pacific;Japan;Brazil;Australia;India;Canada;UK;global"
+    containers:
+     - name: sku-container
+       repository: armdataacrskudfeastus.azurecr.io/sku-datalabs
+       tag: latest
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "eventTypes" : "Microsoft.Inventory/subscriptionInternalProperties/write,Microsoft.Resources/subscriptionZoneMappings/write,Microsoft.Features/featureProviders/subscriptionFeatureRegistrations/write,Microsoft.Resources/subscriptionRegistrations/write"
+                      }
+       multiResponseResourcesMatchTypes: | 
+                      {
+                      "eventTypes" :  "Microsoft.Inventory/skuProviders/resourceTypes/locations/globalSkus/write" 
+                      }
+  - name: cache-ingestion
+    serviceName: cache-ingestion-service
+    replicaCount: 2
+    partnerConfigMap:
+      name: cache-ingestion-service-config
+    containers:
+     - name: cache-ingestion-container
+       repository: armdataacrskudfeastus.azurecr.io/cache-ingestion
+       tag: latest
+       port: 5078
+       concurrency: 10
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" : "Microsoft.Inventory/subscriptionInternalProperties,Microsoft.Inventory/skuProviders/resourceTypes/locations/globalSkus"
+                      }
+       
+resourceFetcherConfigMap:
+  partnerNames: "abcsolution;sku"
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://resource-fetcher.resource-fetcher-namespace.svc.cluster.local:6072
+  resourceFetcherTokenResource: https://resourcefetcherservice-int.microsoft.com
+  resourceFetcherHomeTenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+resourceProxyConfigMap:
+  getResourceAllowedTypes:
+    "Microsoft.Inventory/subscriptionInternalProperties:cache;
+    Microsoft.Resources/subscriptionZoneMappings:cache;
+    Microsoft.Features/featureProviders/subscriptionFeatureRegistrations:resourcefetcher_arm;
+    microsoft.inventory/configspecs:cache,resourcefetcher_arm;
+    microsoft.inventory/manifestprovider:cache,resourcefetcher_arm;
+    microsoft.compute/version/fetchcapacityrestrictions:cache,resourcefetcher_arm"
+
+resourceProxyServiceAccount:
+  clientId: 66db9ecf-dbb3-4586-bfd1-7ab04c903106
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+  name: resource-proxy-fetcher-identity
+
+resourceProxyImage:
+  name: resourceproxy-container
+  repository: armdataacrskudfeastus.azurecr.io/resourcefetcherproxy
+  tag: latest
+
+cacheService:
+  enabled: true
+  requestMemory: 5Gi
+  requestStorage: 4Gi
+  storageClassName: managed-csi
+  volumeClaimName: data
+  maxMainStoreMemory: 4g
+  maxHashIndexMemory: 1g
+  maxCompactionSegments: 2
+  cacheConfigMap:
+    checkPointIntervalDuration: "00:15:00"
+  cachePools:
+  - cacheName: iocache
+    readEnabled: true
+    nodePoolName: agentpool
+    nodeCount: 2
+    port: 3278
+    nodeReplication:
+    startOffset: 0
+
+cacheImage:
+  tag: latest
+
+partnerCacheService:
+  enabled: true
+  requestMemory: 5Gi
+  requestStorage: 4Gi
+  storageClassName: managed-csi
+  volumeClaimName: data
+  maxMainStoreMemory: 4g
+  maxHashIndexMemory: 1g
+  maxCompactionSegments: 2
+  cacheConfigMap:
+    checkPointIntervalDuration: "00:15:00"
+  cachePools:
+  - cacheName: partnercache
+    readEnabled: true
+    nodePoolName: agentpool
+    nodeCount: 2
+    port: 4278
+    nodeReplication:
+    startOffset: 0
+
+partnerCacheImage:
+  tag: latest
+
+# Monitoring configurations
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: true
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: Test
+    gcs_account: DataLabs
+    gcs_region: eastus
+    gcs_namespace: Datalabs
+    gcs_config_version: '1.6' # TODO Change to respective config version
+    # TODO: Replace subscriptionId for miResourceId
+    miResourceId: /subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourcegroups/MC_nitin-test-solution_nitinSkuTestAKS_eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/nitinSkuTestAKS-agentpool
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: DataLabs
+      namespace: DataLabs
+    Partner: # Change accountInfo for Partner (can be the same as DataLabs)
+      account: DataLabs
+      namespace: DataLabs
+
+  # TODO: Update to objectId of idminteusaks-agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "DataLabs",
+          "objectId": "becd30f7-b84a-461e-bd35-38b5121c26fb"
+        }
+      ]
+    }

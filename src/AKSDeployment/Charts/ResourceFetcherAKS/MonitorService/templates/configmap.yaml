@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.telegraf.configMapName }}-kubernetes
+  namespace: {{ .Values.monitorNameSpace }}
+data:
+  telegraf.conf: {{ .Files.Get "telegraf-kubernetes.conf" | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.telegraf.configMapName }}-akscluster
+  namespace: {{ .Values.monitorNameSpace }}
+data:
+  telegraf.conf: {{ .Files.Get "telegraf-akscluster.conf" | quote }}

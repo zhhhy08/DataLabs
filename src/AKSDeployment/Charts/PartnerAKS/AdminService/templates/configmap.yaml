@@ -1,0 +1,21 @@
+{{- if .Values.adminService.isEnabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.adminServiceConfigMap.name }}
+  namespace: {{ .Values.adminServiceNameSpace }}
+data:
+  Port: {{ .Values.adminService.service.targetPort | quote }}
+  GenevaActionDstsCertificateName: {{ .Values.adminService.sslSecretProvider.certificateName | quote }}
+
+  # Auth related
+  DstsRealm: {{ .Values.adminServiceConfigMap.dstsRealm | quote }}
+  DstsName: {{ .Values.adminServiceConfigMap.dstsName | quote }}
+  ServiceDns: {{ .Values.adminServiceConfigMap.serviceDns | quote}}
+  ServiceName: {{ .Values.adminServiceConfigMap.serviceName | quote }}
+  AllowedActors: {{ .Values.adminServiceConfigMap.allowedActors | quote }}
+
+  # Endpoint related
+  ResourceProxyAdminEndpoint: http://{{ .Values.resourceProxyService.adminPortServiceName }}.{{ .Values.solutionNameSpace }}.svc.cluster.local:{{ .Values.adminService.adminPort }}
+  IOServiceAdminEndpoint: http://{{ .Values.ioService.name }}.{{ .Values.solutionNameSpace }}.svc.cluster.local:{{ .Values.adminService.adminPort }}
+{{- end }}

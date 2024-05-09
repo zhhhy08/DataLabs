@@ -1,0 +1,9 @@
+Requires to be run on SAW.
+
+`buildrf.ps1` was called:
+- `.\buildrf.ps1 68d38d95-0964-447c-8840-f381378f9253 eus eastus prod 9b776e32-83f7-4e98-b234-f43612dea78d caf615cd-215f-4706-8a49-600ecdfc59dc 75c6bdbd-d177-465c-bd3c-b340c1333167`
+- `.\buildrf.ps1 68d38d95-0964-447c-8840-f381378f9253 neu northeurope prod 9b776e32-83f7-4e98-b234-f43612dea78d caf615cd-215f-4706-8a49-600ecdfc59dc 75c6bdbd-d177-465c-bd3c-b340c1333167`
+- `.\buildrf.ps1 68d38d95-0964-447c-8840-f381378f9253 sdc swedencentral prod 9b776e32-83f7-4e98-b234-f43612dea78d caf615cd-215f-4706-8a49-600ecdfc59dc 75c6bdbd-d177-465c-bd3c-b340c1333167`
+- `.\buildrf.ps1 68d38d95-0964-447c-8840-f381378f9253 wu3 westus3 prod 9b776e32-83f7-4e98-b234-f43612dea78d caf615cd-215f-4706-8a49-600ecdfc59dc 75c6bdbd-d177-465c-bd3c-b340c1333167`
+- `.\buildrf.ps1 68d38d95-0964-447c-8840-f381378f9253 ea eastasia prod 9b776e32-83f7-4e98-b234-f43612dea78d caf615cd-215f-4706-8a49-600ecdfc59dc 75c6bdbd-d177-465c-bd3c-b340c1333167`
+- `.\buildrf.ps1 68d38d95-0964-447c-8840-f381378f9253 sea southeastasia prod 9b776e32-83f7-4e98-b234-f43612dea78d caf615cd-215f-4706-8a49-600ecdfc59dc 75c6bdbd-d177-465c-bd3c-b340c1333167`

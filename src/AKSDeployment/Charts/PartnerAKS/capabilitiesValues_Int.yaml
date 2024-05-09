@@ -1,0 +1,141 @@
+# Values File for pol in INT Environment
+# As INT infra was deployed with "pol", will not use "cap" for infra related resources
+agentPoolName: agentpool
+primaryRegionName: "p-eu2"
+backupRegionName: "b-eu2"
+
+solutionInfo:
+  solutionName: &solutionName capsolution
+  aksClusterName: polinteu2aks
+  environment: INT
+  region: eastus2
+  scaleUnit: *solutionName
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+# az identity show --resource-group "DataLabspolRG" --name "polintioconnectorid" --query 'clientId' -otsv
+ioServiceAccount:
+  # Replace Client Id with MI's Client Id
+  clientId: 022206f3-5dbc-458f-89a1-f876aa30d01f
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+ioConfigMap:
+#  inputEventHubNameSpaceAndName: "polinteu2premipehns0/polinteu2premipeh"
+  inputEventHubNameSpaceAndName: "jaesolutionpolicyeh/jae-solution-poc-policy-input"  # hardcoded
+  backupInputEventHubNameSpaceAndName : "polinteu2bipehns0/polinteu2bipeh/00:05:00"
+#outputEventHubNameSpaceAndName: "polinteu2opehns0/polinteu2opeh"
+  outputEventHubNameSpaceAndName: "jaesolutionpolicyeh/jae-solution-poc-policy-output"  # hardcoded
+  eventHubStorageAccountName: "0polinteu2ehcpsa"
+  blobStorageAccountNames: "0polinteu2sotsa;1polinteu2sotsa"
+  backupBlobStorageAccountNames: "0polinteu2sotsa;1polinteu2sotsa"
+  useSourceOfTruth: "true"
+  serviceBusNameSpaceAndName: "polinteu2sb0/0polinteu2sbq"
+  outputDataset: "NewPartner"
+  allowedOutputTypes: "microsoft.resources/capabilities"
+  publishOutputToArn: "false"
+#  arnPublishStorageAccountNames: "0polinteu2arnpsa;1polinteu2arnpsa"
+#  arnPublishEventGridDomainIds: "/subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourceGroups/DataLabspolRG-eastus2/providers/Microsoft.EventGrid/domains/polinteu2apeg1"
+#  arnPublishEventGridDomainEndpoints: "https://polinteu2apeg1.eastus2-1.eventgrid.azure.net/api/events"
+#  arnPublishEventGridTopics: "/subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourceGroups/DataLabspolRG-eastus2/providers/Microsoft.EventGrid/domains/polinteu2apeg1/topics/arnpublishtopic"
+
+partnerConfig:    
+  pods:
+  - name: pol-cap-solution
+    serviceName: pol-cap-solution-service 
+    replicaCount: 3
+    partnerConfigMap:
+      name: pol-cap-solution-config
+    containers:
+     - name: polpartnersolution
+       repository: datalabsintacr.azurecr.io/polpartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" :  "*" 
+                      }
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://rfinteusaks.pol.int.eu2aks:6072
+  resourceFetcherTokenResource: https://resourcefetcherservice-int.microsoft.com
+  resourceFetcherHomeTenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+resourceProxyConfigMap:
+  callARMGenericRequestAllowedTypes:
+    "/providers/Microsoft.Authorization/policySetDefinitions:resourcefetcher_arm;
+    /providers/Microsoft.Authorization/policyDefinitions:resourcefetcher_arm;
+    /providers:resourcefetcher_arm"
+
+# Replace Client Id with MI's Client Id
+resourceProxyServiceAccount:
+  clientId: 022206f3-5dbc-458f-89a1-f876aa30d01f
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+cacheService:
+  enabled: false
+
+# Monitoring configurations
+monitorInfo:
+  exporterType: DUMMY # default is console exporter
+  isInternalPartner: false
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: Test
+    gcs_account: DataLabs
+    gcs_region: eastus2
+    gcs_namespace: DataLabs
+    gcs_config_version: '1.6' # parametrized in the future
+    miResourceId: /subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourcegroups/MC_DataLabspolRG-eastus2_polinteu2aks_eastus2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/polinteu2aks-agentpool
+  partner:
+    gcs_environment: Test
+    #gcs_account: poltestlsacc
+    gcs_account: DataLabs
+    gcs_region: eastus2
+    #gcs_namespace: poltestlsacc
+    gcs_namespace: DataLabs
+    gcs_config_version: '1.6' # parametrized in the future
+    miResourceId: /subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourcegroups/MC_DataLabspolRG-eastus2_polinteu2aks_eastus2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/polinteu2aks-agentpool
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  metricEndpoint: https://global.ppe.microsoftmetrics.com/
+  
+  accountInfo:
+    DataLabs:
+      account: DataLabs
+      namespace: DataLabs
+    Partner: # Change accountInfo for Partner (can be the same as DataLabs)
+#      account: poltestlsacc
+      account: DataLabs
+#      namespace: poltestlsacc
+      namespace: DataLabs
+
+  # (Get-AzAksCluster -ResourceGroupName DataLabspolRG-eastus2 -Name polinteu2aks ).IdentityProfile.kubeletidentity.objectid
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "poltestlsacc",
+          "objectId": "c7a794b6-77a5-481a-928c-9184fe1c8f58"
+        },
+        {
+          "account": "DataLabs",
+          "objectId": "c7a794b6-77a5-481a-928c-9184fe1c8f58"
+        }
+      ]
+    }
+
+keyVault:
+  name: polinteu2kv
+  clientId: 7d2619f9-7f28-4b6c-bb8f-28aecb64cc3d
+
+adminService:
+  isEnabled: false
+  sslSecretProvider:
+    certificateName: polinteu2aks-ssl
+
+adminServiceConfigMap:
+  dstsRealm: realm://dsts.core.azure-test.net/
+  dstsName: co2agg04-dsts.dsts.core.azure-test.net
+  serviceDns: int.datalabs.core.windows.net
+  allowedActors: GenevaActionsTest,acisTestTodSMSTest,GenevaActionsDelegatedAuthNonProd

@@ -1,0 +1,59 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-01-01/rolloutParameters.json",
+    "contentVersion": "1.0.0.0",
+    "shellExtensions": [
+        {
+            "name": "Run",
+            "type": "Run",
+            "properties": {
+                "maxExecutionTime": "PT50M"
+            },
+            "package": {
+                "reference": {
+                    "path": "Run.tar"
+                }
+            },
+            "launch": {
+                "command": [
+                    "/bin/bash",
+                    "/package/unarchive/InternalAksSetupRF.sh"
+                ],
+                "environmentVariables": [
+                    {
+                        "name": "CHARTS_TAR",
+                        "reference": {
+                            "path": "charts.tar"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "RfSubscription",
+                        "value": "__RF_SUB_ID__"
+                    },
+                    {
+                        "name": "CloudName",
+                        "value": "__CLOUD_NAME__"
+                    },
+                    {
+                        "name": "RegionAcronym",
+                        "value": "__REGION_ACRONYM__"
+                    },
+                    {
+                        "name": "ValuesFilename",
+                        "value": "__VALUES_FILENAME__"
+                    },
+                    {
+                        "name": "EnableAdminService",
+                        "value": "__ENABLE_ADMIN_SERVICE__"
+                    }
+                ],
+                "identity": {
+                    "type": "userAssigned",
+                    "userAssignedIdentities": [
+                        "__SCRIPT_EV2_MANAGED_IDENTITY__"
+                    ]
+                }
+            }
+        }
+    ]
+}

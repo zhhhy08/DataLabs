@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: resource-fetcher-namespace
+  labels:
+    name: resource-fetcher-namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitor-namespace
+  labels:
+    name: monitor-namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: admin-namespace
+  labels:
+    name: admin-namespace

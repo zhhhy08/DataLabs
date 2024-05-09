@@ -1,0 +1,58 @@
+{
+    "$schema": "http://schema.express.azure.com/schemas/2015-01-01-alpha/RolloutSpec.json",
+    "ContentVersion": "1.0.0.0",
+    "RolloutMetadata": {
+        "ServiceModelPath": "ServiceModel.json",
+        "ScopeBindingsPath": "ScopeBindings.json",
+        "Name": "GenevaConfigChangeDeploy",
+        "RolloutType": "Major",
+        "BuildSource": {
+            "Parameters": {
+                "VersionFile": "buildver.txt"
+            }
+        },        
+        "notification": {
+          "email": {
+            "to": "datalabs@microsoft.com"
+          }
+      }
+    },
+    "OrchestratedSteps": [
+      // Test Logs Account With Multiple Configs. Consider repeatOver Functionality https://ev2docs.azure.net/features/service-artifacts/actions/http-extensions/repeatover.html
+      //{
+      //  "Name": "ManageGenevaLogConfig",
+      //  "TargetType": "ServiceResource",
+      //  "TargetName": "GenevaLogConfig",
+      //  "Actions": [ "Extension/ProvisionGenevaAccount" ]
+      //},
+      // Metrics Configs
+      {    
+         "Name": "ManageMdmConfigurations",
+         "TargetType": "ServiceResource",
+         "TargetName": "DeployMetricConfigs",
+         "Actions": [ "Extension/ManageMdmConfigurations" ]   
+      },
+      // Health Configs
+      {    
+         "Name": "HealthAndMonitor",
+         "TargetType": "ServiceResource",
+         "TargetName": "DeployMonitorConfigs",
+         "Actions": [ "Extension/HealthAndMonitor" ]   
+      }
+      //,
+      // Dashboard Configs
+      //{    
+      //   "Name": "Dashboard",
+      //   "TargetType": "ServiceResource",
+      //   "TargetName": "DeployDashboardConfigs",
+      //   "Actions": [ "Extension/ManageJarvisDashboards" ]   
+      //}
+      // SLO Definition with Configs
+      //{ 
+      //    "name": " ValidateAndSaveSloDefinition", 
+      //    "targetType": "ServiceResource", 
+      //    "targetName": "ValidateAndSaveSloDefinition" ,
+      //    "actions": [ "extension/ValidateAndSaveSloDefinition"]
+      //}
+    ]
+}

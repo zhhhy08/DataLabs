@@ -1,0 +1,190 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "cloudName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "regionAcronym": {
+            "type": "string",
+            "maxLength": 5,
+            "metadata": {
+                "description": "standard acronym for region"
+            }
+        },
+        "adminGroupObjectIds": {
+            "type": "array"
+        },
+        "agentpoolConfig": {
+            "type": "array"
+        },
+        "cachepoolConfig": {
+            "type": "array"
+        },
+        "enableAdminService": {
+            "type": "string"
+        },
+        "dnsZoneName": {
+            "type": "string"
+        },
+        "cnameSuffix": {
+            "type": "string"
+        },
+        "privateAKSClusterTemplateUri": {
+            "type": "string"
+        },
+        "availabilityZonesInRegion": {
+            "type": "int"
+        },
+        "storageAccountTemplateUri": {
+            "type": "string"
+        },
+        "keyvaultTemplateUri": {
+            "type": "string"
+        },
+        "cnameTemplateUri": {
+            "type": "string"
+        },
+        "maintenanceConfigurationsConfigs" : {
+            "type": "object"
+        }
+    },
+    "variables": {
+        "resourceFetcherAcronym": "rf",
+        "metadataSaConfig": {
+            "type": "metadataStorageAccount",
+            "typeAcronym": "md",
+            "createRAForIOConnector": "false",
+            "skuName": "Standard_ZRS",
+            "skuTier": "Standard",
+            "kind": "StorageV2",
+            "count": 1,
+            "useDeleteRetentionPolicy": false,
+            "retentionPolicyPeriod": 30
+        },
+        "resourceFetcherAksName": "[tolower(concat(variables('resourceFetcherAcronym'), parameters('cloudName'), parameters('regionAcronym'), 'aks'))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2019-10-01",
+            "name": "[tolower(concat(variables('resourceFetcherAcronym'), parameters('cloudName'), parameters('regionAcronym'), '-private-akscluster-deployment'))]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('privateAKSClusterTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "name": {
+                        "value": "[variables('resourceFetcherAksName')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "dnsPrefix": {
+                        "value": "[tolower(concat(variables('resourceFetcherAcronym'), parameters('cloudName'), parameters('regionAcronym'), 'aks', '-dns'))]"
+                    },
+                    "agentpoolConfig": {
+                        "value": "[parameters('agentpoolConfig')]"
+                    },
+                    "cachepoolConfig": {
+                        "value": "[parameters('cachepoolConfig')]"
+                    },
+                    "adminGroupObjectIds": {
+                        "value": "[parameters('adminGroupObjectIds')]"
+                    },
+                    "maintenanceConfigurationsConfigs": {
+                        "value": "[parameters('maintenanceConfigurationsConfigs')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "[tolower(concat('datalabs', parameters('cloudName'), parameters('regionAcronym'), '-metadata-storageaccount-deployment'))]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('storageAccountTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "suffix": {
+                        "value": "[tolower(concat('datalabs', parameters('cloudName'), parameters('regionAcronym'), variables('metadataSaConfig').typeAcronym, 'sa'))]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "storageAccountConfigs": {
+                        "value": "[variables('metadataSaConfig')]"
+                    },
+                    "cloudName": {
+                        "value": "[parameters('cloudName')]"
+                    },
+                    "partnerAcronym": {
+                        "value": "datalabs"
+                    },
+                    "availabilityZonesInRegion": {
+                        "value": "[parameters('availabilityZonesInRegion')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-10-01",
+            "name": "[tolower(concat('datalabs', parameters('cloudName'), parameters('regionAcronym'), '-keyvault-deployment'))]",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', tolower(concat('datalabs', parameters('cloudName'), parameters('regionAcronym'), '-metadata-storageaccount-deployment')))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('keyvaultTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "keyVaultName": {
+                        "value": "[tolower(concat('datalabs', parameters('cloudName'), parameters('regionAcronym'), 'rfkv'))]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "metadataSaName": {
+                        "value": "[tolower(concat('0datalabs', parameters('cloudName'), parameters('regionAcronym'), variables('metadataSaConfig').typeAcronym, 'sa'))]"
+                    }
+                }
+            }
+        },
+        {
+            "condition": "[equals(parameters('enableAdminService'), 'true')]",
+            "apiVersion": "2019-10-01",
+            "name": "[tolower(concat('datalabs', parameters('cloudName'), parameters('regionAcronym'), '-cname-deployment'))]",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "datalabsrg",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('cnameTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "dnsZoneName": {
+                        "value": "[parameters('dnsZoneName')]"
+                    },
+                    "recordName": {
+                        "value": "[variables('resourceFetcherAksName')]"
+                    },
+                    "cnameAlias": {
+                        "value": "[tolower(concat(variables('resourceFetcherAksName'), '.', parameters('location'), '.', parameters('cnameSuffix')))]"
+                    }
+                }
+            }
+        }
+    ]
+}

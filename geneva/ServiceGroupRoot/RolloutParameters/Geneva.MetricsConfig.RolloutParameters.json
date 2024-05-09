@@ -1,0 +1,43 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "extensions": [
+    {
+      "Name": "ManageMdmConfigurations",
+      "Type": "Microsoft.Geneva.Metrics/ManageConfigurations",
+      "Version": "2020-06-01",
+      "ConnectionProperties": {
+        "MaxExecutionTime": "PT30M",
+        "Authentication": {
+          "Type": "CertificateAuthentication",
+          "Reference": {
+            "Provider": "AzureKeyVault",
+            "Parameters": {
+              "SecretId": "https://datalabsgeneva-gbl-kv.vault.azure.net/secrets/DatalabsGenevaKeyVaultCert"
+            }
+          }
+        }
+      },
+      // The extension supports a property bag. 
+      // Property 'accountConfigFolderName' or 'metricConfigFolderName' can be omitted if not needed but not both.
+      // The "delete/remove" semantics is not supported via EV2,
+      // but it can be done with MDM SDK: https://genevamondocs.azurewebsites.net/consume/metrics/gettingstarted.html.
+      "Payloadproperties": {
+        "configurationPackage": {
+          "Reference": {
+            "Path": "Package\\MetricConfigs.zip"
+          }
+        },
+        "monitoringAccountName": {
+          "Value": "ARGDataLabs"
+        },
+        "accountConfigFolderName": {
+          "Value": "AccountConfig"
+        },
+        "metricConfigFolderName": {
+          "Value": "Metrics"
+        }
+      }
+    }
+  ]
+}

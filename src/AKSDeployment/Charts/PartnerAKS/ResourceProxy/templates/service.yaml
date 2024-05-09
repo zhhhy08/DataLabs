@@ -1,0 +1,15 @@
+{{- if .Values.resourceProxyService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.resourceProxyService.serviceName }}
+  namespace: {{ .Values.solutionNameSpace }}
+spec:
+  clusterIP: None
+  selector:
+    app: {{ .Values.resourceProxyService.name }}
+  ports:
+  - name: resourceproxy
+    port: {{ .Values.resourceProxyService.port }}
+    protocol: TCP
+{{- end }}

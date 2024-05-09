@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+		<Platforms>x64</Platforms>
+    <Nullable>enable</Nullable>
+		<OutputType>Library</OutputType>
+		<GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+		<GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+  </PropertyGroup>
+	<ItemGroup>
+		<None Include="GenevaActionsExtension.Test.config">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="GenevaActionsExtension.Public.config">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="swagger_empty.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Include="swagger_DataLabs.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AcisExtensionSDK.Net" />
+		<PackageReference Include="Azure.Identity" />
+		<PackageReference Include="Microsoft.WindowsAzure.Wapd.Acis.Contracts" />
+	</ItemGroup>
+	<PropertyGroup>
+		<GASMEPackageInputDir>$(OutputPath)</GASMEPackageInputDir>
+		<GASMEPackageOutputDir>$(OutputPath)\..\GenevaActionsPackages</GASMEPackageOutputDir>
+		<GAPackageName>$(AssemblyName)</GAPackageName>
+		<GASMEAssembly>$(AssemblyName).dll</GASMEAssembly>
+	</PropertyGroup>
+	<ItemGroup Condition="'$(SkipPackaging)' != 'true'">
+		<GAPackageEnvironment Include="Test">
+			<SMEConfigFile>GenevaActionsExtension.Test.config</SMEConfigFile>
+		</GAPackageEnvironment>
+		<GAPackageEnvironment Include="Public">
+			<SMEConfigFile>GenevaActionsExtension.Public.config</SMEConfigFile>
+		</GAPackageEnvironment>
+	</ItemGroup>
+</Project>

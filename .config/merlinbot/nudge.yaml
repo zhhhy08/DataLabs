@@ -1,0 +1,16 @@
+# To enable or disable
+enabled: true
+# How many reviewers to Nudge in comment?
+maxReviewersToNudge: 3 
+# Do not nudge users that are included in the following list
+#excludeUsers:
+#  - user1@microsoft.com
+#  - user2@microsoft.com
+# Do not nudge PRs authored by users that are included in the following list
+#excludePrsFromAuthors:
+#  - excludedPrAuthor1@microsoft.com
+#  - excludedPrAuthor2@microsoft.com
+# To enable or disable early nudge on pull requests
+enableEarlyNudge: true
+# Number of days to wait after a pull request is created, to analyze it for an early nudge
+earlyNudgeThresholdDays: 2

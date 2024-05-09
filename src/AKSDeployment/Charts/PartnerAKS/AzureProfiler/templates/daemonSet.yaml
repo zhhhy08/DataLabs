@@ -1,0 +1,73 @@
+# Documentation: https://eng.ms/docs/products/azure-profiler/data-collection/aks
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: azure-profiler
+  namespace: {{ .Values.monitorNameSpace }}
+  labels:
+    app: azure-profiler
+spec:
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      name: azure-profiler
+  template:
+    metadata:
+      labels:
+        name: azure-profiler
+    spec:
+      #Enable shareProcessNameSpace so Azure Profiler can see other Processes within Pod
+      #This is needed for sidecar (Pod level) scenario
+      #shareProcessNamespace: true
+
+      #Enable hostPID so Azure Profiler can see other Process within Node
+      #This is needed for daemonset (Node level) scenario
+      hostPID: true
+
+      #Image pull secret that is created based on SP with acrpull permission
+      #imagePullSecrets:
+      #  - name:  acr-secret
+      containers:
+        - name: azure-profiler
+          #Please change this to the ACR Images in Azure Profiler ACR Session above
+          image: {{ .Values.azureProfiler.repository }}:{{ .Values.azureProfiler.tag }}
+          env:
+            #Please modify these env variables with GroupName/Role for your Topic
+            - name: AZURE_PROFILER_GROUP
+              value: "DataLabs-{{ .Values.solutionInfo.environment }}"
+            - name: AZURE_PROFILER_ROLE
+              value: {{ .Values.solutionInfo.aksClusterName | quote }}
+            - name: AZURE_PROFILER_INTERVAL_MINUTES
+              value: "360"
+            - name: AZURE_PROFILER_INSTALL_ON_HOST
+              value: "false"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 443
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /host/proc
+              mountPropagation: HostToContainer
+              name: proc
+              readOnly: true
+            - mountPath: /host/sys
+              mountPropagation: HostToContainer
+              name: sys
+              readOnly: true
+            - mountPath: /host/root
+              mountPropagation: HostToContainer
+              name: root
+              readOnly: true
+      hostNetwork: true
+      volumes:
+        - hostPath:
+            path: /proc
+          name: proc
+        - hostPath:
+            path: /sys
+          name: sys
+        - hostPath:
+            path: /
+          name: root

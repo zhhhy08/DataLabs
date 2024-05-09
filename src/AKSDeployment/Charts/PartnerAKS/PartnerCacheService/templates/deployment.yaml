@@ -1,0 +1,165 @@
+{{- if .Values.partnerCacheService.enabled }}
+{{ $index := .Values.setArrayIndexVar }}
+{{ $indexplusone := add $index 1 }}
+{{- $numCachePool := len .Values.partnerCacheService.cachePools }}
+{{- if lt $index $numCachePool }}
+{{ $cachePool := index .Values.partnerCacheService.cachePools $index }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $cachePool.cacheName }}
+  namespace: {{ $.Values.cacheNameSpace }}
+spec:
+  replicas: {{ $cachePool.nodeCount }}
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ $cachePool.cacheName }}
+  serviceName: {{ $cachePool.cacheName }}
+  minReadySeconds: {{ $cachePool.minReadySeconds | default $.Values.partnerCacheService.minReadySeconds }}
+  template:
+    metadata:
+      labels:
+        app: {{ $cachePool.cacheName }}
+    spec:
+      nodeSelector:
+        "agentpool": {{ $cachePool.nodePoolName }}
+      terminationGracePeriodSeconds: {{ $cachePool.gracePeriod | default $.Values.partnerCacheService.gracePeriod }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ $cachePool.cacheName }}
+            topologyKey: kubernetes.io/hostname
+            namespaceSelector: {}
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ $cachePool.cacheName }}-config
+      - name: mdsd-run-vol  # connects with monitor pod for logs/traces
+        hostPath:
+          path: {{ $.Values.mdsd.hostPathPath | quote }}
+      - name: ifx-path      # connects with monitor pod for metrics
+        hostPath:
+          path: {{ $.Values.mdm.ifxmetrics_socket_folder_hostPath | quote }}
+      containers:
+      - name: {{ $.Values.partnerCacheImage.name }}
+        image: {{ $.Values.partnerCacheImage.repository }}:{{ $.Values.partnerCacheImage.tag }}
+        imagePullPolicy: {{ $.Values.partnerCacheImage.pullPolicy }}
+        resources:
+          requests:
+            memory: {{ $cachePool.requestMemory | default $.Values.partnerCacheService.requestMemory | quote }}
+            cpu: {{ $cachePool.requestCPU | default $.Values.partnerCacheService.requestCPU | quote }}
+        args: [ "--port",{{ $cachePool.port | quote }},"-m",{{ $cachePool.maxMainStoreMemory | default $.Values.partnerCacheService.maxMainStoreMemory | quote }},"-i",{{ $cachePool.maxHashIndexMemory | default $.Values.partnerCacheService.maxHashIndexMemory | quote }},"--compaction-max-segments",{{ $cachePool.maxCompactionSegments | default $.Values.partnerCacheService.maxCompactionSegments | quote }},"--compaction-freq",{{ $cachePool.compactionFreqInSec | default $.Values.partnerCacheService.compactionFreqInSec | quote }},{{ $cachePool.garnetArgs | default $.Values.partnerCacheService.garnetArgs }} ]
+        ports:
+        - containerPort: {{ $cachePool.port }}
+        volumeMounts:
+        - name: {{ $.Values.partnerCacheService.volumeClaimName }}
+          mountPath: /data
+        - name: config-volume
+          mountPath: "/config"
+          readOnly: true
+        - name: mdsd-run-vol
+          mountPath: {{ $.Values.mdsd.run_dir_path | quote }}
+        - name: ifx-path
+          mountPath: {{ $.Values.mdm.ifxmetrics_socket_folder_path | quote }}
+        env:
+        - name: CACHE_SERVICE_PORT
+          value: "{{ $cachePool.port }}"
+        - name: scaleUnit
+          value: "{{ $.Values.solutionInfo.scaleUnit }}"
+        - name: service
+          value: "PartnerCacheService"
+        - name: region
+          value: "{{ $.Values.solutionInfo.region }}"
+        - name: buildVersion
+          value: "{{ $.Values.partnerCacheImage.tag }}"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP 
+        - name: LOGGER_MIN_LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ $cachePool.cacheName }}-config
+              key: LOGGER_MIN_LOG_LEVEL
+        - name: DOTNET_EnableDiagnostics
+          value: "1"
+        - name: DOTNET_RUNNING_IN_CONTAINER
+          value: "true"
+        - name: DOTNET_USE_POLLING_FILE_WATCHER
+          value: "true"
+        - name: CONFIGMAP_DIR
+          value: "/config"
+        - name: OTLP_EXPORTER_TYPE
+          value: {{ $.Values.monitorInfo.exporterType }}
+        - name: MDSD_DATALABS_ENDPOINT
+          value: {{ include "otlp_endpoint.mdsd" $.Values.mdsd | trim | quote }}
+        - name: MDM_DATALABS_ENDPOINT
+          value: {{ include "otlp_endpoint.mdm" (dict "info" $.Values.mdm.accountInfo.DataLabs "Values" $.Values) | trim | quote }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ $.Values.partnerCacheService.volumeClaimName }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: {{ $.Values.partnerCacheService.storageClassName }} # `kubectl apply -f premium_zrs_disk.yaml` or azure-ultra-disk-sc.yaml before deploying the chart.
+      resources:
+        requests:
+          storage: {{ $cachePool.requestStorage | default $.Values.partnerCacheService.requestStorage | quote }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ $cachePool.cacheName }}-networkpolicy
+  namespace: {{ $.Values.cacheNameSpace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ $cachePool.cacheName }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: {{ $.Values.partnerNameSpace }}
+    - namespaceSelector:
+        matchLabels:
+          name: {{ $.Values.solutionNameSpace }}
+    ports:
+     - port: {{ $cachePool.port }}
+       protocol: TCP
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $cachePool.cacheName }}-pdb
+  namespace: {{ $.Values.cacheNameSpace }}
+  annotations:
+    meta.helm.sh/release-name: {{ $.Values.helmInfo.partnercacheserviceReleasePrefix }}{{ $indexplusone }}
+    meta.helm.sh/release-namespace: default
+  labels:
+    app.kubernetes.io/managed-by: Helm
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ $cachePool.cacheName }}
+{{- end }}
+{{- end }}

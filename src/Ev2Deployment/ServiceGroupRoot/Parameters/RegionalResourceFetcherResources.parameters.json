@@ -1,0 +1,65 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "paths": [
+        {
+            "parameterReference": "privateAKSClusterTemplateUri"
+        },
+        {
+            "parameterReference": "storageAccountTemplateUri"
+        },
+        {
+            "parameterReference": "keyvaultTemplateUri"
+        },
+        {
+            "parameterReference": "cnameTemplateUri"
+        }
+    ],
+    "parameters": {
+        "cloudName": {
+            "value": "__CLOUD_NAME__"
+        },
+        "location": {
+            "value": "__LOCATION__"
+        },
+        "regionAcronym": {
+            "value": "__REGION_ACRONYM__"
+        },
+        "adminGroupObjectIds": {
+            "value": "__ADMIN_GROUP_OBJECT_IDS__"
+        },
+        "agentpoolConfig": {
+            "value": "__PRIVATE_AKS_AGENTPOOL__"
+        },
+        "cachepoolConfig": {
+            "value": "__PRIVATE_AKS_CACHEPOOL__"
+        },
+        "maintenanceConfigurationsConfigs" : {
+            "value": "__MAINTENANCE_CONFIGURATIONS_CONFIGS__"
+        },
+        "availabilityZonesInRegion": {
+            "value": "__AVAILABILITY_ZONE_COUNT__"
+        },
+        "enableAdminService": {
+            "value": "__ENABLE_ADMIN_SERVICE__"
+        },
+        "dnsZoneName": {
+            "value": "__DNS_ZONE_NAME__"
+        },
+        "cnameSuffix": {
+            "value": "__CNAME_SUFFIX__"
+        },
+        "privateAKSClusterTemplateUri": {
+            "value": "Templates\\Common\\PrivateAksCluster.Template.json"
+        },
+        "storageAccountTemplateUri": {
+            "value": "Templates\\Common\\StorageAccount.Template.json"
+        },
+        "keyvaultTemplateUri": {
+            "value": "Templates\\Common\\KeyVault.Template.json"
+        },
+        "cnameTemplateUri": {
+            "value": "Templates\\Common\\Cname.Template.json"
+        }
+    }
+}

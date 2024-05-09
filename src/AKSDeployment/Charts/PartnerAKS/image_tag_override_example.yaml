@@ -1,0 +1,32 @@
+partnerConfig:    
+  pods:
+  - name: bcdr-solution
+    serviceName: bcdr-solution-service 
+    replicaCount: 3
+    partnerConfigMap:
+      name: bcdr-solution-config   
+    containers:
+     - name: abcpartnersolution
+       repository: datalabsintacr.azurecr.io/abcpartnersolution
+       tag: latest
+       port: 5072
+       multiResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" :  "*" 
+                      }
+
+ioImage:
+  tag: latest
+
+resourceProxyImage:
+  tag: latest
+
+socat:
+  tag: latest
+
+cacheImage:
+  tag: latest
+
+cacheService:
+  enabled: true
+    

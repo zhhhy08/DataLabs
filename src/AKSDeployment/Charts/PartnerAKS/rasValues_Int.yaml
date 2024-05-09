@@ -1,0 +1,125 @@
+# Values File for Resource Alias in INT Environment
+primaryRegionName: "p-eus"
+backupRegionName: "b-eus"
+
+solutionInfo:
+  solutionName: &solutionName rassolution
+  aksClusterName: rasinteusaks
+  environment: INT
+  region: eastus
+  scaleUnit: *solutionName
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+  # Replace Client Id with MI's Client Id
+  clientId: 795fa1e9-3a3b-4fa5-a82a-cd9f3ea2c602
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+ioConfigMap:
+  inputEventHubNameSpaceAndName: "rasinteuspremipehns0/rasinteuspremipeh"
+  backupInputEventHubNameSpaceAndName : "rasinteusbipehns0/rasinteusbipeh/00:05:00"
+  outputEventHubNameSpaceAndName: "rasinteuspremipehns0/rastestouput"
+  publishOutputToArn: "false"
+  eventHubStorageAccountName: "0rasinteusehcpsa"
+  serviceBusNameSpaceAndName: "rasinteussb0/0rasinteussbq"
+  useSourceOfTruth: "false"
+  allowedOutputTypes: "microsoft.maintenance/scheduledevents;microsoft.aliases/namespaces/types/identifiers/values"
+  outputDataset: "rassolution"
+  
+partnerConfig:    
+  pods:
+  - name: ras-solution
+    serviceName: ras-solution-service
+    replicaCount: 3
+    partnerConfigMap:
+      name: ras-solution-config
+    containers:
+     - name: raspartnersolution
+       repository: datalabsintacr.azurecr.io/raspartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" :  "*" 
+                      }
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://rfinteusaks.ras.int.eusaks:6072
+  resourceFetcherTokenResource: https://resourcefetcherservice-int.microsoft.com
+  resourceFetcherHomeTenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+  #  Client using partner Own certificate
+  partnerCertificates:
+    isEnabled: true
+    tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+    aadTokenIssuer: https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/
+    # ARG Query FrontDoor Client Related
+    qfdClient:
+      endpoints: https://arg-int-qfd.arg-int.core.windows.net/
+      certificateName: datalabs-ras-dsts-client-int-eastus-gov-rp-art-int
+      dstsSkipServerCertificateValidation: false
+      dstsClientId: 5dd01e74-18cc-44cc-b571-83454994c345
+      dstsServerId: 60e96093-40cb-4996-b293-41bd57d26baf
+      dstsClientHome: https://co2agg04-passive-dsts.dsts.core.azure-test.net/dstsv2/7a433bfc-2514-4697-b467-e0933190487f
+      dstsServerHome: https://co2agg04-passive-dsts.dsts.core.azure-test.net/dstsv2/7a433bfc-2514-4697-b467-e0933190487f
+      dstsServerRealm: ""
+
+resourceProxyServiceAccount:
+  clientId: 795fa1e9-3a3b-4fa5-a82a-cd9f3ea2c602
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+resourceProxyConfigMap:
+  getIdMappingAllowedTypes:
+    "*:qfd|2016-09-01"
+
+# Monitoring configurations
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: true
+
+genevaAccounts:
+  partner:
+    gcs_environment: Test
+    gcs_account: AliasDatalabsSlnProd
+    gcs_region: eastus
+    gcs_namespace: AliasDatalabsSlnProd
+    gcs_config_version: "2.1" 
+    miResourceId: /subscriptions/6d5b60f5-24e0-4722-acbb-ad6b9ee7675f/resourcegroups/MC_DataLabsrasRG-eastus_rasinteusaks_eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/rasinteusaks-agentpool
+  
+  datalabs:
+    gcs_environment: Test
+    gcs_account: DataLabs
+    gcs_region: eastus
+    gcs_namespace: DataLabs
+    gcs_config_version: "1.6" 
+    miResourceId: /subscriptions/6d5b60f5-24e0-4722-acbb-ad6b9ee7675f/resourcegroups/MC_DataLabsrasRG-eastus_rasinteusaks_eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/rasinteusaks-agentpool
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  metricEndpoint: https://global.ppe.microsoftmetrics.com/
+  
+  accountInfo:
+    DataLabs:
+      account: DataLabs
+      namespace: DataLabs
+    Partner: # Change accountInfo for Partner (can be the same as DataLabs)
+      account: AliasDatalabsSlnProd
+      namespace: AliasDatalabsSlnProd
+
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "DataLabs", 
+          "objectId": "a0b17759-0541-4e58-aa0c-990485178b81"
+        },
+        {
+          "account": "AliasDatalabsSlnProd",
+          "objectId": "a0b17759-0541-4e58-aa0c-990485178b81"
+        }
+      ]
+    }
+
+keyVault:
+  name: rasinteuskv
+  # azurekeyvaultsecretsprovider-rasinteusaks 
+  clientId: 99d61388-e89a-44a0-8b3c-4eed43ec1bc8

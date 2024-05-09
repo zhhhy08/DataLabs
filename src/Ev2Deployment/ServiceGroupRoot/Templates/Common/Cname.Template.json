@@ -1,0 +1,28 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "dnsZoneName": {
+            "type": "string"
+        },
+        "recordName": {
+            "type": "string"
+        },
+        "cnameAlias": {
+            "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/dnsZones/CNAME",
+            "apiVersion": "2018-05-01",
+            "name": "[concat(parameters('dnsZoneName'), '/', parameters('recordName'))]",
+            "properties": {
+                "TTL": 300,
+                "CNAMERecord": {
+                    "cname": "[parameters('cnameAlias')]"
+                }
+            }
+        }
+    ]
+}

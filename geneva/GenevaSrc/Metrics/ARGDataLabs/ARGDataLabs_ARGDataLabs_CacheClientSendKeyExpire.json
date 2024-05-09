@@ -1,0 +1,164 @@
+{
+  "bv": 10,
+  "component": "ARGDataLabs",
+  "computedMetrics": [
+    {
+      "displayName": "Average",
+      "expression": "raw.Sum / (raw.Count || 1)",
+      "expressionEngine": "",
+      "higherNumberIs": null,
+      "id": "Average",
+      "isBuiltIn": true,
+      "metricTypeId": "Average",
+      "minMaxMetricsEnabled": false,
+      "numberSuffix": null,
+      "numberType": null,
+      "percentileConfiguration": null
+    },
+    {
+      "displayName": "NullableAverage",
+      "expression": "raw.Count ? (raw.Sum / raw.Count) : null",
+      "expressionEngine": "",
+      "higherNumberIs": null,
+      "id": "NullableAverage",
+      "isBuiltIn": true,
+      "metricTypeId": "NullableAverage",
+      "minMaxMetricsEnabled": false,
+      "numberSuffix": null,
+      "numberType": null,
+      "percentileConfiguration": null
+    },
+    {
+      "displayName": "Rate",
+      "expression": "raw.Sum / 60",
+      "expressionEngine": "",
+      "higherNumberIs": null,
+      "id": "Rate",
+      "isBuiltIn": true,
+      "metricTypeId": "Rate",
+      "minMaxMetricsEnabled": false,
+      "numberSuffix": null,
+      "numberType": null,
+      "percentileConfiguration": null
+    }
+  ],
+  "deleted": false,
+  "description": "",
+  "dimensions": [
+    {
+      "id": "buildVersion"
+    },
+    {
+      "id": "CacheNode"
+    },
+    {
+      "id": "isActivityFailed"
+    },
+    {
+      "id": "NODE_NAME"
+    },
+    {
+      "id": "POD_NAME"
+    },
+    {
+      "id": "region"
+    },
+    {
+      "id": "scaleUnit"
+    },
+    {
+      "id": "service"
+    }
+  ],
+  "displayName": null,
+  "enableClientEtwPublication": true,
+  "enableClientSideForking": true,
+  "enableClientSideLastSamplingMode": false,
+  "enableClientSidePublication": true,
+  "estimationOnlyPreAggregations": [],
+  "id": "CacheClientSendKeyExpire",
+  "isFromNewPipeline": true,
+  "isQosMetric": false,
+  "lastUpdatedBy": "",
+  "lastUpdateTime": "",
+  "metrics": [
+    {
+      "displayName": "Count",
+      "expression": null,
+      "expressionEngine": null,
+      "higherNumberIs": null,
+      "id": "Count",
+      "isBuiltIn": false,
+      "metricTypeId": "Count",
+      "minMaxMetricsEnabled": false,
+      "numberSuffix": null,
+      "numberType": null,
+      "percentileConfiguration": null
+    },
+    {
+      "displayName": "Sum",
+      "expression": null,
+      "expressionEngine": null,
+      "higherNumberIs": null,
+      "id": "Sum",
+      "isBuiltIn": false,
+      "metricTypeId": "Sum",
+      "minMaxMetricsEnabled": false,
+      "numberSuffix": null,
+      "numberType": null,
+      "percentileConfiguration": null
+    }
+  ],
+  "pendingMetricsOrderingFix": false,
+  "preferQueryMetricsStore": null,
+  "replicationState": 0,
+  "scalingFactor": 1,
+  "streamingViews": [],
+  "tenant": "ARGDataLabs",
+  "treatMissingSeriesAsZeros": false,
+  "version": 0,
+  "views": [
+    {
+      "dimensions": [],
+      "displayName": "Total",
+      "distinctCountColumns": [],
+      "doNotUseCacheServer": true,
+      "exemplarsEnabled": false,
+      "isFilterBased": false,
+      "isMStoreAggregated": true,
+      "minMaxMetricsEnabled": false,
+      "percentileMetricsEnabled": false,
+      "preaggregateThrottled": false,
+      "rollupsEnabled": false,
+      "standardDeviationMetricsEnabled": false,
+      "useMetricsStore": true
+    },
+    {
+      "dimensions": [
+        "buildVersion",
+        "CacheNode",
+        "isActivityFailed",
+        "NODE_NAME",
+        "POD_NAME",
+        "region",
+        "scaleUnit",
+        "service"
+      ],
+      "disabledTimeInUtc": "",
+      "displayName": "By-buildVersion-CacheNode-isActivityFailed-NODE_NAME-POD_NAME-region-scaleUnit-service",
+      "distinctCountColumns": [],
+      "doNotUseCacheServer": true,
+      "effectiveTimeInUtc": "",
+      "exemplarsEnabled": false,
+      "isFilterBased": false,
+      "isMStoreAggregated": true,
+      "metricsStoreMigrationTimeUtc": "",
+      "minMaxMetricsEnabled": false,
+      "percentileMetricsEnabled": false,
+      "preaggregateThrottled": false,
+      "rollupsEnabled": false,
+      "standardDeviationMetricsEnabled": false,
+      "useMetricsStore": true
+    }
+  ]
+}

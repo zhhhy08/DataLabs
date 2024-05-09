@@ -1,0 +1,69 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "AcrPushOids": {
+            "type": "array"
+        },
+        "geoReplicationRegions": {
+            "type": "array",
+            "metadata":{
+                "description":"Registry replication must specify a region different from the home registry location"
+            }
+        }
+    },
+    "variables": {
+        "acrPushRoleId": "8311e382-0749-4cb8-b61a-304f252e45ec"
+    },
+    "resources": [
+        {
+            "name": "[parameters('name')]",
+            "type": "Microsoft.ContainerRegistry/registries",
+            "apiVersion": "2019-05-01",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Premium"
+            },
+        "properties": {}
+        },
+        {
+            "condition": "[greater(length(parameters('geoReplicationRegions')),0)]",
+            "type": "Microsoft.ContainerRegistry/registries/replications",
+            "apiVersion": "2019-12-01-preview",
+            "name": "[format('{0}/{1}', parameters('name'),parameters('geoReplicationRegions')[copyIndex()])]",
+            "location": "[parameters('geoReplicationRegions')[copyIndex()]]",
+        "properties": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.ContainerRegistry/registries', parameters('name'))]"
+            ],
+            "copy": {
+                "name": "geoReplicationRegionsCopy",
+                "count": "[length(parameters('geoReplicationRegions'))]"
+            }
+        },
+        {
+            "condition": false,
+            "name": "[guid(parameters('AcrPushOids')[copyIndex()].principalResourceId, parameters('location'), variables('acrPushRoleId'))]",
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2022-04-01",
+            "properties": {
+                "roleDefinitionId": "[SubscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('acrPushRoleId'))]",
+                "principalId": "[reference(parameters('AcrPushOids')[copyIndex()].principalResourceId, '2018-11-30', 'Full').properties.principalId]",
+                "principalType": "ServicePrincipal"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ContainerRegistry/registries', parameters('name'))]"
+            ],
+            "copy": {
+                "name": "RoleAssignmentCopy",
+                "count": "[length(parameters('AcrPushOids'))]"
+            }
+        }
+    ]
+}

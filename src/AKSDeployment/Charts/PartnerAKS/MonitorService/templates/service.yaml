@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: socat-endpoints-service
+  namespace: {{ .Values.monitorNameSpace }}
+spec:
+  clusterIP: None
+  selector:
+    app: {{ .Values.monitorInfo.name }}
+  ports:
+  {{- range $key, $value := .Values.socat.diagnosticEndpoints }}
+  - port: {{ $value.port }}
+    name: {{ $value.serviceName }}
+    protocol: TCP
+  {{- end }}
+---
+# Telegraf service (mdm default reads 8089 port)
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.monitorInfo.name }}
+  namespace: {{ .Values.monitorNameSpace }}
+  labels:
+    app: {{ .Values.monitorInfo.name }} # matches geneva-service daemonset
+spec:
+  type: ClusterIP
+  ports:
+    - name: mdm-influxdb-udp
+      protocol: UDP
+      port: 8089
+      targetPort: 8089
+  selector:
+    app: {{ .Values.monitorInfo.name }}

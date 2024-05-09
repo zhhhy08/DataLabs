@@ -1,0 +1,62 @@
+{
+  "$schema": "https://ev2schema.azure.net/schemas/2020-04-01/StageMap.json",
+  "name": "Datalabs.Production.Default",
+  "version": "1.0.0.0",
+  "configuration": {
+    "promotion": {
+      "manual": true,
+      "timeout": "P3D"
+    }
+  },
+  "stages": [
+    {
+      "sequence": 1,
+      "name": "Prod_Canary",
+      "regions": [
+        "eastus2euap"
+      ]
+    },
+    {
+      "sequence": 2,
+      "name": "Prod_Region1",
+      "regions": [
+        "westus3"
+      ]
+    },
+    {
+      "sequence": 3,
+      "name": "Prod_Region2",
+      "regions": [
+        "northeurope"
+      ]
+    },
+    {
+      "sequence": 4,
+      "name": "Prod_Region3",
+      "regions": [
+        "southeastasia"
+      ]
+    },
+    {
+      "sequence": 5,
+      "name": "Prod_Region4",
+      "regions": [
+        "eastus"
+      ]
+    },
+    {
+      "sequence": 6,
+      "name": "Prod_Region5",
+      "regions": [
+        "swedencentral"
+      ]
+    },
+    {
+      "sequence": 7,
+      "name": "Prod_Region6",
+      "regions": [
+        "eastasia"
+      ]
+    }
+  ]
+}

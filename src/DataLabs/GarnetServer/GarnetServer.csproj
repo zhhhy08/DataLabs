@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<Platforms>x64</Platforms>
+		<UseAppHost>false</UseAppHost>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+		<ServerGarbageCollection>true</ServerGarbageCollection>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="out\**" />
+		<EmbeddedResource Remove="out\**" />
+		<None Remove="out\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Remove="defaults.conf" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="defaults.conf">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="Dockerfile">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
+		</None>
+	</ItemGroup>
+
+	<PropertyGroup>
+		<ExcludeFromCodeCoverage>true</ExcludeFromCodeCoverage>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommandLineParser" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Configuration" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" />
+		<PackageReference Include="Microsoft.FASTER.Devices.AzureStorage" />
+		<PackageReference Include="Microsoft.Garnet" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="$(DataLabsRoot)\Common\Common.Core.csproj" />
+		<ProjectReference Include="..\PartnerCommon\Common.Partner.csproj" />
+	</ItemGroup>
+
+</Project>

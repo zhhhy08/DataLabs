@@ -1,0 +1,64 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-01-01/rolloutParameters.json",
+    "contentVersion": "1.0.0.0",
+    "shellExtensions": [
+        {
+            "name": "Run",
+            "type": "Run",
+            "properties": {
+                "maxExecutionTime": "PT50M",
+                "skipDeleteAfterExecution": "false"
+            },
+            "package": {
+                "reference": {
+                    "path": "Run.tar"
+                }
+            },
+            "launch": {
+                "command": [
+                    "/bin/bash",
+                    "/package/unarchive/AppDeploy.ResourceFetcher.sh"
+                ],
+                "environmentVariables": [
+                    {
+                        "name": "CHARTS_TAR",
+                        "reference": {
+                            "path": "charts.tar"
+                        },
+                        "asSecureValue": "true"
+                    },
+                    {
+                        "name": "DataLabsLocation",
+                        "value": "__LOCATION__"
+                    },
+                    {
+                        "name": "CloudName",
+                        "value": "__CLOUD_NAME__"
+                    },
+                    {
+                        "name": "RegionAcronym",
+                        "value": "__REGION_ACRONYM__"
+                    },
+                    {
+                        "name": "PartnerAcronym",
+                        "value": "__PARTNER_ACRONYM__"
+                    },
+                    {
+                        "name": "ValuesFilename",
+                        "value": "__VALUES_FILENAME__"
+                    },
+                    {
+                        "name": "AppName",
+                        "value": "ResourceFetcherService"
+                    }
+                ],
+                "identity": {
+                    "type": "userAssigned",
+                    "userAssignedIdentities": [
+                        "__APPS_EV2_MANAGED_IDENTITY__"
+                    ]
+                }
+            }
+        }
+    ]
+}

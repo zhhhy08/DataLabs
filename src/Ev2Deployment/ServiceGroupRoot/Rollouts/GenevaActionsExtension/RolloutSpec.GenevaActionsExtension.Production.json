@@ -1,0 +1,27 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-04-01/RegionAgnosticRolloutSpecification.json",
+    "rolloutMetadata": {
+        "serviceModelPath": "Rollouts\\GenevaActionsExtension\\DataLabs.ServiceModel.GenevaActionsExtension.Production.json",
+        "scopeBindingsPath": "ScopeBindings.json",
+        "name": "AcisServiceGroup",
+        "rolloutType": "Major",
+        "buildSource": {
+            "parameters": {
+                "versionFile": "buildver.txt"
+            }
+        },
+        "Configuration": {
+            "serviceGroupScope": {
+                "specPath": "ConfigurationSpecification\\Configuration.Production.json"
+            }
+        }
+    },
+    "orchestratedSteps": [
+        {
+            "name": "Publish",
+            "targetType": "ServiceResourceDefinition",
+            "targetName": "AcisServiceResource",
+            "actions": ["Extension/publishoperation"]
+        }
+    ]
+}

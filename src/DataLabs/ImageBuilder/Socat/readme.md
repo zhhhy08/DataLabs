@@ -1,0 +1,1 @@
+**Note**: This directory should only include Dockerfile's that are meant to build images that do not need code in the project. For example, we are using socat in our solution to communicate across pods, so we will use the socat command from the mcr.microsoft.com/cbl-mariner/base/core:2.0 instead of "alpine/socat:latest".

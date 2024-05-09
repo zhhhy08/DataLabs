@@ -1,0 +1,156 @@
+{
+  "bv": 10,
+  "component": "Mdm/Internal/HealthReports/V2",
+  "computedMetrics": [
+    {
+      "displayName": "Average",
+      "expression": "raw.Sum / (raw.Count || 1)",
+      "expressionEngine": null,
+      "higherNumberIs": null,
+      "id": "Average",
+      "isBuiltIn": true,
+      "minMaxMetricsEnabled": false,
+      "numberSuffix": null,
+      "numberType": null,
+      "percentileConfiguration": null
+    },
+    {
+      "displayName": "NullableAverage",
+      "expression": "raw.Count ? (raw.Sum / raw.Count) : null",
+      "expressionEngine": null,
+      "higherNumberIs": null,
+      "id": "NullableAverage",
+      "isBuiltIn": true,
+      "minMaxMetricsEnabled": false,
+      "numberSuffix": null,
+      "numberType": null,
+      "percentileConfiguration": null
+    },
+    {
+      "displayName": "Rate",
+      "expression": "raw.Sum / 60",
+      "expressionEngine": null,
+      "higherNumberIs": null,
+      "id": "Rate",
+      "isBuiltIn": true,
+      "minMaxMetricsEnabled": false,
+      "numberSuffix": null,
+      "numberType": null,
+      "percentileConfiguration": null
+    }
+  ],
+  "deleted": false,
+  "description": null,
+  "dimensions": [
+    {
+      "id": "ResourceName"
+    },
+    {
+      "id": "WatchdogName"
+    }
+  ],
+  "displayName": null,
+  "enableClientEtwPublication": true,
+  "enableClientSideForking": true,
+  "enableClientSideLastSamplingMode": false,
+  "enableClientSidePublication": true,
+  "id": "RunnerInstanceWatchdogReport/Unhealthy",
+  "isFromNewPipeline": true,
+  "isQosMetric": false,
+  "lastUpdatedBy": "95fbafbf4600808f97e33608f6bcad3c.metricsclient.geneva.core.windows.net",
+  "lastUpdateTime": "2023-06-10T02:03:28.1261915Z",
+  "metrics": [
+    {
+      "displayName": "Count",
+      "expression": null,
+      "expressionEngine": null,
+      "higherNumberIs": null,
+      "id": "Count",
+      "isBuiltIn": false,
+      "minMaxMetricsEnabled": false,
+      "numberSuffix": null,
+      "numberType": null,
+      "percentileConfiguration": null
+    },
+    {
+      "displayName": "Sum",
+      "expression": null,
+      "expressionEngine": null,
+      "higherNumberIs": null,
+      "id": "Sum",
+      "isBuiltIn": false,
+      "minMaxMetricsEnabled": false,
+      "numberSuffix": null,
+      "numberType": null,
+      "percentileConfiguration": null
+    }
+  ],
+  "monitors": null,
+  "pendingMetricsOrderingFix": false,
+  "preferQueryMetricsStore": null,
+  "replicationState": 0,
+  "tenant": "ARGDataLabs",
+  "treatMissingSeriesAsZeros": false,
+  "version": 0,
+  "views": [
+    {
+      "dimensions": [],
+      "displayName": "Total",
+      "distinctCountColumns": null,
+      "doNotUseCacheServer": true,
+      "effectiveTimeInUtc": "2023-06-10T02:33:28.1261915Z",
+      "isMStoreAggregated": true,
+      "minMaxMetricsEnabled": false,
+      "percentileMetricsEnabled": false,
+      "preaggregateIdentifier": {
+        "hashHigh": -2917188434888930300,
+        "hashLow": 1492513316977680000
+      },
+      "preaggregateThrottled": false,
+      "rollupsEnabled": false,
+      "useMetricsStore": true
+    },
+    {
+      "dimensions": [
+        "ResourceName",
+        "WatchdogName"
+      ],
+      "displayName": "ResourceName/WatchdogName",
+      "distinctCountColumns": null,
+      "doNotUseCacheServer": true,
+      "effectiveTimeInUtc": "2023-06-10T02:33:28.1261915Z",
+      "isMStoreAggregated": true,
+      "minMaxMetricsEnabled": false,
+      "percentileMetricsEnabled": false,
+      "preaggregateIdentifier": {
+        "hashHigh": 5255741467956969000,
+        "hashLow": 5931367966446570000
+      },
+      "preaggregateThrottled": false,
+      "rollupsEnabled": false,
+      "useMetricsStore": true
+    },
+    {
+      "dimensions": [
+        "Environment",
+        "RunnerInstance",
+        "RunnerName",
+        "WatchdogName"
+      ],
+      "displayName": "Environment/RunnerName/RunnerInstance/WatchdogName",
+      "distinctCountColumns": null,
+      "doNotUseCacheServer": true,
+      "effectiveTimeInUtc": "2023-06-10T02:33:28.1261915Z",
+      "isMStoreAggregated": true,
+      "minMaxMetricsEnabled": false,
+      "percentileMetricsEnabled": false,
+      "preaggregateIdentifier": {
+        "hashHigh": 3751043370234017300,
+        "hashLow": 5363752129095457000
+      },
+      "preaggregateThrottled": false,
+      "rollupsEnabled": false,
+      "useMetricsStore": true
+    }
+  ]
+}

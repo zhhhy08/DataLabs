@@ -1,0 +1,165 @@
+# Values File for Azores in INT Environment
+primaryRegionName: "p-eus"
+backupRegionName: "b-eus"
+
+solutionInfo:
+  solutionName: &solutionName azrsolution
+  aksClusterName: azrinteusaks
+  environment: INT
+  region: eastus
+  scaleUnit: *solutionName
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+  # Replace Client Id with MI's Client Id
+  clientId: cebda750-9381-4553-8d4b-4f120831fa81
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+ioConfigMap:
+  inputEventHubNameSpaceAndName: "azrinteusipehns0/0azrinteusipeh;azrinteusipehns0/azrinteusipeh;azrinteuspremipehns0/0azrinteuspremipeh;azrinteuspremipehns0/azrinteuspremipeh" 
+  backupInputEventHubNameSpaceAndName : "azrinteusbipehns0/0azrinteusbipeh/00:05:00;azrinteusbipehns0/azrinteusbipeh/00:05:00"
+  startBackupInputProvidersAtStartup : false
+  outputEventHubNameSpaceAndName: ""
+  eventHubStorageAccountName: "0azrinteusehcpsa"
+  useSourceOfTruth: "false"
+  blobStorageAccountNames: ""
+  backupBlobStorageAccountNames: ""
+  serviceBusNameSpaceAndName: "azrinteussb0/0azrinteussbq"
+  outputDataset: "azores"
+  globalConcurrency: "2000"
+  inputChannelConcurrency: "30"
+  allowedOutputTypes: "microsoft.resilience/resiliencestates"
+  arnPublishStorageAccountNames: "0azrinteusarnpsa;1azrinteusarnpsa"
+  arnPublishEventGridDomainIds: "/subscriptions/6d5b60f5-24e0-4722-acbb-ad6b9ee7675f/resourceGroups/DataLabsazrRG-eastus/providers/Microsoft.EventGrid/domains/azrinteusapeg1"
+  arnPublishEventGridDomainEndpoints: "https://azrinteusapeg1.eastus-1.eventgrid.azure.net/api/events"
+  arnPublishEventGridTopics: "/subscriptions/6d5b60f5-24e0-4722-acbb-ad6b9ee7675f/resourceGroups/DataLabsazrRG-eastus/providers/Microsoft.EventGrid/domains/azrinteusapeg1/topics/arnpublishtopic"
+  pairedRegionArnPublishEventGridDomainIds: "/subscriptions/6d5b60f5-24e0-4722-acbb-ad6b9ee7675f/resourceGroups/DataLabsazrRG-eastus/providers/Microsoft.EventGrid/domains/azrinteusapeg1"
+  pairedRegionArnPublishEventGridDomainEndpoints: https://azrinteusapeg1.eastus-1.eventgrid.azure.net/api/events"
+  pairedRegionArnPublishEventGridTopics:  "/subscriptions/6d5b60f5-24e0-4722-acbb-ad6b9ee7675f/resourceGroups/DataLabsazrRG-eastus/providers/Microsoft.EventGrid/domains/azrinteusapeg1/topics/arnpublishtopic"
+  inputCacheTypes: microsoft.compute/disks;microsoft.network/virtualnetworks;microsoft.network/publicipaddresses;microsoft.network/networkinterfaces"
+  defaultInputCacheTTL: "2.00:00:00"
+  defaultOutputCacheTTL: "01:00:00"
+  defaultNotFoundEntryCacheTTL: "01:00:00"
+  resourceTypeCacheTTLMappings:
+    "microsoft.compute/disks|2.00:00:00;
+    microsoft.network/virtualnetworks|2.00:00:00;
+    microsoft.network/publicipaddresses|2.00:00:00;
+    microsoft.network/networkinterfaces|2.00:00:00"
+
+cacheService:
+  enabled: true
+  requestMemory: 12Gi
+  requestStorage: 64Gi
+  storageClassName: managed-csi
+  volumeClaimName: data
+  maxMainStoreMemory: 8g
+  maxHashIndexMemory: 2g
+  maxCompactionSegments: 32
+  cacheConfigMap:
+    checkPointIntervalDuration: "00:15:00"
+  cachePools:
+  - cacheName: iocache
+    readEnabled: true
+    writeEnabled: true
+    nodePoolName: agentpool
+    nodeCount: 3
+    port: 3278
+    nodeReplication:
+    startOffset: 0
+
+partnerConfig:    
+  pods:
+  - name: azr-solution
+    serviceName: azr-solution-service 
+    replicaCount: 3
+    partnerConfigMap:
+      name: azr-solution-config   
+    containers:
+     - name: azrpartnersolution
+       repository: datalabsintacr.azurecr.io/azorespartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" :  "*" 
+                      }
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://rfinteusaks.azr.int.eusaks:6072
+  resourceFetcherTokenResource: https://resourcefetcherservice-int.microsoft.com
+  resourceFetcherHomeTenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+resourceProxyConfigMap:
+  getResourceAllowedTypes:
+    "microsoft.compute/disks:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.network/virtualnetworks:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.network/publicipaddresses:cache|write|addNotFound,resourcefetcher_arm;
+     microsoft.network/networkinterfaces:cache|write|addNotFound,resourcefetcher_arm;"
+   
+
+resourceProxyServiceAccount:
+  clientId: cebda750-9381-4553-8d4b-4f120831fa81
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+# Monitoring configurations
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: false
+
+genevaAccounts:
+  partner:
+    gcs_environment: Test
+    gcs_account: DataLabs
+    gcs_region: eastus
+    gcs_namespace: DataLabs
+    gcs_config_version: "1.6" 
+    miResourceId: /subscriptions/6d5b60f5-24e0-4722-acbb-ad6b9ee7675f/resourcegroups/MC_DataLabsazrRG-eastus_azrinteusaks_eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/azrinteusaks-agentpool
+
+  datalabs:
+    gcs_environment: Test
+    gcs_account: DataLabs
+    gcs_region: eastus
+    gcs_namespace: DataLabs
+    gcs_config_version: "1.6" 
+    miResourceId: /subscriptions/6d5b60f5-24e0-4722-acbb-ad6b9ee7675f/resourcegroups/MC_DataLabsazrRG-eastus_azrinteusaks_eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/azrinteusaks-agentpool
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  metricEndpoint: https://global.ppe.microsoftmetrics.com/
+  
+  accountInfo:
+    DataLabs:
+      account: DataLabs
+      namespace: DataLabs
+    Partner: # Change accountInfo for Partner (can be the same as DataLabs)
+      account: DataLabs
+      namespace: DataLabs
+
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "DataLabs",
+          "objectId": "3da28355-adf7-47bb-a95e-32763ec3ff75"
+        },
+        {
+          "account": "DataLabs",
+          "objectId": "3da28355-adf7-47bb-a95e-32763ec3ff75"
+        }
+      ]
+    }
+
+keyVault:
+  name: azrinteuskv
+  clientId: 4c93e9b0-d2cc-4663-9d73-782fca41bb8b
+
+adminService:
+  isEnabled: false
+  sslSecretProvider:
+    certificateName: azrinteuskv-ssl
+
+adminServiceConfigMap:
+  dstsRealm: realm://dsts.core.azure-test.net/
+  dstsName: co2agg04-dsts.dsts.core.azure-test.net
+  serviceDns: int.datalabs.core.windows.net
+  allowedActors: GenevaActionsTest,acisTestTodSMSTest,GenevaActionsDelegatedAuthNonProd

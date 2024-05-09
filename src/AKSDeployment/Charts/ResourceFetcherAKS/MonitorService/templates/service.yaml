@@ -1,0 +1,17 @@
+# Telegraf service (mdm default reads 8089 port)
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.monitorInfo.name }}
+  namespace: {{ .Values.monitorNameSpace }}
+  labels:
+    name: {{ .Values.monitorInfo.name }} # matches geneva-service daemonset
+spec:
+  type: ClusterIP
+  ports:
+    - name: mdm-influxdb-udp
+      protocol: UDP
+      port: 8089
+      targetPort: 8089
+  selector:
+    name: {{ .Values.monitorInfo.name }}

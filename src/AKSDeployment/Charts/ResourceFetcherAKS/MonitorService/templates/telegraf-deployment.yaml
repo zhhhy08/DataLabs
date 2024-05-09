@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: telegraf-kubernetes
+  namespace: monitor-namespace
+spec:
+  selector:
+    matchLabels:
+      app: telegraf-kubernetes
+  template:
+    metadata:
+      labels:
+        app: telegraf-kubernetes
+      annotations:
+        deploymentRollingRandomNumber: {{ randAlphaNum 32 | quote }}
+    spec:
+      volumes:
+        - name: {{ .Values.telegraf.kubernetesVolume.name }}-kubernetes
+          configMap:
+            name: {{ .Values.telegraf.configMapName }}-kubernetes
+        - name: ifx-path
+          hostPath:
+            path: /var/etw
+      containers:
+        # Telegraf kubernetes platform metrics
+        - name: {{ .Values.telegraf.containerName }}
+          image: {{ .Values.telegraf.repository }}:{{ .Values.telegraf.tag }}
+          imagePullPolicy: Always
+          env:
+          - name: REGION
+            value: {{ .Values.solutionInfo.region }}
+          - name: SCALE_UNIT
+            value: {{ .Values.solutionInfo.scaleUnit }}
+          - name: COMPONENT
+            value: {{ .Values.telegraf.component }}
+          - name: SERVICE
+            value: {{ .Values.telegraf.service }}
+          - name: HOST_IP  # Connect to kubelet
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          volumeMounts:
+          - name: {{ .Values.telegraf.kubernetesVolume.name }}-kubernetes
+            mountPath: {{ .Values.telegraf.kubernetesVolume.path }}
+          - name: ifx-path
+            mountPath: /var/etw
+          resources:
+            limits:
+              cpu: {{ .Values.telegraf.limits.cpu }}
+              memory: {{ .Values.telegraf.limits.memory }}
+            requests:
+              cpu: {{ .Values.telegraf.requests.cpu }}
+              memory: {{ .Values.telegraf.requests.memory }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telegraf-kube-inventory
+  namespace: {{ .Values.monitorNameSpace }}
+spec:
+  replicas: 1 # only need 1 for single cluster
+  selector:
+    matchLabels:
+      app: telegraf-kube-inventory
+  template:
+    metadata:
+      labels:
+        app: telegraf-kube-inventory
+      annotations:
+        deploymentRollingRandomNumber: {{ randAlphaNum 32 | quote }}
+    spec:
+      volumes:
+        - name: {{ .Values.telegraf.kubernetesVolume.name }}-akscluster
+          configMap:
+            name: {{ .Values.telegraf.configMapName }}-akscluster
+      containers:
+        - name: telegraf-kube-inventory
+          image: telegraf:{{ .Values.telegraf.tag }}
+          env:
+          - name: REGION
+            value: {{ .Values.solutionInfo.region }}
+          - name: SCALE_UNIT
+            value: {{ .Values.solutionInfo.scaleUnit }}
+          - name: COMPONENT
+            value: {{ .Values.telegraf.component }}
+          - name: SERVICE
+            value: {{ .Values.telegraf.service }}
+          - name: HOST_IP  # Connect to kubelet
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          volumeMounts:
+            - name: {{ .Values.telegraf.kubernetesVolume.name }}-akscluster
+              mountPath: {{ .Values.telegraf.kubernetesVolume.path }}
+              readOnly: true
+          resources:
+            limits:
+              cpu: {{ .Values.telegraf.limits.cpu }}
+              memory: {{ .Values.telegraf.limits.memory }}
+            requests:
+              cpu: {{ .Values.telegraf.requests.cpu }}
+              memory: {{ .Values.telegraf.requests.memory }}

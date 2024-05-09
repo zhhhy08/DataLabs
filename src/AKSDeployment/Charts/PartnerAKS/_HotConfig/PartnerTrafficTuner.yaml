@@ -1,0 +1,19 @@
+﻿# Usage: 
+# set RESOURCE_GROUP "DataLabsabcRG-eastus"
+# set AKS_NAME "abcinteusaks"
+# Invoke-AzAksRunCommand -ResourceGroupName ${RESOURCE_GROUP} -Name ${AKS_NAME} -Force -Command "kubectl patch configmap solution-io-config -n solution-namespace --type merge --patch-file PartnerTrafficTuner.yaml" -CommandContextAttachment "PartnerTrafficTuner.yaml" 
+
+# current value as in bcdrValues_Prod_eus.yaml except stopalltenants, update as needed before run
+
+# allowalltenants and stopalltenants cannot be both false for any traffic tuner rule unless Included subscriptions, excluded subscriptions or included regions list is filled
+# allowalltenants is first priority, stopalltenants is second priority
+
+data:
+    PartnerTrafficTunerRule:
+        "allowalltenants: false;
+        stopalltenants: true;
+        includedregions:;
+        includedsubscriptions:;
+        excludedsubscriptions:;
+        excludedresourcetypes:;
+        messageretrycutoffcount: 12"

@@ -1,0 +1,158 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.ioService.name }}
+  namespace: {{ .Values.solutionNameSpace }}
+spec:
+  replicas: {{ .Values.ioService.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  minReadySeconds: {{ .Values.ioService.minReadySeconds }}
+  selector:
+    matchLabels:
+      app: {{ .Values.ioService.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.ioService.name }}
+        azure.workload.identity/use: "true"
+    spec:
+      nodeSelector:
+        "agentpool": {{ .Values.agentPoolName }}
+      serviceAccountName: {{ .Values.ioServiceAccount.name }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values: 
+                - {{ .Values.ioService.name }}
+            topologyKey: kubernetes.io/hostname
+      volumes:
+      {{- if .Values.resourceProxyService.partnerCertificates.isEnabled }}
+      - name: dsts-secret-store-inline
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: {{ .Values.resourceProxyService.partnerCertificates.secretProviderClassName }}
+      {{- end }}
+      - name: config-volume
+        configMap:
+          name: {{ .Values.ioConfigMap.name }}
+      - name: mdsd-run-vol  # connects with monitor pod for logs/traces
+        hostPath:
+          path: {{ .Values.mdsd.hostPathPath | quote }}
+      - name: ifx-path      # connects with monitor pod for metrics
+        hostPath:
+          path: {{ .Values.mdm.ifxmetrics_socket_folder_hostPath | quote }}
+      containers:
+      - name: {{ .Values.ioImage.name }}
+        image: {{ .Values.ioImage.repository }}:{{ .Values.ioImage.tag }}
+        imagePullPolicy: {{ .Values.ioImage.pullPolicy }}
+        resources:
+          requests:
+            memory: {{ .Values.ioImage.requestMemory | quote }}
+          limits:
+            memory: {{ .Values.ioImage.maxMemorySize | quote }}
+        volumeMounts:
+        {{- if  .Values.resourceProxyService.partnerCertificates.isEnabled }}
+        - name: dsts-secret-store-inline
+          mountPath: /secrets-store
+          readOnly: true
+        {{- end }}
+        - name: config-volume
+          mountPath: "/config"
+          readOnly: true
+        - name: mdsd-run-vol
+          mountPath: {{ .Values.mdsd.run_dir_path | quote }}
+        - name: ifx-path
+          mountPath: {{ .Values.mdm.ifxmetrics_socket_folder_path | quote }}
+        ports:
+        - containerPort: {{ .Values.adminService.adminPort }}
+        env:
+        - name: scaleUnit
+          value: "{{ .Values.solutionInfo.scaleUnit }}"
+        - name: service
+          value: "IOService"
+        - name: region
+          value: "{{ .Values.solutionInfo.region }}"
+        - name: buildVersion
+          value: "{{ .Values.ioImage.tag }}"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP 
+        - name: LOGGER_MIN_LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.ioConfigMap.name }}
+              key: LOGGER_MIN_LOG_LEVEL
+        - name: DOTNET_EnableDiagnostics
+          value: "1"
+        - name: DOTNET_RUNNING_IN_CONTAINER
+          value: "true"
+        - name: DOTNET_USE_POLLING_FILE_WATCHER
+          value: "true"
+        - name: CONFIGMAP_DIR
+          value: "/config"
+        - name: OTLP_EXPORTER_TYPE
+          value: {{ .Values.monitorInfo.exporterType }}
+        - name: MDSD_DATALABS_ENDPOINT
+          value: {{ include "otlp_endpoint.mdsd" .Values.mdsd | trim | quote }}
+        - name: MDM_DATALABS_ENDPOINT
+          value: {{ include "otlp_endpoint.mdm" (dict "info" .Values.mdm.accountInfo.DataLabs "Values" .Values) | trim | quote }}
+        - name: SECRETS_STORE_DIR
+          value: "/secrets-store"
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.ioService.name }}-networkpolicy
+  namespace: {{ .Values.solutionNameSpace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Values.ioService.name }}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: {{ .Values.adminServiceNameSpace }}
+      podSelector:
+        matchLabels:
+          app: {{ .Values.adminService.deployment.labels.app }}
+    ports:
+     - port: {{ .Values.adminService.adminPort }}
+       protocol: TCP
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name:  {{ .Values.ioService.name }}-pdb
+  namespace: {{ .Values.solutionNameSpace }}
+  annotations:
+    meta.helm.sh/release-name: {{ .Values.helmInfo.ioserviceRelease }}
+    meta.helm.sh/release-namespace: default
+  labels:
+    app.kubernetes.io/managed-by: Helm
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.ioService.name }}

@@ -1,0 +1,19 @@
+{
+  "Debug_DoNotUseMeters": "true",
+
+  "SolutionName": "testsolution",
+  "PrimaryRegionName": "testprimary",
+  "BackupRegionName": "testbackup",
+  "UseSourceOfTruth": "false",
+
+  "EnableGrpcTrace": "true",
+  "EnableHttpClientTrace": "true",
+  "EnableAzureSDKActivity": "true",
+  "ResourceProxyCallMaxTimeOutInSec": "120/240",
+
+  "CachePoolDomain": "localhost",
+  "CacheNumPools": "1",
+  "CachePool-0": "CacheName=test;ReadEnabled=true;WriteEnabled=true;NodeCount=1;Port=3278;StartOffset=0;NodeSelectionMode=JumpHash",
+  "CachePoolConnectionsOption-0": "NumConnections=4;ConnectRetry=0;ConnectTimeout=00:00:10;OperationTimeout=00:10:00"
+}
+

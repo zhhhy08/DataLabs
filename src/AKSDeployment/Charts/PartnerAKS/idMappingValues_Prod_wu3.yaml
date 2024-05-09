@@ -1,0 +1,130 @@
+# Values File for IDMapping in prod wu3 Environment
+agentPoolName: agentpool2
+primaryRegionName: wu3
+backupRegionName: eus
+
+solutionInfo:
+  solutionName: &solutionName idmapping
+  aksClusterName: idmprodwu3aks
+  environment: Prod
+  region: westus3
+  scaleUnit: *solutionName
+
+ioService:
+  replicaCount: 5 # override from dataLabServices.yaml
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+#MI of idm partner
+  clientId: 0d27a978-3ca2-4d6b-9fa6-031e2c34bfb0
+  tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+
+ioConfigMap:
+  inputEventHubNameSpaceAndName: "idmprodwu3pipehns0/idmprodwu3pipeh;idmprodwu3pipehns1/idmprodwu3pipeh"
+  outputEventHubNameSpaceAndName: "idmprodwu3opehns0/idmprodwu3opeh"
+  eventHubStorageAccountName: "0idmprodwu3ehcpsa"
+  blobStorageAccountNames: "" # No source of truth
+  backupInputEventHubNameSpaceAndName: "idmprodwu3bpipehns0/idmprodwu3bpipeh/00:05:00;idmprodwu3bpipehns1/idmprodwu3bpipeh/00:05:00"
+  backupBlobStorageAccountNames: ""
+  serviceBusNameSpaceAndName: "idmprodwu3sb0/0idmprodwu3sbq;idmprodwu3sb1/1idmprodwu3sbq"
+  outputDataset: 'idmapping'
+  useSourceOfTruth: 'false'
+  allowedOutputTypes: "microsoft.idmapping/identifiers"
+  arnPublishStorageAccountNames: "0idmprodwu3arnpsa;1idmprodwu3arnpsa;2idmprodwu3arnpsa;3idmprodwu3arnpsa;4idmprodwu3arnpsa;5idmprodwu3arnpsa"
+  arnPublishEventGridDomainIds: "/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-westus3/providers/Microsoft.EventGrid/domains/idmprodwu3apeg1;/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-westus3/providers/Microsoft.EventGrid/domains/idmprodwu3apeg2"
+  arnPublishEventGridDomainEndpoints: "https://idmprodwu3apeg1.westus3-1.eventgrid.azure.net/api/events;https://idmprodwu3apeg2.westus3-1.eventgrid.azure.net/api/events"
+  arnPublishEventGridTopics: "/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-westus3/providers/Microsoft.EventGrid/domains/idmprodwu3apeg1/topics/arnpublishtopic;/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-westus3/providers/Microsoft.EventGrid/domains/idmprodwu3apeg2/topics/arnpublishtopic"
+  pairedRegionArnPublishEventGridDomainIds: "/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-eastus/providers/Microsoft.EventGrid/domains/idmprodeusapeg1;/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-eastus/providers/Microsoft.EventGrid/domains/idmprodeusapeg2"
+  pairedRegionArnPublishEventGridDomainEndpoints: "https://idmprodeusapeg1.eastus-1.eventgrid.azure.net/api/events;https://idmprodeusapeg2.eastus-1.eventgrid.azure.net/api/events"
+  pairedRegionArnPublishEventGridTopics: "/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-eastus/providers/Microsoft.EventGrid/domains/idmprodeusapeg1/topics/arnpublishtopic;/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-eastus/providers/Microsoft.EventGrid/domains/idmprodeusapeg2/topics/arnpublishtopic"
+  outputChannelBufferDelay: "100"
+
+partnerConfig:    
+  pods:
+  - name: idmapping-solution
+    serviceName: idmapping-solution-service
+    replicaCount: 5
+    partnerConfigMap:
+      name: idmapping-solution-config    
+    containers:
+     - name: idmpartnersolution
+       repository: datalabsprodacr.azurecr.io/idmpartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" : "*"
+                      }
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://rfprodwu3aks.abc.prod.wu3aks:6072
+
+resourceProxyServiceAccount: 
+# MI of idm partner
+  clientId: 0d27a978-3ca2-4d6b-9fa6-031e2c34bfb0
+
+cacheService:
+  enabled: false
+
+# Monitoring Information
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: true
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGDataLabs
+    gcs_region: westus3
+    gcs_namespace: ARGDataLabs
+    gcs_config_version: "1.6"
+    miResourceId: /subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourcegroups/MC_DataLabsidmRG-westus3_idmprodwu3aks_westus3/providers/Microsoft.ManagedIdentity/userAssignedIdentities/idmprodwu3aks-agentpool
+  partner:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGIdMapping
+    gcs_region: westus3
+    gcs_namespace: ARGIdMapping
+    gcs_config_version: "3.1"
+    miResourceId: /subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourcegroups/MC_DataLabsidmRG-westus3_idmprodwu3aks_westus3/providers/Microsoft.ManagedIdentity/userAssignedIdentities/idmprodwu3aks-agentpool
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  # metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: ARGDataLabs
+      namespace: ARGDataLabs
+    Partner: 
+      account: ARGIdMapping
+      namespace: ARGIdMapping
+
+  # objectId of idm aks-agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "ARGDataLabs",
+          "objectId": "76f91273-03bb-4071-b56b-910ed86ca690"
+        },
+        {
+          "account": "ARGIdMapping", 
+          "objectId": "76f91273-03bb-4071-b56b-910ed86ca690"
+        }
+      ]
+    }
+
+keyVault:
+  name: idmprodwu3kv
+  clientId: 0795cce0-bca6-4db9-abd8-c81721adb69f
+
+adminService:
+  isEnabled: true
+  sslSecretProvider:
+    certificateName: idmprodwu3aks-ssl
+
+adminServiceConfigMap:
+  dstsRealm: realm://dsts.core.windows.net/
+  dstsName: prod-dsts.dsts.core.windows.net
+  serviceDns: prod.datalabs.core.windows.net
+  allowedActors: GenevaActionsPublicPrimary,GenevaActionsPublicSecondary,GenevaActionsPublicWestUs

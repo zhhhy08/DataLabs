@@ -1,0 +1,217 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.ioConfigMap.name }}
+  namespace: {{ .Values.solutionNameSpace }}
+data:
+  SolutionName: {{ .Values.solutionInfo.solutionName | quote }}
+
+# TimeOut Related
+  InputEventHubTaskTimeOutDuration: {{ .Values.ioConfigMap.inputEventHubTaskTimeOutDuration | default "00:01:00" | quote }}
+  InputEventHubMessageMaxDurationWithoutCheckPoint: {{ .Values.ioConfigMap.inputEventHubMessageMaxDurationWithoutCheckPoint | default "00:02:00" | quote }}
+  PartnerBlobCallMaxTimeOutInSec: {{ .Values.ioConfigMap.partnerBlobCallMaxTimeOutInSec | default "5/20" | quote }}
+  OutputBlobUploadMaxTimeOutInSec: {{ .Values.ioConfigMap.outputBlobUploadMaxTimeOutInSec | default "5/15" | quote }}
+  OutputBlobDownloadMaxTimeOutInSec: {{ .Values.ioConfigMap.outputBlobDownloadMaxTimeOutInSec | default "5/15" | quote }}
+  ServiceBusMaxAutoRenewDuration: {{ .Values.ioConfigMap.serviceBusMaxAutoRenewDuration | default "00:05:00" | quote }}
+  ServiceBusRetryQueueTaskTimeOutDuration: {{ .Values.ioConfigMap.serviceBusRetryQueueTaskTimeOutDuration | default "00:02:00" | quote }}
+  ServiceBusSubJobQueueTaskTimeOutDuration: {{ .Values.ioConfigMap.serviceBusSubJobQueueTaskTimeOutDuration | default "00:03:00" | quote }}
+
+# Region
+  PrimaryRegionName: {{ .Values.primaryRegionName | quote }}
+  BackupRegionName: {{ .Values.backupRegionName | quote }}
+  
+# Storage Accounts
+  EventHubStorageAccountName: {{ .Values.ioConfigMap.eventHubStorageAccountName | quote }}
+  BlobStorageAccountNames: {{ .Values.ioConfigMap.blobStorageAccountNames | quote }}
+  BackupBlobStorageAccountNames: {{ .Values.ioConfigMap.backupBlobStorageAccountNames | quote }}
+  BlobStorageLogsEnabled: {{ .Values.ioConfigMap.blobStorageLogsEnabled | default false | quote }}
+  BlobStorageTraceEnabled: {{ .Values.ioConfigMap.blobStorageTraceEnabled | default false | quote }}
+  StorageSuffix: {{ .Values.commonConfig.storageSuffix | quote }}
+
+# Input EventHubs
+  InputEventHubPartitions: {{ .Values.ioConfigMap.inputEventHubPartitions | default 60 | quote }}
+  InputEventHubNameSpaceAndName: {{ .Values.ioConfigMap.inputEventHubNameSpaceAndName | quote }}
+  InputEventHubConsumerGroup: {{ .Values.ioConfigMap.inputEventHubConsumerGroup | default "$Default" | quote }}
+  InputEventHubCheckPointIntervalInSec: {{ .Values.ioConfigMap.inputEventHubCheckPointIntervalInSec | default 20 | quote }}
+  InputEventHubCheckPointTimeoutInSec: {{ .Values.ioConfigMap.inputEventHubCheckPointTimeoutInSec | default 10 | quote }}
+  InputChannelActive: {{ .Values.ioConfigMap.inputChannelActive | default "" | quote }}
+  BackupInputEventHubNameSpaceAndName: {{ .Values.ioConfigMap.backupInputEventHubNameSpaceAndName | quote }}
+  BackupInputChannelActive: {{ .Values.ioConfigMap.backupInputChannelActive | default "" | quote }}
+  StartBackupInputProvidersAtStartup: {{ .Values.ioConfigMap.startBackupInputProvidersAtStartup | default false | quote }}
+
+# Output EventHubs
+  OutputEventHubNameSpaceAndName: {{ .Values.ioConfigMap.outputEventHubNameSpaceAndName | quote }}
+  OutputDataset: {{ .Values.ioConfigMap.outputDataset | quote }}
+  EventHubWriteFailRetryDelayInMsec: {{ .Values.ioConfigMap.eventHubWriteFailRetryDelayInMsec | default 1000 | quote }}
+  EventHubWriterMaxRetry: {{ .Values.ioConfigMap.eventHubWriterMaxRetry | default 3 | quote }}
+  EventHubWriterDelayInMsec: {{ .Values.ioConfigMap.eventHubWriterDelayInMsec | default 800 | quote }}
+  EventHubWriterMaxDelayPerAttempInSec: {{ .Values.ioConfigMap.eventHubWriterMaxDelayPerAttempInSec | default 5 | quote }}
+  EventHubWriterMaxTimePerAttempInSec: {{ .Values.ioConfigMap.eventHubWriterMaxTimePerAttempInSec | default 5 | quote }}
+  EventHubMaxOutputSize: {{ .Values.ioConfigMap.eventHubMaxOutputSize | default 512000 | quote }}
+  EventHubConnectionRefreshDuration: {{ .Values.ioConfigMap.eventHubConnectionRefreshDuration | default "00:00:30" | quote }}
+
+# ServiceBus
+  ServiceBusNameSpaceAndName: {{ .Values.ioConfigMap.serviceBusNameSpaceAndName | quote }}
+  ServiceBusRetryQueueConcurrency: {{ .Values.ioConfigMap.serviceBusRetryQueueConcurrency | default 20 | quote }}
+  ServiceBusRetryQueuePrefetchCount: {{ .Values.ioConfigMap.serviceBusRetryQueuePrefetchCount | default 300 | quote }}
+  ServiceBusSubJobQueueName: {{ .Values.ioConfigMap.serviceBusSubJobQueueName | default "subjob" | quote }}
+  ServiceBusSubJobQueueConcurrency: {{ .Values.ioConfigMap.serviceBusSubJobQueueConcurrency | default 10 | quote }}
+  ServiceBusSubJobQueuePrefetchCount: {{ .Values.ioConfigMap.serviceBusSubJobQueuePrefetchCount | default 100 | quote }}
+  ServiceBusWriterMaxRetry: {{ .Values.ioConfigMap.serviceBusWriterMaxRetry | default 3 | quote }}
+  ServiceBusWriterDelayInMsec: {{ .Values.ioConfigMap.serviceBusWriterDelayInMsec | default 800 | quote }}
+  ServiceBusWriterMaxDelayPerAttempInSec: {{ .Values.ioConfigMap.serviceBusWriterMaxDelayPerAttempInSec | default 3 | quote }}
+  ServiceBusWriterMaxTimePerAttempInSec: {{ .Values.ioConfigMap.serviceBusWriterMaxTimePerAttempInSec | default 5 | quote }}
+  ServiceBusConnectionRefreshDuration: {{ .Values.ioConfigMap.serviceBusConnectionRefreshDuration | default "00:00:30" | quote }}
+  ChainedRetryBackOffInfo: {{ .Values.ioConfigMap.chainedRetryBackOffInfo | default "6;00:00:01;1.00:00:00;00:00:30;6;01:00:00;05:20:00;01:00:00" | quote }}
+  PartnerStreamingThresholdForRetry: {{ .Values.ioConfigMap.partnerStreamingThresholdForRetry | default "20" | quote }} 
+  PartnerStreamingInputRetryDelayMS: {{ .Values.ioConfigMap.partnerStreamingInputRetryDelayMS | default "200" | quote }} 
+  PartnerStreamingTaskTimeOutInSec: {{ .Values.ioConfigMap.partnerStreamingTaskTimeOutInSec | default "30" | quote }} 
+
+# Batch Writer Related
+# In code, constant is defined <XXXX> with suffix BatchWriterTimeOutInsec. Search "BatchWriterTimeOutInsec" in the code
+  EventHubBatchWriterTimeOutInSec: {{ .Values.ioConfigMap.eventHubBatchWriterTimeOutInSec | default 10 | quote }}
+  RetryQueueBatchWriterTimeOutInSec: {{ .Values.ioConfigMap.retryQueueBatchWriterTimeOutInSec | default 10 | quote }}
+  PoisonQueueBatchWriterTimeOutInSec: {{ .Values.ioConfigMap.poisonQueueBatchWriterTimeOutInSec | default 10 | quote }}
+  ArnPublishBatchWriterTimeOutInSec: {{ .Values.ioConfigMap.arnPublishBatchWriterTimeOutInSec | default 10 | quote }}
+  SubJobQueueBatchWriterTimeOutInSec: {{ .Values.ioConfigMap.subJobQueueBatchWriterTimeOutInSec | default 10 | quote }}
+# In code, constant is defined <XXXX> with suffix BatchMaxSize. Search "BatchMaxSize" in the code
+  EventHubBatchMaxSize: {{ .Values.ioConfigMap.eventHubBatchMaxSize | default 200 | quote }}
+  RetryQueueBatchMaxSize: {{ .Values.ioConfigMap.retryQueueBatchMaxSize | default 200 | quote }}
+  PoisonQueueBatchMaxSize: {{ .Values.ioConfigMap.poisonQueueBatchMaxSize | default 200 | quote }}
+  SubJobQueueBatchMaxSize: {{ .Values.ioConfigMap.subJobQueueBatchMaxSize | default 200 | quote }}
+
+# GRPC Related  
+  PartnerSolutionGrpcOption: {{ .Values.ioConfigMap.partnerSolutionGrpcOption | default "" | quote }}
+
+  # Maps single response resource types to the partner channel eg) { "resourceTypes": "type1,type2", "eventTypes": "type3/write,type4/write|delete", partnerChannelAddress: "partnerAddr", "PartnerChannelName":"channelName"}
+  PartnerSingleResponseResourcesRouting: {{ include "partner.singleresponseresourcesroutingconfig" .Values | trim | quote }}
+  # Maps multi response resource types to the partner channel eg) { "resourceTypes": "type1,type2", "eventTypes": "type3/write,type4/write|delete", partnerChannelAddress: "partnerAddr", "PartnerChannelName":"channelName"}
+  PartnerMultiResponseResourcesRouting: {{ include "partner.multiresponseresourcesroutingconfig" .Values | trim | quote }}
+ 
+# Logging Related
+  LOGGER_MIN_LOG_LEVEL: {{ .Values.ioConfigMap.minLogLevel | default "Information" | quote }}
+  EnableGrpcTrace: {{ .Values.ioConfigMap.enableGrpcTrace | default false | quote }}
+  EnableHttpClientTrace: {{ .Values.ioConfigMap.enableHttpClientTrace | default false | quote }}
+  EnableAzureSDKActivity: {{ .Values.ioConfigMap.enableAzureSDKActivity | default false | quote }}
+  IncludeRunTimeMetrics: {{ .Values.ioConfigMap.includeRunTimeMetrics | default true | quote }}
+  IncludeHttpClientMetrics: {{ .Values.ioConfigMap.includeHttpClientMetrics | default false | quote }}
+  
+# Channel Concurrency
+  # Maps concurrency for each partner channel in IO service eg) partnerChannelName1:concurrency1| partnerChannelName2:concurrency2
+  PartnerChannelConcurrency: {{ include "partner.io.concurrency" .Values | trim | quote }}
+  GlobalConcurrency: {{ .Values.ioConfigMap.globalConcurrency | default 1000 | quote }}
+  RawInputChannelConcurrency: {{ .Values.ioConfigMap.rawInputChannelConcurrency | default 50 | quote }}
+  InputChannelConcurrency: {{ .Values.ioConfigMap.inputChannelConcurrency | default 0 | quote }}
+  SourceOfTruthChannelConcurrency: {{ .Values.ioConfigMap.sourceOfTruthChannelConcurrency | default 0 | quote }}
+  SourceOfTruthChannelConcurrencyWaitTimeoutInSec: {{ .Values.ioConfigMap.sourceOfTruthChannelConcurrencyWaitTimeoutInSec | default 0 | quote }}
+  OutputChannelNumBufferQueue: {{ .Values.ioConfigMap.outputChannelNumBufferQueue | default 5 | quote }}
+  OutputChannelBufferDelay: {{ .Values.ioConfigMap.outputChannelBufferDelay | default 0 | quote }}
+  OutputChannelBufferQueueLength: {{ .Values.ioConfigMap.outputChannelBufferQueueLength | default 2000 | quote }}
+  OutputChannelMaxBufferedSize: {{ .Values.ioConfigMap.outputChannelMaxBufferedSize | default 500 | quote }}
+  {{- if .Values.ioConfigMap.publishOutputToArn }}
+  OutputChannelPartitionKey: {{ .Values.ioConfigMap.outputChannelPartitionKey | default "SCOPEID" | quote }}
+  {{- else }}
+  OutputChannelPartitionKey: {{ .Values.ioConfigMap.outputChannelPartitionKey | default "NONE" | quote }}
+  {{- end }}
+  RetryChannelNumBufferQueue: {{ .Values.ioConfigMap.retryChannelNumBufferQueue | default 10 | quote }}
+  RetryChannelBufferDelay: {{ .Values.ioConfigMap.retryChannelBufferDelay | default 0 | quote }}
+  RetryChannelBufferQueueLength: {{ .Values.ioConfigMap.retryChannelBufferQueueLength | default 2000 | quote }}
+  RetryChannelMaxBufferedSize: {{ .Values.ioConfigMap.retryChannelMaxBufferedSize | default 500 | quote }}
+  PoisonChannelNumBufferQueue: {{ .Values.ioConfigMap.poisonChannelNumBufferQueue | default 10 | quote }}
+  PoisonChannelBufferDelay: {{ .Values.ioConfigMap.poisonChannelBufferDelay | default 0 | quote }}
+  PoisonChannelBufferQueueLength: {{ .Values.ioConfigMap.poisonChannelBufferQueueLength | default 2000 | quote }}
+  PoisonChannelMaxBufferedSize: {{ .Values.ioConfigMap.poisonChannelMaxBufferedSize | default 500 | quote }}
+  BlobPayloadRoutingChannelNumBufferQueue: {{ .Values.ioConfigMap.blobPayloadRoutingChannelNumBufferQueue | default 5 | quote }}
+  BlobPayloadRoutingChannelBufferDelay: {{ .Values.ioConfigMap.blobPayloadRoutingChannelBufferDelay | default 0 | quote }}
+  BlobPayloadRoutingChannelBufferQueueLength: {{ .Values.ioConfigMap.blobPayloadRoutingChannelBufferQueueLength | default 2000 | quote }}
+  BlobPayloadRoutingChannelMaxBufferedSize: {{ .Values.ioConfigMap.blobPayloadRoutingChannelMaxBufferedSize | default 500 | quote }}
+  BlobPayloadRoutingChannelPartitionKey: {{ .Values.ioConfigMap.blobPayloadRoutingChannelPartitionKey | default "SCOPEID" | quote }}
+  
+# DepedentResource Related
+  DependentResourceTypes: {{ .Values.ioConfigMap.dependentResourceTypes | default "" | quote }}
+
+# Source Of Truth Related
+  UseSourceOfTruth: {{ .Values.ioConfigMap.useSourceOfTruth | default true | quote }}
+  SourceOfTruthConflictRetryDelayInMsec: {{ .Values.ioConfigMap.sourceOfTruthConflictRetryDelayInMsec | default 100 | quote }}
+  SourceOfTruthUseOutputTimeTagCondition: {{ .Values.ioConfigMap.sourceOfTruthUseOutputTimeTagCondition | default false | quote }}
+
+# Partner Blob related
+  PartnerBlobClientOption: {{ .Values.ioConfigMap.partnerBlobClientOption | default "" | quote }}
+  PartnerBlobNonRetryableCodes: {{ .Values.ioConfigMap.partnerBlobNonRetryableCodes | default "401;403" | quote }}
+
+# Output Channel Related
+  AllowedOutputTypes: {{ .Values.ioConfigMap.allowedOutputTypes | default "" | quote }}
+
+# Traffic tuner
+  TrafficTunerRule: {{ .Values.ioConfigMap.trafficTuner | default "" | quote }}
+  PartnerTrafficTunerRule: {{ .Values.ioConfigMap.partnerTrafficTuner | default "" | quote }}
+  BackupProviderInputTrafficTunerRule: {{ .Values.ioConfigMap.backupProviderInputTrafficTunerRule | default "" | quote }}
+  BackupProviderPartnerTrafficTunerRule: {{ .Values.ioConfigMap.backupProviderPartnerTrafficTunerRule | default "" | quote }}
+
+# RawInput Related
+  MaxBatchedChildBeforeMoveToRetryQueue: {{ .Values.ioConfigMap.maxBatchedChildBeforeMoveToRetryQueue | default 100 | quote }}
+
+# Arn Publish
+  NotificationReceiverEnvironment: {{ .Values.commonConfig.notificationReceiverEnvironment | quote }}
+  NotificationReceiverEndPoint: {{ .Values.commonConfig.notificationReceiverEndPoint | default "" | quote }}
+  IsArnClientLogInfoEnabled: {{ .Values.ioConfigMap.isArnClientLogInfoEnabled | default false | quote }}
+  IsArnClientLogDebugEnabled: {{ .Values.ioConfigMap.isArnClientLogDebugEnabled | default false | quote }}
+  ArnPublishMaxBatchSize: {{ .Values.ioConfigMap.arnPublishMaxBatchSize | default -1 | quote }}
+  ArnPublishStorageAccountNames: {{ .Values.ioConfigMap.arnPublishStorageAccountNames | default "" | quote }}
+  ArnPublishAadAppId: {{ .Values.ioConfigMap.arnPublishAadAppId | default "" | quote }}
+  ArnPublishEventGridDomainIds: {{ .Values.ioConfigMap.arnPublishEventGridDomainIds | default "" | quote }}
+  ArnPublishEventGridDomainEndpoints: {{ .Values.ioConfigMap.arnPublishEventGridDomainEndpoints | default "" | quote }}
+  ArnPublishEventGridTopics: {{ .Values.ioConfigMap.arnPublishEventGridTopics | default "" | quote }}
+  ArnPublishWriteFailRetryDelayInMsec: {{ .Values.ioConfigMap.arnPublishWriteFailRetryDelayInMsec | default 1000 | quote }}
+  PublishOutputToArn: {{ .Values.ioConfigMap.publishOutputToArn | default true | quote }}
+  ArnPublisherInfo: {{ .Values.ioConfigMap.arnPublisherInfo | default "Microsoft.DataLabs" | quote }}
+  PairedRegionArnPublishEventGridDomainIds: {{ .Values.ioConfigMap.pairedRegionArnPublishEventGridDomainIds | default "" | quote }}
+  PairedRegionArnPublishEventGridDomainEndpoints: {{ .Values.ioConfigMap.pairedRegionArnPublishEventGridDomainEndpoints | default "" | quote }}
+  PairedRegionArnPublishEventGridTopics: {{ .Values.ioConfigMap.pairedRegionArnPublishEventGridTopics | default "" | quote }}
+  ArnPublishPairedRegionWrite: {{ .Values.ioConfigMap.pairedRegionWriteForArnPublish | default false | quote }}
+  ArnPublishPercentage: {{ .Values.ioConfigMap.arnPublishPercentage | default 100 | quote }}
+
+  # Blob Payload Routing
+  EnableBlobPayloadRouting: {{ .Values.ioConfigMap.enableBlobPayloadRouting | default false | quote }}
+  BlobPayloadRoutingTypes: {{ .Values.ioConfigMap.blobPayloadRoutingTypes | default "" | quote }}
+
+  {{- if .Values.cacheService.enabled }}
+  CachePoolDomain: "{{ .Values.cacheNameSpace }}.svc.cluster.local"
+  CachePoolDenyList: {{ .Values.cacheService.cachePoolDenyList | default "" | quote }}
+
+  # IO Cache Related
+  InputCacheTypes: {{ .Values.ioConfigMap.inputCacheTypes | default "" | quote }}
+  UseHashForResourceCacheKey: {{ .Values.ioConfigMap.useHashForResourceCacheKey | default true | quote }}
+  ResourceCacheReadQuorum: {{ .Values.ioConfigMap.resourceCacheReadQuorum | default 1 | quote }}
+
+# Output Cache Related
+  UseOutputCache: {{ .Values.ioConfigMap.useOutputCache | default false | quote }}
+  UseSyncOutputCache: {{ .Values.ioConfigMap.useSyncOutputCache | default false | quote }}
+  DeleteCacheAfterETagConflict: {{ .Values.ioConfigMap.deleteCacheAfterETagConflict | default true | quote }}
+  UseOutputTimeStampInCache: {{ .Values.ioConfigMap.useOutputTimeStampInCache | default false | quote }}
+
+# Cache TTL Related
+  DefaultOutputCacheTTL: {{ .Values.ioConfigMap.defaultOutputCacheTTL | default "2.00:00:00" | quote }}
+  DefaultInputCacheTTL: {{ .Values.ioConfigMap.defaultInputCacheTTL | default "2.00:00:00" | quote }}
+  DefaultNotFoundEntryCacheTTL: {{ .Values.ioConfigMap.defaultNotFoundEntryCacheTTL | default "01:00:00" | quote }}
+  ResourceTypeCacheTTLMappings: {{ .Values.ioConfigMap.resourceTypeCacheTTLMappings | default "" | quote }}
+
+  {{- $numCachePool := len .Values.cacheService.cachePools }}
+  CacheNumPools: {{ $numCachePool | quote }}
+
+  {{- range $cacheIndex, $cachePool := .Values.cacheService.cachePools }}
+  CachePool-{{ $cacheIndex }}: {{ include "cachepool_config" $cachePool | trim | quote }}
+  CachePoolNodeReplicationMapping-{{ $cacheIndex }}: {{ $cachePool.nodeReplicationMapping | default "" | quote }}
+  CachePoolConnectionsOption-{{ $cacheIndex }}: {{ $cachePool.connectionsOption | default $.Values.cacheService.connectionsOption | default "" | quote }}
+  {{- end }} # end of range $cacheIndex, $cachePool := .Values.cacheService.cachePools
+
+  {{- end }} # end of if .Values.cacheService.enabled
+
+# Drop Poison Messages instead of sending to Poison Queue
+  DropPoisonMessage: {{ .Values.ioConfigMap.dropPoisonMessage | default false | quote }}
+
+# Dsts authentication notifiation receiver
+  NrDstsIsEnabled: {{ .Values.ioConfigMap.dstsNotificationReceiver.isEnabled | default "false" | quote }}
+  NrDstsCertificateName: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.certificateName | default "" | quote }}
+  NrDstsClientId: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.dstsClientId | default "" | quote }}
+  NrDstsClientHome: {{ .Values.resourceProxyService.partnerCertificates.qfdClient.dstsClientHome | default "" | quote }}

@@ -1,0 +1,129 @@
+# Values File for IDMapping in prod sdc Environment
+primaryRegionName: sdc
+backupRegionName: neu
+
+solutionInfo:
+  solutionName: &solutionName idmapping
+  aksClusterName: idmprodsdcaks
+  environment: Prod
+  region: swedencentral
+  scaleUnit: *solutionName
+
+ioService:
+  replicaCount: 5 # override from dataLabServices.yaml
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+#MI of idm partner
+  clientId: 0d27a978-3ca2-4d6b-9fa6-031e2c34bfb0
+  tenantId: 33e01921-4d64-4f8c-a055-5bdaffd5e33d
+
+ioConfigMap:
+  inputEventHubNameSpaceAndName: "idmprodsdcpipehns0/idmprodsdcpipeh;idmprodsdcpipehns1/idmprodsdcpipeh"
+  outputEventHubNameSpaceAndName: "idmprodsdcopehns0/idmprodsdcopeh"
+  eventHubStorageAccountName: "0idmprodsdcehcpsa"
+  blobStorageAccountNames: "" # No source of truth
+  backupInputEventHubNameSpaceAndName: "idmprodsdcbpipehns0/idmprodsdcbpipeh/00:05:00;idmprodsdcbpipehns1/idmprodsdcbpipeh/00:05:00"
+  backupBlobStorageAccountNames: ""
+  serviceBusNameSpaceAndName: "idmprodsdcsb0/0idmprodsdcsbq;idmprodsdcsb1/1idmprodsdcsbq"
+  outputDataset: 'idmapping'
+  useSourceOfTruth: 'false'
+  allowedOutputTypes: "microsoft.idmapping/identifiers"
+  arnPublishStorageAccountNames: "0idmprodsdcarnpsa;1idmprodsdcarnpsa;2idmprodsdcarnpsa;3idmprodsdcarnpsa;4idmprodsdcarnpsa;5idmprodsdcarnpsa"
+  arnPublishEventGridDomainIds: "/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-swedencentral/providers/Microsoft.EventGrid/domains/idmprodsdcapeg1;/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-swedencentral/providers/Microsoft.EventGrid/domains/idmprodsdcapeg2"
+  arnPublishEventGridDomainEndpoints: "https://idmprodsdcapeg1.swedencentral-1.eventgrid.azure.net/api/events;https://idmprodsdcapeg2.swedencentral-1.eventgrid.azure.net/api/events"
+  arnPublishEventGridTopics: "/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-swedencentral/providers/Microsoft.EventGrid/domains/idmprodsdcapeg1/topics/arnpublishtopic;/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-swedencentral/providers/Microsoft.EventGrid/domains/idmprodsdcapeg2/topics/arnpublishtopic"
+  pairedRegionArnPublishEventGridDomainIds: "/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-northeurope/providers/Microsoft.EventGrid/domains/idmprodneuapeg1;/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-northeurope/providers/Microsoft.EventGrid/domains/idmprodneuapeg2"
+  pairedRegionArnPublishEventGridDomainEndpoints: "https://idmprodneuapeg1.northeurope-1.eventgrid.azure.net/api/events;https://idmprodneuapeg2.northeurope-1.eventgrid.azure.net/api/events"
+  pairedRegionArnPublishEventGridTopics: "/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-northeurope/providers/Microsoft.EventGrid/domains/idmprodneuapeg1/topics/arnpublishtopic;/subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourceGroups/DataLabsidmRG-northeurope/providers/Microsoft.EventGrid/domains/idmprodneuapeg2/topics/arnpublishtopic"
+  outputChannelBufferDelay: "100"
+
+partnerConfig:    
+  pods:
+  - name: idmapping-solution
+    serviceName: idmapping-solution-service
+    replicaCount: 5
+    partnerConfigMap:
+      name: idmapping-solution-config    
+    containers:
+     - name: idmpartnersolution
+       repository: datalabsprodacr.azurecr.io/idmpartnersolution
+       tag: [[<BUILD_VERSION>]]
+       port: 5072
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" : "*"
+                      }
+
+resourceProxyService:
+  resourceFetcherEndpoints: http://rfprodsdcaks.abc.prod.sdcaks:6072
+
+resourceProxyServiceAccount: 
+# MI of idm partner
+  clientId: 0d27a978-3ca2-4d6b-9fa6-031e2c34bfb0
+
+cacheService:
+  enabled: false
+
+# Monitoring Information
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: true
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGDataLabs
+    gcs_region: swedencentral
+    gcs_namespace: ARGDataLabs
+    gcs_config_version: "1.6"
+    miResourceId: /subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourcegroups/MC_DataLabsidmRG-swedencentral_idmprodsdcaks_swedencentral/providers/Microsoft.ManagedIdentity/userAssignedIdentities/idmprodsdcaks-agentpool
+  partner:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGIdMapping
+    gcs_region: swedencentral
+    gcs_namespace: ARGIdMapping
+    gcs_config_version: "3.1"
+    miResourceId: /subscriptions/9b776e32-83f7-4e98-b234-f43612dea78d/resourcegroups/MC_DataLabsidmRG-swedencentral_idmprodsdcaks_swedencentral/providers/Microsoft.ManagedIdentity/userAssignedIdentities/idmprodsdcaks-agentpool
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  # metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: ARGDataLabs
+      namespace: ARGDataLabs
+    Partner: 
+      account: ARGIdMapping
+      namespace: ARGIdMapping
+
+  # objectId of idm aks-agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "ARGDataLabs",
+          "objectId": "0bc544e4-7a88-4720-9b9f-3fcaf69834ce"
+        },
+        {
+          "account": "ARGIdMapping", 
+          "objectId": "0bc544e4-7a88-4720-9b9f-3fcaf69834ce"
+        }
+      ]
+    }
+
+keyVault:
+  name: idmprodsdckv
+  clientId: 4bf3937d-856d-4836-9f7f-48f4f39b1707
+
+adminService:
+  isEnabled: true
+  sslSecretProvider:
+    certificateName: idmprodsdcaks-ssl
+
+adminServiceConfigMap:
+  dstsRealm: realm://dsts.core.windows.net/
+  dstsName: prod-dsts.dsts.core.windows.net
+  serviceDns: prod.datalabs.core.windows.net
+  allowedActors: GenevaActionsPublicPrimary,GenevaActionsPublicSecondary,GenevaActionsPublicWestUs

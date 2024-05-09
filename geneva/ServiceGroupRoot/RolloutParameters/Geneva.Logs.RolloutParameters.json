@@ -1,0 +1,53 @@
+{
+  "$schema": "../../../RolloutSchema/RolloutParameters.WithGenevaLogsExt.Schema.json",
+  "contentVersion": "1.0.0.0",
+  "extensions": [
+    {
+      "name": "ProvisionGenevaAccount",
+      // For Test, Stage, Canary endpoints: the type is "Microsoft.Geneva.Logs/ConfigureLogsTestAccount
+      // For all other endpoints: the type is "Microsoft.Geneva.Logs/ConfigureLogsAccount
+      // REFER TO THE ScopeBindings.json FOR SETTINGS
+      "type": "Microsoft.Geneva.Logs/ConfigureLogsTestAccount",
+      "version": "2020-06-01",
+      "connectionProperties": {
+        "maxExecutionTime": "PT30M",
+        "authentication": {
+          "type": "CertificateAuthentication",
+          "reference": {
+            "provider": "AzureKeyVault",
+            //Replace the secretID with your own KeyVault certificate's secret id. This is needed to authenticate the Ev2 rollout.
+            "parameters": {
+              "SecretId": "https://datalabsgeneva-gbl-kv.vault.azure.net/secrets/DatalabsGenevaKeyVaultCert"
+            }
+          }
+        }
+      },
+      // When creating a new account, the extension needs the following properties. Note that the certificate you define above
+      // is added as an administrator on the account. This ensures that only this certificate may manage the account.
+      "payloadProperties": {
+        // Required
+        // Valid endpoint values: DiagnosticsProd, BillingProd, FirstPartyProd, ExternalProd, CaFairfax, CaMooncake, UsNat, UsSec, Test, Stage, Canary.
+        "mdsEnvironment": {
+          "value": "__ENDPOINT_NAME__"
+        },
+        // Required
+        // The name of the warm path account you want to create. This must be unique. 
+        // Logs Account name must start with a letter and can contain numbers/letters. 
+        // Should be at least 6 characters long but not exceed 32 characters.
+        "accountName": {
+          "value": "__ACCOUNT__"
+        },
+        // Optional
+        // A namespaces to register with MDS. Namespaces are unique prefixes. You may get conflict errors if another account owns a namespace that conflicts with
+        // what you specify here.
+        "namespaceNames": {
+          "value": [
+            "__NAMESPACE__"
+          ]
+        },
+        // Zip Config directory with imports folder and main.xml. 
+        "namespaceConfig": { "Reference": { "Path": "__CONFIGPATH__" } }
+      }
+    }
+  ]
+}

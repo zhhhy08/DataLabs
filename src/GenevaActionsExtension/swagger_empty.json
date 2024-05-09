@@ -1,0 +1,14 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "empty",
+    "title": "empty"
+  },
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+  },
+  "definitions": {
+  }
+}

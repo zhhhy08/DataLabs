@@ -1,0 +1,199 @@
+# Values File for SKU in INT Environment
+primaryRegionName: "p-eus2"
+backupRegionName: "b-eus2"
+
+solutionInfo:
+  solutionName: &solutionName sku
+  aksClusterName: armdata-aks-sku-int-eastus
+  environment: INT
+  region: eastus2
+  scaleUnit: *solutionName
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+ioServiceAccount:
+# Replace Client Id with MI's Client Id
+  clientId: 66db9ecf-dbb3-4586-bfd1-7ab04c903106
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+ioConfigMap:
+  # Replace Input EH, Output EH, Storage Account
+  inputEventHubNameSpaceAndName: "armdata-eh-sku-int-eastus/eh-sku-int-input"
+  outputEventHubNameSpaceAndName: "armdata-eh-sku-int-eastus/eh-sku-int-output"
+  eventHubStorageAccountName: "armdataskuinteastus"
+  blobStorageAccountNames: "armdataskuinteastus"
+  serviceBusNameSpaceAndName: "armdata-sb-sku-int-eastus/sb-sku-int-queue"
+  outputDataset: "sku"
+  useSourceOfTruth: "false"
+  inputCacheTypes: "Microsoft.Inventory/subscriptionInternalProperties;Microsoft.Resources/subscriptionZoneMappings;Microsoft.Resources/subscriptionRegistrations"
+  allowedOutputTypes: "microsoft.inventory/skuproviders/resourcetypes/locations/skus"
+
+partnerConfig:
+  pods:
+  - name: sku-solution
+    serviceName: sku-solution-service 
+    replicaCount: 1
+    partnerConfigMap:
+      name: sku-service-config
+      minLogLevel: Information
+      enableGrpcTrace: false
+      enableHttpClientTrace: false
+      enableAzureSDKActivity: false
+      customConfig: |
+        { 
+          "subjobBatchSize" : "1000",
+          "serviceName": "sku-partialsync"
+        }
+    containers:
+     - name: sku-container
+       repository: armdataacrskuinteastus.azurecr.io/sku-datalabs
+       tag: latest
+       port: 5072 
+       multiResponseResourcesMatchTypes: | 
+                      {
+                      "eventTypes" :  "Microsoft.Inventory/skuProviders/resourceTypes/locations/globalSkus/write,Microsoft.Inventory/subscriptionInternalProperties/write,Microsoft.Resources/subscriptionZoneMappings/write,Microsoft.Features/featureProviders/subscriptionFeatureRegistrations/write,Microsoft.CapacityAllocation/capacityRestrictions/restrictionsChanged/event" 
+                      }
+  - name: sku-fullsync-solution
+    serviceName: sku-fullsync-service 
+    replicaCount: 1
+    partnerConfigMap:
+      name: sku-fullsync-service-config
+      minLogLevel: Information
+      enableGrpcTrace: false
+      enableHttpClientTrace: false
+      enableAzureSDKActivity: false
+      customConfig: |
+        {
+          "subjobBatchSize:1000",
+          "serviceName": "sku-fullsync"
+        }
+    containers:
+     - name: sku-fullsync-container
+       repository: armdataacrskuinteastus.azurecr.io/sku-fullsync
+       tag: latest
+       port: 5080 
+       multiResponseResourcesMatchTypes: | 
+                      {
+                      "eventTypes" :  "Microsoft.ResourceGraph/skuFullSyncTriggerEvents/write" 
+                      }
+  - name: cache-ingestion
+    serviceName: cache-ingestion-service
+    replicaCount: 2
+    partnerConfigMap:
+      name: cache-ingestion-service-config
+    containers:
+     - name: cache-ingestion-container
+       repository: armdataacrskuinteastus.azurecr.io/cache-ingestion
+       tag: latest
+       port: 5078
+       singleResponseResourcesMatchTypes: | 
+                      {
+                      "resourceTypes" : "Microsoft.Inventory/subscriptionInternalProperties,Microsoft.Inventory/skuProviders/resourceTypes/locations/globalSkus"
+                      }
+
+resourceProxyService:
+ resourceFetcherEndpoints: http://resource-fetcher.resource-fetcher-namespace.svc.cluster.local:6072
+ resourceFetcherTokenResource: https://resourcefetcherservice-int.microsoft.com
+ resourceFetcherHomeTenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+resourceFetcherConfigMap:
+  partnerNames: "abcsolution;sku"
+  
+resourceProxyConfigMap:
+  getResourceAllowedTypes:
+    "Microsoft.Inventory/subscriptionInternalProperties:cache;
+    Microsoft.Resources/subscriptionZoneMappings:cache;
+    Microsoft.Features/featureProviders/subscriptionFeatureRegistrations:resourcefetcher_arm;
+    microsoft.inventory/configspecs:cache,resourcefetcher_arm;
+    microsoft.inventory/manifestprovider:cache,resourcefetcher_arm;
+    microsoft.compute/version/fetchcapacityrestrictions:cache,resourcefetcher_arm"
+
+resourceProxyServiceAccount:
+  clientId: 66db9ecf-dbb3-4586-bfd1-7ab04c903106
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+  
+cacheService:
+  enabled: true
+  requestMemory: 5Gi
+  requestStorage: 4Gi
+  storageClassName: managed-csi
+  volumeClaimName: data
+  maxMainStoreMemory: 4g
+  maxHashIndexMemory: 1g
+  maxCompactionSegments: 2
+  cacheConfigMap:
+    checkPointIntervalDuration: "00:15:00"
+  cachePools:
+  - cacheName: iocache
+    readEnabled: true
+    nodePoolName: agentpool
+    nodeCount: 2
+    port: 3278
+    nodeReplication:
+    startOffset: 0
+
+cacheImage:
+  tag: latest
+
+partnerCacheService:
+  enabled: true
+  requestMemory: 5Gi
+  requestStorage: 4Gi
+  storageClassName: managed-csi
+  volumeClaimName: data
+  maxMainStoreMemory: 4g
+  maxHashIndexMemory: 1g
+  maxCompactionSegments: 2
+  cacheConfigMap:
+    checkPointIntervalDuration: "00:15:00"
+  cachePools:
+  - cacheName: partnercache
+    readEnabled: true
+    nodePoolName: agentpool
+    nodeCount: 2
+    port: 4278
+    nodeReplication:
+    startOffset: 0
+
+partnerCacheImage:
+  tag: latest
+
+socat:
+  tag: latest
+
+# Monitoring configurations
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  isInternalPartner: true
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: Test
+    gcs_account: DataLabs
+    gcs_region: eastus
+    gcs_namespace: Datalabs
+    gcs_config_version: '1.6' # TODO Change to respective config version
+    # TODO: Replace subscriptionId for miResourceId
+    miResourceId: /subscriptions/82506e98-9fdb-41f5-ab67-031005041a26/resourcegroups/MC_armdata-rg-sku-df-eastus_armdata-aks-sku-df-eastus_eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/armdata-aks-sku-df-eastus-agentpool
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: DataLabs
+      namespace: DataLabs
+    Partner: # Change accountInfo for Partner (can be the same as DataLabs)
+      account: DataLabs
+      namespace: DataLabs
+
+  # TODO: Update to objectId of idminteusaks-agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "DataLabs",
+          "objectId": "405cf773-eee2-45a2-845e-c63d48c60ef6"
+        }
+      ]
+    }

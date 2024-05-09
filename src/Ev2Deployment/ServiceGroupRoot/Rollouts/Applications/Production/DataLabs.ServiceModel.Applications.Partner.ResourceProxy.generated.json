@@ -1,0 +1,71 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-04-01/RegionAgnosticServiceModel.json",
+    "contentVersion": "1.0.0.0",
+    "serviceMetadata": {
+        "serviceGroup": "Microsoft.Azure.DataLabs.Applications.Partner.ResourceProxy",
+        "displayName": "Microsoft.Azure.DataLabs.Applications.Partner.ResourceProxy",
+        "serviceIdentifier": "00df9fbf-c722-42e4-9acd-bc7125483b22",
+        "serviceSpecificationPath": "ServiceSpec/ServiceSpec.json",
+        "environment": "$config(cloudName)",
+        "tenantId": "$config(cloudTenant)",
+        "buildout": {
+        "dependencies": []
+        }
+    },
+    "serviceResourceGroupDefinitions": [
+        {
+            "name": "SubscriptionDataLabsResourceGroup",
+            "subscriptionKey": "DataLabsRF$config(cloudName)Sub",
+            "azureResourceGroupName": "DataLabsRG",
+            "serviceResourceDefinitions": [
+                {
+                    "name": "EmptyServiceResource",
+                    "composedOf": {
+                        "arm": {
+                            "parametersPath": "Parameters/Empty.parameters.json",
+                            "templatePath": "Templates/Common/Empty.template.json"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "RegionalPartnerResourceGroup",
+            "subscriptionKey": "DataLabs$config(stamp_$stamp().partner.partnerAcronym)$config(cloudName)Sub",
+            "azureResourceGroupName": "DataLabs$config(stamp_$stamp().partner.partnerAcronym)RG-$location()",
+            "scopeTags": [
+                {
+                    "name": "General"
+                },
+                {
+                    "name": "Ev2ManagedIdentity"
+                },
+                {
+                    "name": "PartnerConfigs"
+                }
+            ],
+            "stamps": {
+                "count": "$config(countOfPartner)"
+            },
+            "serviceResourceDefinitions": [
+                {
+                    "name": "AppDeployPartnerResourceProxy",
+                    "composedOf": {
+                        "extension": {
+                            "shell": [
+                                {
+                                    "type": "Run",
+                                    "properties": {
+                                        "imageName": "adm-mariner-20-l",
+                                        "imageVersion": "v4"
+                                    }
+                                }
+                            ],
+                            "rolloutParametersPath": "Rollouts/Applications/RolloutParameters/AppDeploy.Partner.ResourceProxy.Rollout.copied.json"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

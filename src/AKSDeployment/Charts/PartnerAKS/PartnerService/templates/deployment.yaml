@@ -1,0 +1,250 @@
+{{- range $pk, $pv := $.Values.partnerConfig.pods }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $pv.name }}
+  namespace: {{ $.Values.partnerNameSpace }}
+spec:
+  replicas: {{ $pv.replicaCount | default $.Values.partnerApp.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  minReadySeconds: {{ $pv.minReadySeconds | default $.Values.partnerApp.minReadySeconds }}
+  selector:
+    matchLabels:
+      app: {{ $pv.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $pv.name }}
+    spec:
+      nodeSelector:
+        "agentpool": {{ $.Values.agentPoolName }}
+      automountServiceAccountToken: false
+      serviceAccountName:
+      securityContext:
+        fsGroup: {{ $pv.fsGroup | default $.Values.partnerApp.fsGroup }}
+        runAsNonRoot: true
+        runAsUser: {{ $pv.runAsUser | default $.Values.partnerApp.runAsUser }}
+        runAsGroup: {{ $pv.runAsGroup | default $.Values.partnerApp.runAsGroup }}
+        seccompProfile:
+          type: RuntimeDefault
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ $pv.name }}
+            topologyKey: kubernetes.io/hostname
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ $pv.partnerConfigMap.name }}
+      - name: {{ $.Values.socat.volumeMountName }}  # connects with monitor pod for logs/traces
+        emptyDir: {}
+      containers:
+      {{- $socatMetadata := $.Values.socat.diagnosticEndpoints }}
+      {{- range $key, $value := $socatMetadata }}
+      - name: {{ $value.containerName }}
+        image: {{ $.Values.socat.repository }}:{{ $.Values.socat.tag}}
+        env:
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        args:
+        - {{ include "socat.receiving" (dict "value" $value "partnerApp" $.Values.partnerApp "partnerConfig" $pv) | trim | quote }}
+        - {{ include "socat.sending" $value | trim | quote }}
+        volumeMounts:
+        - name: {{ $.Values.socat.volumeMountName }}
+          mountPath: {{ $.Values.socat.partnerVolumePath }}
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: {{ $pv.runAsUser | default $.Values.partnerApp.runAsUser }}
+          runAsGroup: {{ $pv.runAsGroup | default $.Values.partnerApp.runAsGroup }}
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+      {{- end }}
+      # partner service
+      {{- range $ck, $cv := $pv.containers }}
+      - name: {{ $cv.name }}
+        image: {{ $cv.repository }}:{{ $cv.tag }}
+        imagePullPolicy: {{ $cv.pullPolicy | default $.Values.partnerImage.pullPolicy }}
+        resources:
+          requests:
+            memory: "1Gi"
+          limits:
+            memory: {{ $.Values.partnerImage.maxMemorySize | quote }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: "/config"
+          readOnly: true
+        - name: {{ $.Values.socat.volumeMountName }}
+          mountPath: {{ $.Values.socat.partnerVolumePath }}
+        ports:
+        - containerPort: {{ $cv.port }}
+        env:
+        - name: scaleUnit
+          value: "{{ $.Values.solutionInfo.scaleUnit }}"
+        - name: service
+          value: "PartnerService"
+        - name: region
+          value: "{{ $.Values.solutionInfo.region }}"
+        - name: buildVersion
+          value: {{ $cv.tag | quote }}
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP 
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP 
+        - name: IS_INTERNAL_PARTNER
+          value: "{{ $.Values.monitorInfo.isInternalPartner }}"
+        - name: IS_DEDICATED_PARTNER_AKS
+          value: "{{ $.Values.dedicatedPartnerAKS }}"
+        - name: DOTNET_EnableDiagnostics
+          value: "1"
+        - name: DOTNET_RUNNING_IN_CONTAINER
+          value: "true"
+        - name: DOTNET_USE_POLLING_FILE_WATCHER
+          value: "true"
+        - name: CONFIGMAP_DIR
+          value: "/config"
+        - name: LOGGER_MIN_LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ $pv.partnerConfigMap.name }}
+              key: LOGGER_MIN_LOG_LEVEL
+        {{- if $.Values.resourceProxyService.enabled }}
+        - name: HOST_GRPC_PORT
+          value: "{{ $.Values.resourceProxyService.port }}"
+        {{- end }}
+        # Monitoring endpoint values
+        - name: OTLP_EXPORTER_TYPE
+          value: {{ $.Values.monitorInfo.exporterType }}
+        - name: MDSD_PARTNER_ENDPOINT
+        {{- if $.Values.genevaAccounts.partner }} # partners with their own mdsd account will export to partner socat
+          value: {{ include "otlp_endpoint.mdsd" $.Values.socat.diagnosticEndpoints.mdsdPartner | trim | quote }}
+        {{- else }}
+          value: {{ include "otlp_endpoint.mdsd" $.Values.socat.diagnosticEndpoints.mdsdDatalabs | trim | quote }}          
+        {{- end }}
+        - name: MDSD_DATALABS_ENDPOINT
+          value: {{ include "otlp_endpoint.mdsd" $.Values.socat.diagnosticEndpoints.mdsdDatalabs | trim | quote }}
+        - name: MDM_DATALABS_ENDPOINT
+          value: {{ include "otlp_endpoint.mdm" (dict "info" $.Values.mdm.accountInfo.DataLabs "Values" $.Values) | trim | quote }}
+        - name: MDM_PARTNER_ENDPOINT
+        {{- if $.Values.mdm.accountInfo.Partner }}
+          value: {{ include "otlp_endpoint.mdm" (dict "info" $.Values.mdm.accountInfo.Partner "Values" $.Values) | trim | quote }}
+        {{- else }}
+          value: {{ include "otlp_endpoint.mdm" (dict "info" $.Values.mdm.accountInfo.DataLabs "Values" $.Values) | trim | quote }}
+        {{- end }}
+        {{- if $.Values.mdm.accountInfo.Customer }}
+        - name: MDM_CUSTOMER_ENDPOINT
+          value: {{ include "otlp_endpoint.mdm" (dict "info" $.Values.mdm.accountInfo.Customer "Values" $.Values) | trim | quote }}
+        {{- end }}
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: {{ $pv.runAsUser | default $.Values.partnerApp.runAsUser }}
+          runAsGroup: {{ $pv.runAsGroup | default $.Values.partnerApp.runAsGroup }}
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: 
+            - ALL
+      {{- end }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ $pv.name }}-networkpolicy
+  namespace: {{ $.Values.partnerNameSpace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ $pv.name }}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: {{ $.Values.solutionNameSpace }}
+      podSelector:
+        matchLabels:
+          app: {{ $.Values.ioService.name }}
+    ports:
+    {{- range $ck, $cv := $pv.containers }}
+     - port: {{ $cv.port }}
+       protocol: TCP
+    {{- end }}
+  egress:
+  - to:
+    - ipBlock:
+        cidr: {{ $.Values.networkPolicy.clusterIpBlock }}
+    ports:
+      - protocol: TCP
+        port: {{ $.Values.socat.startPort }}
+        endPort: {{ $.Values.socat.endPort }}
+      - protocol: TCP
+        port: 53    # Allow DNS TCP traffic
+      - protocol: UDP
+        port: 53   # Allow DNS UDP traffic
+  {{- if $.Values.resourceProxyService.enabled }}
+      - protocol: TCP
+        port: {{ $.Values.resourceProxyService.port }}
+  {{- end }}
+  {{- $isDedicatedCache := and $.Values.dedicatedPartnerAKS $.Values.resourceProxyService.enabled $.Values.cacheService.enabled -}}
+  {{- if or $.Values.partnerCacheService.enabled $isDedicatedCache }}
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: {{ $.Values.cacheNameSpace }}
+    ports:
+    {{- if $.Values.partnerCacheService.enabled }}
+    {{- range $cacheIndex, $cachePool := $.Values.partnerCacheService.cachePools }}
+      - port: {{ $cachePool.port }}
+        protocol: TCP
+    {{- end }} 
+    {{- end }}
+    {{- if $isDedicatedCache }}
+    {{- range $cacheIndex, $cachePool := $.Values.cacheService.cachePools }}
+      - port: {{ $cachePool.port }}
+        protocol: TCP
+    {{- end }}
+    {{- end }}
+  {{- end }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $pv.name }}-pdb
+  namespace: {{ $.Values.partnerNameSpace }}
+  annotations:
+    meta.helm.sh/release-name: {{ $.Values.helmInfo.partnerserviceRelease }}
+    meta.helm.sh/release-namespace: default
+  labels:
+    app.kubernetes.io/managed-by: Helm
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ $pv.name }}
+{{- end }}

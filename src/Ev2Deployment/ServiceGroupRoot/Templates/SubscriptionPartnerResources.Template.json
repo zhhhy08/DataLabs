@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "cloudName": {
+            "type": "string"
+        },
+        "managedIdentityConfigs": {
+            "type": "array",
+            "metadata": {
+                "description": "list of prefixes of identities"
+            }
+        },
+        "partnerAcronym": {
+            "type": "string",
+            "maxLength": 4,
+            "metadata": {
+                "description": "short name of the partner"
+            }
+        },
+        "managedIdentityTemplateUri": {
+            "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2019-05-01",
+            "name": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('managedIdentityConfigs')[copyIndex()], 'managedidentity-deployment'))]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[parameters('managedIdentityTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "identityName": {
+                        "value": "[tolower(concat(parameters('partnerAcronym'), parameters('cloudName'), parameters('managedIdentityConfigs')[copyIndex()],'id'))]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "managedidentityiterator",
+                "count": "[length(parameters('managedIdentityConfigs'))]"
+            }
+        }
+    ]
+}

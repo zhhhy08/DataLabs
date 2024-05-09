@@ -1,0 +1,2 @@
+localrestore.bat
+localbuild.bat

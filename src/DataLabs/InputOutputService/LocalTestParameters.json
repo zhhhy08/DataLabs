@@ -1,0 +1,84 @@
+{
+  // For input eventHub, output eventHub, serviceBus, and storage account
+  // Please add owner role assignment
+
+  "Debug_DoNotUseMeters": "true",
+
+  "SolutionName": "testsolution",
+  "PrimaryRegionName": "testprimary",
+  "BackupRegionName": "testbackup",
+  "UseSourceOfTruth": "false",
+  "PublishOutputToArn": "false",
+
+  "EnableGrpcTrace": "true",
+  "EnableHttpClientTrace": "true",
+  "EnableAzureSDKActivity": "true",
+
+  "UseTestMemoryWriter": "true",
+  "NumTestMemoryWriter": "1",
+
+  "CachePoolDomain": "localhost",
+  "CacheNumPools": "1",
+
+  "CachePool-0": "CacheName=test;ReadEnabled=true;WriteEnabled=true;NodeCount=1;Port=3278;StartOffset=0;NodeSelectionMode=JumpHash",
+  "CachePoolNodeReplicationMapping-0": "",
+
+  /* Partner Need to Fill below for local testing */
+  // ==============================================================================
+
+  // Input EventHubs
+  "InputEventHubNameSpaceAndName": "<eventHubNameSpace>/<eventHubName>",
+  // e.g. "InputEventHubNameSpaceAndName": "abc-test-eastus-input-1/abc-test-eastus-input-1",
+  "InputEventHubConnectionString": "<connection string for above eventHub>",
+  "InputEventHubConsumerGroup": "$Default",
+
+  // Below storage account is necessary for eventHub checkpoint
+  "EventHubStorageAccountName": "<storage account name>",
+  // e.g. "EventHubStorageAccountName": "abctesteastusehcp1",
+  "EventHubStorageAccountConnectionString": "<connection string for above storage account>",
+
+  // ServiceBus Queue is used for retry and poison queue
+  "ServiceBusNameSpaceAndName": "<serviceBusNameSpace>/<serviceBusQueueName>",
+  // e.g. "ServiceBusNameSpaceAndName": "abc-test-eastus-1/abc-test-eastus-1",
+  "ServiceBusQueueConnectionString": "<connection string for above service Bus Namespace>",
+  "ServiceBusSubJobQueueName": "subjob",
+
+  // Output from Solution will be sent to this eventHub
+  "OutputEventHubNameSpaceAndName": "<eventHubNameSpace>/<eventHubName>",
+  "OutputEventHubConnectionString": "<connection string for above eventHub>",
+
+  // output type from solution should be defined here with semicolon delimiter, otherwise, IO service will drop because it is not allowed output type
+  "AllowedOutputTypes": "Microsoft.TestPartner/TestSolution",
+
+  // Select one of below.
+  // 1. PartnerSingleResponseResourcesRouting will call Partner Interface 
+  // public Task<DataLabsARNV3Response> GetResponseAsync(DataLabsARNV3Request request, CancellationToken cancellationToken);
+
+  // 2. PartnerMultiResponseResourcesRouting will call Partner Interface
+  // public IAsyncEnumerable<DataLabsARNV3Response> GetResponsesAsync(DataLabsARNV3Request request, CancellationToken cancellationToken);
+
+  // For single response, please fill below
+  "PartnerSingleResponseResourcesRouting": "{\"resourceTypes\" : \"*\", \"partnerChannelAddress\":\"http://localhost:5072\", \"partnerChannelName\":\"localhost\"}"
+
+  // For multi response, please fill below
+  //"PartnerMultiResponseResourcesRouting": "{\"resourceTypes\" : \"*\",\"partnerChannelAddress\":\"http://localhost:5072\", \"partnerChannelName\":\"localhost\"}"
+
+  //=============================================================================
+
+  /*
+  "PublishOutputToArn": "true",
+  "ArnPublishLocalTesting": "true",
+  "ArnPublishEventGridDomainIds": "/subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourceGroups/DataLabsabcRG-eastus/providers/Microsoft.EventGrid/domains/abcinteusapeg1",
+  "ArnPublishEventGridDomainEndpoints": "https://abcinteusapeg1.eastus-1.eventgrid.azure.net/api/events",
+  "ArnPublishEventGridTopics": "/subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourceGroups/DataLabsabcRG-eastus/providers/Microsoft.EventGrid/domains/abcinteusapeg1/topics/arnpublishtopic",
+  "ArnPublishEventGridDomainKeys": "",
+  "ArnPublishStorageAccountConnectionStrings": "",
+  "AllowedOutputTypes": "Microsoft.TestPartner/TestSolution",
+  "argKVEndpoint": "https://datalabsintgblkv.vault.azure.net/",
+  "argKVManagedIdentityClientId": "",
+  "PartnerSingleResponseResourcesRouting": "{\"resourceTypes\" : \"Microsoft.Compute/*\", \"eventTypes\": \"Microsoft.TestPartner/TestSolution/write|delete\",\"partnerChannelAddress\":\"http://localhost:5072\", \"partnerChannelName\":\"localhost\"}",
+  "PartnerMultiResponseResourcesRouting": "{\"resourceTypes\" : \"Microsoft.Test/TestSolution\",\"partnerChannelAddress\":\"http://localhost:5072\", \"partnerChannelName\":\"localhost\"}",
+  "PartnerChannelConcurrency": "localhost:1;"
+  */
+}
+

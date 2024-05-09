@@ -1,0 +1,246 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-01-01/scopeBindings.json",
+    "contentVersion": "1.0.0.0",
+    "scopeBindings": [
+        {
+            "scopeTagName": "SubscriptionProvisioning",
+            "bindings": [
+                {
+                    "find": "\"__ONECERT_DOMAINS__\"",
+                    // TODO add "*.$config(cloudName).datalabs$config(cloudDNS)" after one cert registration is complete for that domain, needed for geneva actions. refer https://eng.ms/docs/products/onecert-certificates-key-vault-and-dsms/key-vault-dsms/onecert/docs/registering-a-domain-in-onecert
+                    // arg.core.windows.net and gov-rp-art are added to make sure that we can create the cert needed for the first party app "Azure Resource Graph" access for ARM calls from datalabs.
+                    "replaceWith": "\"*.arg$config(cloudDNS)\",\"*.gov-rp-art\""
+                }
+            ]
+        },
+        {
+            "scopeTagName": "PartnerSubscriptionProvisioning",
+            "bindings": [
+                {
+                    "find": "__DISPLAY_NAME__",
+                    "replaceWith": "ARG DataLabs $config(stamp_$stamp().partner.partnerAcronym) $config(cloudName)"
+                }
+            ]
+        },
+        {
+            "scopeTagName": "ARGSubscriptionProvisioning",
+            "bindings": [
+                {
+                    "find": "__DISPLAY_NAME__",
+                    "replaceWith": "ARG DataLabs $config(cloudName)"
+                }
+            ]
+        },
+        {
+            "scopeTagName": "ARGDiagResourcesSubscriptionProvisioning",
+            "bindings": [
+                {
+                    "find": "__DISPLAY_NAME__",
+                    "replaceWith": "ARG DataLabs DiagResources $config(cloudName)"
+                }
+            ]
+        },
+        {
+            "scopeTagName": "General",
+            "bindings": [
+                {
+                    "find": "__LOCATION__",
+                    "replaceWith": "$location()"
+                },
+                {
+                    "find": "__BUILD_VERSION__",
+                    "replaceWith": "$buildVersion()"
+                },
+                {
+                    "find": "__REGION_ACRONYM__",
+                    "replaceWith": "$config(regionAcronym)"
+                },
+                {
+                    "find": "__PAIRED_REGION_ACRONYM__",
+                    "replaceWith": "$config(pairedRegionAcronym)"
+                },
+                {
+                    "find": "\"__MAINTENANCE_CONFIGURATIONS_CONFIGS__\"",
+                    "replaceWith": "$config(maintenanceConfigurations)"
+                },
+                {
+                    "find": "__PAIRED_REGION_LOCATION__",
+                    "replaceWith": "$config(pairedRegionLocation)"
+                },
+                {
+                    "find": "__CLOUD_NAME__",
+                    "replaceWith": "$config(cloudName)"
+                },
+                {
+                    "find": "\"__ADMIN_GROUP_OBJECT_IDS__\"",
+                    "replaceWith": "$config(adminGroupObjectIds)"
+                },
+                {
+                    "find": "__RF_SUB_ID__",
+                    "replaceWith": "$serviceResourceGroupDefinition(RegionalResourceFetcherResourceGroup).azureSubscriptionId()"
+                },
+                {
+                    "find": "__PARTNER_SUB_ID__",
+                    "replaceWith": "$serviceResourceGroupDefinition(RegionalPartnerResourceGroup).azureSubscriptionId()"
+                },
+                {
+                    "find": "__DESTINATION_ACR_NAME__",
+                    "replaceWith": "datalabs$config(cloudName)acr"
+                },
+                {
+                    "find": "\"__AVAILABILITY_ZONE_COUNT__\"",
+                    "replaceWith": "$config(availabilityZoneLiveCount)"
+                },
+                {
+                    "find": "__DNS_ZONE_NAME__",
+                    "replaceWith": "$config(dnsZone.name)"
+                },
+                {
+                    "find": "__CNAME_SUFFIX__",
+                    "replaceWith": "$config(dnsZone.cnameSuffix)"
+                },
+                {
+                    "find": "\"__DEPLOY_DNS_ZONE__\"",
+                    "replaceWith": "$config(dnsZone.deployDnsZone)"
+                },
+                {
+                    "find": "__DATALABS_SUB_ID__",
+                    "replaceWith": "$serviceResourceGroupDefinition(SubscriptionDataLabsResourceGroup).azureSubscriptionId()"
+                }
+            ]
+        },
+        {
+            "scopeTagName": "PartnerConfigs",
+            "bindings": [
+                {
+                    "find": "__PARTNER_ACRONYM__",
+                    "replaceWith": "$config(stamp_$stamp().partner.partnerAcronym)"
+                },
+                {
+                    "find": "\"__PRIVATE_AKS_AGENTPOOL__\"",
+                    "replaceWith": "$config(stamp_$stamp().partner.agentpool)"
+                },
+                {
+                    "find": "\"__PRIVATE_AKS_CACHEPOOL__\"",
+                    "replaceWith": "$config(stamp_$stamp().partner.cachepool)"
+                },
+                {
+                    "find": "\"__EVENTHUBNAMESPACE_CONFIGS__\"",
+                    "replaceWith": "$config(stamp_$stamp().partner.eventHubNamespace)"
+                },
+                {
+                    "find": "\"__SERVICEBUS_CONFIGS__\"",
+                    "replaceWith": "$config(stamp_$stamp().partner.serviceBus)"
+                },
+                {
+                    "find": "\"__STORAGEACCOUNT_CONFIGS__\"",
+                    "replaceWith": "$config(stamp_$stamp().partner.storageAccount)"
+                },
+                {
+                    "find": "\"__EVENTGRID_CONFIGS__\"",
+                    "replaceWith": "$config(stamp_$stamp().partner.eventGrid)"
+                },
+                {
+                    "find": "\"__MANAGED_IDENTITY_PREFIX_LIST__\"",
+                    "replaceWith": "$config(stamp_$stamp().partner.subscriptionResources.managedIdentityPrefixList)"
+                },
+                {
+                    "find": "__VALUES_FILENAME__",
+                    "replaceWith": "$config(stamp_$stamp().partner.valuesFilename)"
+                },
+                {
+                    "find": "__ENABLE_ADMIN_SERVICE__",
+                    "replaceWith": "$config(stamp_$stamp().partner.enableAdminService)"
+                }
+            ]
+        },
+        {
+            "scopeTagName": "ResourceFetcherConfigs",
+            "bindings": [
+                {
+                    "find": "\"__PRIVATE_AKS_AGENTPOOL__\"",
+                    "replaceWith": "$config(resourceFetcher.agentpool)"
+                },
+                {
+                    "find": "\"__PRIVATE_AKS_CACHEPOOL__\"",
+                    "replaceWith": "$config(resourceFetcher.cachepool)"
+                },
+                {
+                    "find": "\"__MANAGED_IDENTITY_PREFIX_LIST__\"",
+                    "replaceWith": "$config(resourceFetcher.subscriptionResources.managedIdentityPrefixList)"
+                },
+                {
+                    "find": "__VALUES_FILENAME__",
+                    "replaceWith": "$config(resourceFetcher.valuesFilename)"
+                },
+                {
+                    "find": "__ENABLE_ADMIN_SERVICE__",
+                    "replaceWith": "$config(resourceFetcher.enableAdminService)"
+                }
+            ]
+        },
+        {
+            "scopeTagName": "DataLabsConfigs",
+            "bindings": [
+                {
+                    "find": "\"__MANAGED_IDENTITY_PREFIX_LIST__\"",
+                    "replaceWith": "$config(datalabs.subscriptionResources.managedIdentityPrefixList)"
+                },
+                {
+                    "find": "\"__CONTAINER_REGISTRY_REGIONS__\"",
+                    "replaceWith": "$config(datalabs.subscriptionResources.containerRegistryRegions)"
+                },
+                {
+                    "find": "\"__DEPLOY_RF_AAD_APP__\"",
+                    "replaceWith": "$config(datalabs.subscriptionResources.deployRFAADApp)"
+                },
+                {
+                    "find": "__PUBLISHER_DOMAIN__",
+                    "replaceWith": "$config(datalabs.subscriptionResources.publisherDomain)"
+                }
+            ]
+        },
+        {
+            "scopeTagName": "Ev2ManagedIdentity",
+            "bindings": [
+                {
+                    "find": "__SCRIPT_EV2_MANAGED_IDENTITY__",
+                    "replaceWith": "/subscriptions/$serviceResourceGroupDefinition(RegionalResourceFetcherResourceGroup).azureSubscriptionId()/resourceGroups/DataLabsRG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/datalabs$config(cloudName)ev2id"
+                },
+                {
+                    "find": "__APPS_EV2_MANAGED_IDENTITY__",
+                    "replaceWith": "/subscriptions/$serviceResourceGroupDefinition(SubscriptionDataLabsResourceGroup).azureSubscriptionId()/resourceGroups/DataLabsRG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/datalabs$config(cloudName)ev2id"
+                }
+            ]
+        },
+        {
+            "scopeTagName": "RunRoleAssignmentPowershellScripts",
+            "bindings": [
+                {
+                    "find": "__MANUAL_WAIT_DURATION__",
+                    "replaceWith": "PT5H"
+                },
+                {
+                    "find": "__MANUAL_DESCRIPTION__",
+                    "replaceWith": "Run Role Assignment scripts for this cloud"
+                },
+                {
+                    "find": "__MANUAL_CATETORY___",
+                    "replaceWith": "Security and Access"
+                },
+                {
+                    "find": "__MANUAL_TOPIC__",
+                    "replaceWith": "https://azure-ecosystem.visualstudio.com/JEDI%20DevOps/_workitems/edit/94616"
+                },
+                {
+                    "find": "__MANUAL_NOTIFICATION_TITLE__",
+                    "replaceWith": "Ev2 buildout out manual action: Run Role Assignment scripts"
+                },
+                {
+                    "find": "__MANUAL_NOTIFICATION_CONTENT__",
+                    "replaceWith": "Run Role Assignment scripts in src/Ev2Deployment/Scripts/RoleAssignments"
+                }
+            ]
+        }
+    ]
+}

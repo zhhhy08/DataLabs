@@ -1,0 +1,130 @@
+agentPoolName: agentpool2
+
+solutionInfo:
+  aksClusterName: rfinteusaks
+  environment: INT
+  region: eastus
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+resourceFetcherServiceAccount:
+  # Replace Client Id with MI's Client Id
+  clientId: d6a32e6a-2d37-4099-bb4f-5528d2101792
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+resourceFetcherService:
+  replicaCount: 3
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+  aadTokenIssuer: https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/
+  aadTokenAudience: https://resourcefetcherservice-int.microsoft.com
+# ARM Client Related
+  armClient:
+    firstPartyAppId: e6a18a18-ffe6-4ac3-b822-362bb577a6a3
+    certificateName: aad-rp-int-arg-first-party-app-cert
+# Cas Client Related
+  casClient:
+#    endpoints: https://global.capacity.azure-test.net
+#    certificateName: arg-dsts-int-gov-rp-art-int
+    # Cas test endpoint doesnt have a valid certificate yet
+    dstsSkipServerCertificateValidation: true
+    dstsClientId: c1c8a0fd-eba8-4c02-add2-d6b1ec35dd52
+    dstsServerId: b559514b-96c3-45e5-8469-25d2e6e0bc7e
+    dstsClientHome: https://co2agg04-passive-dsts.dsts.core.azure-test.net/dstsv2/7a433bfc-2514-4697-b467-e0933190487f
+    dstsServerHome: ""
+    dstsServerRealm: ""
+# ARG Query FrontDoor Client Related
+  qfdClient:
+#    endpoints: https://arg-df-qfd.arg-df.core.windows.net
+#    certificateName: arg-dsts-int-gov-rp-art-int
+    dstsSkipServerCertificateValidation: false
+    dstsClientId: c1c8a0fd-eba8-4c02-add2-d6b1ec35dd52
+    dstsServerId: 5a5b6d3c-f6cb-4570-95be-059ab813a8ff
+    dstsClientHome: https://co2agg04-passive-dsts.dsts.core.azure-test.net/dstsv2/7a433bfc-2514-4697-b467-e0933190487f
+    dstsServerHome: ""
+    dstsServerRealm: ""
+# ARM Admin Client Related
+  armAdminClient:
+    endpoints: https://northeurope.api-dogfood-admin.resources.windows-int.net
+    certificateName: datalabs-arm-admin-int-gov-rp-art-int
+
+keyVault:
+  name: datalabsintgblkv
+  clientId: cbeef702-37d9-4be4-ac1c-9f2eaa73ef17
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+resourceFetcherConfigMap:
+  partnerNames: "abcsolution;capsolution;azrsolution"    # this should match with Partner AKS value file's solution name (solutionInfo -> solutionName)
+
+abcsolutionConfigMap:
+  clientIds: 7a3dbcb9-916a-47e8-b2ee-f9118105df26
+
+skuConfigMap:
+  clientIds: 66db9ecf-dbb3-4586-bfd1-7ab04c903106
+
+capsolutionConfigMap:
+  clientIds: 022206f3-5dbc-458f-89a1-f876aa30d01f
+
+azrsolutionConfigMap:
+  clientIds: cebda750-9381-4553-8d4b-4f120831fa81
+
+idmappingConfigMap:
+  clientIds: b92486bb-a96c-41c3-9499-b867697a3b56
+
+resourceFetcherImage:
+  repository: datalabsintacr.azurecr.io/resourcefetcherservice
+
+# AdminService 
+adminServiceImage:
+  repository: datalabsintacr.azurecr.io/adminservice
+
+# Monitoring configurations
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+  
+genevaAccounts:
+  datalabs:
+    gcs_environment: Test
+    gcs_account: DataLabs
+    gcs_region: eastus
+    gcs_namespace: DataLabs
+    gcs_config_version: "1.6" 
+    miResourceId: /subscriptions/02d59989-f8a9-4b69-9919-1ef51df4eff6/resourcegroups/MC_DataLabsRFRG-eastus_rfinteusaks_eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/rfinteusaks-agentpool
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  metricEndpoint: https://global.ppe.microsoftmetrics.com/
+  
+  accountInfo:
+    DataLabs:
+      account: DataLabs
+      namespace: DataLabs
+
+  # kubelet identity objectid
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "DataLabs",
+          "objectId": "7e6eff62-91a5-4b04-bd11-c9a7fcc5e525" 
+        }
+      ]
+    }
+
+azureProfiler:
+  repository: azureprofilertest.azurecr.io/azureprofilermariner
+  tag: 1.0.02076.8
+
+regionalKeyVault:
+  name: datalabsinteusrfkv
+  clientId: cbeef702-37d9-4be4-ac1c-9f2eaa73ef17
+  tenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+
+adminService:
+  isEnabled: true
+  sslSecretProvider:
+    certificateName: rfinteusaks-ssl
+
+adminServiceConfigMap:
+  dstsRealm: realm://dsts.core.azure-test.net/
+  dstsName: co2agg04-dsts.dsts.core.azure-test.net
+  serviceDns: int.datalabs.core.windows.net
+  allowedActors: GenevaActionsTest,acisTestTodSMSTest,GenevaActionsDelegatedAuthNonProd

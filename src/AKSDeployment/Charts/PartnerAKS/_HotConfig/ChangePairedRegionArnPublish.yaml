@@ -1,0 +1,7 @@
+# Usage: 
+# set RESOURCE_GROUP "DataLabsabcRG-eastus"
+# set AKS_NAME "abcinteusaks"
+# Invoke-AzAksRunCommand -ResourceGroupName ${RESOURCE_GROUP} -Name ${AKS_NAME} -Force -Command "kubectl patch configmap solution-io-config -n solution-namespace --type merge --patch-file ChangePairedRegionArnPublish.yaml" -CommandContextAttachment "ChangePairedRegionArnPublish.yaml"
+         
+data:
+    ArnPublishPairedRegionWrite: "false"

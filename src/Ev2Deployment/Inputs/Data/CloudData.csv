@@ -1,0 +1,7 @@
+CloudName,Component,SubscriptionKey
+Int,ResourceFetcher,DataLabsIntSubscriptionLibrarySub
+Int,Partner,DataLabs$config(stamp_$stamp().partner.partnerAcronym)IntSubscriptionLibrarySub
+Int,Global,DataLabsIntSubscriptionLibrarySub
+Production,ResourceFetcher,DataLabsRF$config(cloudName)Sub
+Production,Partner,DataLabs$config(stamp_$stamp().partner.partnerAcronym)$config(cloudName)Sub
+Production,Global,DataLabsRF$config(cloudName)Sub

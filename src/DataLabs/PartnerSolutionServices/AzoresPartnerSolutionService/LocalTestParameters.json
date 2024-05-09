@@ -1,0 +1,24 @@
+{
+  "Debug_DoNotUseMeters": "true",
+
+  "SolutionName": "testsolution",
+  "PrimaryRegionName": "testprimary",
+  "BackupRegionName": "testbackup",
+
+  "EnableGrpcTrace": "true",
+  "EnableHttpClientTrace": "true",
+  "EnableAzureSDKActivity": "true",
+
+  "ResourceProxyCallMaxTimeOutInSec": "120/240",
+
+  "GetResourceAllowedTypes": "microsoft.compute/virtualmachines:resourcefetcher_arm",
+  "CallARMGenericRequestAllowedTypes": "",
+  "GetCollectionAllowedTypes": "",
+  "GetManifestConfigAllowedTypes": "",
+  "GetConfigSpecsAllowedTypes": "",
+  "GetCasResponseAllowedTypes": "",
+
+  "resourceProxyGrpcOption": "LBPolicy=LOCAL"
+
+}
+

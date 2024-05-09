@@ -1,0 +1,365 @@
+{
+  "advancedConfiguration": {
+    "debug": false
+  },
+  "alertConditions": [
+    {
+      "alertOutletIds": [],
+      "bucket": {
+        "bucketCount": "2",
+        "totalBucketCount": 3
+      },
+      "conditions": [
+        {
+          "comparator": 1,
+          "expressionId": "dc8009ad-5281-4a1f-9650-f6ce3c81e2fe",
+          "id": "ef9aad7c-400d-4e7d-ba70-acdbf5cc19f3",
+          "type": 0,
+          "value": "5000"
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 1,
+      "id": "475fa1c3-c314-4e33-93b2-35bf449096f5",
+      "metadata": {},
+      "name": "SEV3 - Many Messages to PoisonQueue",
+      "severity": 3
+    },
+    {
+      "alertOutletIds": [],
+      "bucket": {
+        "bucketCount": "2",
+        "totalBucketCount": 3
+      },
+      "conditions": [
+        {
+          "comparator": 1,
+          "expressionId": "dc8009ad-5281-4a1f-9650-f6ce3c81e2fe",
+          "id": "ef9aad7c-400d-4e7d-ba70-acdbf5cc19f3",
+          "type": 0,
+          "value": "20000"
+        }
+      ],
+      "fireOnDivideByZero": false,
+      "fireOnSkip": false,
+      "healthStatus": 1,
+      "id": "124de55c-0c80-4236-ac3a-56032312c128",
+      "metadata": {},
+      "name": "SEV2 - Too Many Messages to PoisonQueue",
+      "severity": 2
+    }
+  ],
+  "alertEnrichmentConfiguration": {
+    "customLinks": [
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+        "accountName": "ARGDataLabs",
+        "autoExecute": true,
+        "dimensionsToOverride": [
+          "scaleUnit",
+          "region",
+          "service"
+        ],
+        "executionDelay": "00:00:00",
+        "lookbackDuration": "1.00:00:00",
+        "path": [
+          "IOService",
+          "PoisonQueue"
+        ],
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "PoisonQueue Dashboard"
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DGrepJarvisLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "clientQuery": "let PoisonReason = Regex.Match(EventList, \"PoisonReason=(.*?)\\n\").Groups[1].Value\r\nlet PoisonFromComponent = Regex.Match(EventList, \"PoisonFromComponent=(.*?)\\n\").Groups[1].Value\r\nlet PoisonDetails = Regex.Match(EventList, \"PoisonDetails=(.*?)\\n\").Groups[1].Value\r\ngroupby PoisonReason, PoisonDetails, PoisonFromComponent let count = Count()\r\norderby count desc",
+        "dGrepEndpoint": "https://dgrepv2-frontend-prod.trafficmanager.net/",
+        "endpointAlias": "Diagnostics PROD",
+        "endTime": "{EndTime}",
+        "eventFilters": [
+          {
+            "isScrubbed": false,
+            "monikerRegex": null,
+            "nameRegex": "Span",
+            "namespaceRegex": "ARGDataLabs",
+            "versionRegex": null
+          }
+        ],
+        "executionDelay": "00:00:00",
+        "identityColumns": {
+          "Region": [
+            "{Monitor.Dimension.region}"
+          ],
+          "ScaleUnit": [
+            "{Monitor.Dimension.scaleUnit}"
+          ]
+        },
+        "lookback": "00:15:00",
+        "maxResultRowCount": 15,
+        "maxRowCount": 500000,
+        "mdsEndpoint": "https://production.diagnostics.monitoring.core.windows.net/",
+        "preIncidentQueryTimeout": "00:00:50",
+        "serverQuery": "where EventList.containsi(\"PoisonReason\")",
+        "startTime": null,
+        "stepback": "00:00:00",
+        "title": "",
+        "uxParameters": [
+          {
+            "key": "aggregatesVisible",
+            "value": true
+          },
+          {
+            "key": "aggregates",
+            "value": []
+          },
+          {
+            "key": "chartsVisible",
+            "value": false
+          },
+          {
+            "key": "chartEditorVisible",
+            "value": true
+          },
+          {
+            "key": "chartType",
+            "value": "line"
+          },
+          {
+            "key": "chartLayers",
+            "value": [
+              [
+                "New Layer",
+                ""
+              ]
+            ]
+          },
+          {
+            "key": "UTC",
+            "value": true
+          }
+        ]
+      },
+      {
+        "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.GenericCustomLink, Microsoft.Online.Metrics.Common",
+        "autoExecute": false,
+        "executionDelay": "00:00:00",
+        "link": "https://eng.ms/docs/cloud-ai-platform/azure-core/azure-management-and-platforms/control-plane-bburns/fleet-inventory/azure-resource-builder/monitors/highretryorpoisonqueue",
+        "preIncidentQueryTimeout": "00:00:50",
+        "title": "DropRetryPoisonTSG"
+      }
+    ]
+  },
+  "autoMitigationConfiguration": {
+    "healthyCountToMitigateIncident": 10,
+    "shouldMitigateIncident": false
+  },
+  "customMetadata": {
+    "Icm.TsgId": "https://eng.ms/docs/cloud-ai-platform/azure-core/azure-management-and-platforms/control-plane-bburns/fleet-inventory/azure-resource-builder/monitors/highretryorpoisonqueue",
+    "Title": "[DataLabs]{Monitor.DisplayName} for SU: {Monitor.Dimension.scaleUnit}, Region: {Monitor.Dimension.region}"
+  },
+  "description": "Messages are failing and sent to poison queue. Investigation is required to determine why messages are failing.",
+  "ev2MetadataInLastDeployment": null,
+  "expressions": [
+    {
+      "endTimeShift": null,
+      "id": "dc8009ad-5281-4a1f-9650-f6ce3c81e2fe",
+      "lookback": "",
+      "name": "Messages to PoisonQueue",
+      "percentages": [
+        {
+          "denominator": [],
+          "multiplier": 1,
+          "numerator": [
+            {
+              "conditions": [
+                {
+                  "dimensionName": "InputAction",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "NODE_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "POD_NAME",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "SnapshotInput",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "buildVersion",
+                  "exclusion": [],
+                  "inclusion": [
+                    {
+                      "filterType": 1,
+                      "values": [
+                        "*"
+                      ]
+                    }
+                  ],
+                  "isEnvironmentVar": false,
+                  "type": 0
+                },
+                {
+                  "dimensionName": "region",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "scaleUnit",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                },
+                {
+                  "dimensionName": "service",
+                  "isEnvironmentVar": false,
+                  "type": 1
+                }
+              ],
+              "dataBlockType": 0,
+              "endTimeShift": null,
+              "expressionId": "",
+              "isNegative": false,
+              "lookback": null,
+              "lookbackAggregation": 0,
+              "multiTimeSeriesAggregation": 0,
+              "timeSeriesId": "947bd6f1-cf67-49c0-a383-5087257af276",
+              "timeSeriesType": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "frequency": "00:03:00",
+  "id": "d819ed62-f5a9-4c75-a28b-2eca30533e65",
+  "lastModifiedBy": "avagarwa",
+  "lastModifiedTime": "2024-04-02T15:13:11.5688348Z",
+  "lookback": "00:05:00",
+  "name": "[IOService] High PoisonQueue Writes",
+  "outlets": [],
+  "recoveryRules": [],
+  "resourceType": "ServiceHealthTemp",
+  "schemaVersion": 0,
+  "state": 1,
+  "tags": [
+    "IOService",
+    "PoisonQueue"
+  ],
+  "targetDimensions": [
+    {
+      "dimensionName": "scaleUnit",
+      "exclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "idmapping"
+          ]
+        }
+      ],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "region",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    },
+    {
+      "dimensionName": "service",
+      "exclusion": [],
+      "inclusion": [
+        {
+          "filterType": 1,
+          "values": [
+            "*"
+          ]
+        }
+      ],
+      "isEnvironmentVar": false,
+      "type": 0
+    }
+  ],
+  "tenant": "ARGDataLabs",
+  "timeSeries": [
+    {
+      "dimensions": [
+        "InputAction",
+        "NODE_NAME",
+        "POD_NAME",
+        "SnapshotInput",
+        "buildVersion",
+        "region",
+        "scaleUnit",
+        "service"
+      ],
+      "id": "947bd6f1-cf67-49c0-a383-5087257af276",
+      "metric": "SLONumMovedToPoisonQueue",
+      "name": "Messages to PoisonQueue",
+      "namespace": "ARGDataLabs",
+      "samplingType": "Average",
+      "tenant": "ARGDataLabs",
+      "timeSeriesType": 0
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "bv": 10,
+  "component": "Mdm/Internal/HealthReports/V2",
+  "computedMetrics": [
+    {
+      "displayName": "Status",
+      "expression": "unhealthy.Sum === 0 ? (degraded.Sum === 0 ? (healthy.Sum === 0 ? null : 1) : 2) : 0",
+      "expressionEngine": null,
+      "higherNumberIs": null,
+      "id": "Status",
+      "isBuiltIn": false,
+      "minMaxMetricsEnabled": false,
+      "numberSuffix": null,
+      "numberType": null,
+      "percentileConfiguration": null
+    }
+  ],
+  "deleted": false,
+  "description": null,
+  "dimensions": null,
+  "displayName": null,
+  "enableClientEtwPublication": true,
+  "enableClientSideForking": true,
+  "enableClientSideLastSamplingMode": false,
+  "enableClientSidePublication": true,
+  "id": "RunnerInstanceHealth/Status",
+  "isFromNewPipeline": false,
+  "isQosMetric": false,
+  "lastUpdatedBy": "95fbafbf4600808f97e33608f6bcad3c.metricsclient.geneva.core.windows.net",
+  "lastUpdateTime": "2023-06-10T02:03:26.8292985Z",
+  "metricIdentifiers": {
+    "degraded": {
+      "metricName": "RunnerInstanceHealth/Degraded",
+      "metricNamespace": "Mdm/Internal/HealthReports/V2",
+      "monitoringAccount": "ARGDataLabs"
+    },
+    "healthy": {
+      "metricName": "RunnerInstanceHealth/Healthy",
+      "metricNamespace": "Mdm/Internal/HealthReports/V2",
+      "monitoringAccount": "ARGDataLabs"
+    },
+    "unhealthy": {
+      "metricName": "RunnerInstanceHealth/Unhealthy",
+      "metricNamespace": "Mdm/Internal/HealthReports/V2",
+      "monitoringAccount": "ARGDataLabs"
+    },
+    "unknown": {
+      "metricName": "RunnerInstanceHealth/Unknown",
+      "metricNamespace": "Mdm/Internal/HealthReports/V2",
+      "monitoringAccount": "ARGDataLabs"
+    }
+  },
+  "metrics": null,
+  "monitors": null,
+  "pendingMetricsOrderingFix": false,
+  "preferQueryMetricsStore": null,
+  "replicationState": 0,
+  "tenant": "ARGDataLabs",
+  "treatMissingSeriesAsZeros": true,
+  "version": 0,
+  "views": null
+}

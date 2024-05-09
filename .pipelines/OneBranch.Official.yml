@@ -1,0 +1,478 @@
+#################################################################################
+#                         OneBranch Pipelines - Official                        #
+# This pipeline was created by EasyStart from a sample located at:              #
+#   https://aka.ms/obpipelines/easystart/samples                                #
+# Documentation:  https://aka.ms/obpipelines                                    #
+# Yaml Schema:    https://aka.ms/obpipelines/yaml/schema                        #
+# Retail Tasks:   https://aka.ms/obpipelines/tasks                              #
+# Support:        https://aka.ms/onebranchsup                                   #
+#################################################################################
+
+trigger: 
+  branches:
+    include: [ main, master ]
+# NOTE: If you cohost your configuration with service source code, you should strongly consider
+# adding a filter to only trigger this pipeline for changes to the configuration files/folders.
+  paths:
+    exclude:
+      - geneva/*
+
+name: $(Date:yyyy.MM.dd).$(Rev:rr)
+
+parameters:
+  - name: 'debug'
+    displayName: 'Enable debug output'
+    type: boolean
+    default: false
+
+variables:
+  - name: IsOfficialBuild
+    value: true
+  - name: ROOT
+    value: $(Build.SourcesDirectory)
+  - name: OUTPUTROOT
+    value: $(ROOT)\out
+  - name: CDP_DEFINITION_BUILD_COUNT
+    value: $[counter('', 0)]
+  - name: system.debug
+    value: ${{ parameters.debug }}
+  - name: WindowsContainerImage
+    value: 'onebranch.azurecr.io/windows/ltsc2019/vse2022'
+  - name: MAJOR
+    value: 1
+  - name: MINOR
+    value: $(Date:yy)
+  - name: BUILD
+    value: 1
+  - name: REVISION
+    value: $[counter(format('{0}.{1}.{2}',variables['MAJOR'],variables['MINOR'],variables['BUILD']), 1)]
+  - name: AdditionalMSBuildArgs
+    value: '/flp1:Verbosity=d;LogFile=$(OUTPUTROOT)\logs\msbuild_x64_release.log;Encoding=UTF-8 /flp2:logfile=$(OUTPUTROOT)\logs\msbuild_x64_release.err;errorsonly /bl:$(OUTPUTROOT)\logs\msbuild_x64_release.binlog'
+  - name: AdditionalMSBuildNugetArgs
+    value: '/flp1:Verbosity=d;LogFile=$(OUTPUTROOT)\logs\msbuild_x64_release_nupkg.log;Encoding=UTF-8 /flp2:logfile=$(OUTPUTROOT)\logs\msbuild_x64_release_nupkg.err;errorsonly /bl:$(OUTPUTROOT)\logs\msbuild_x64_release_nupkg.binlog'
+  - name: CDP_CLOUDVAULT_VERSION_SANITIZE #https://eng.ms/docs/products/onebranch/artifactsandsymbols/containerbasedbuildworkflows/cloudvaultupload#azdeployer-versioning-format
+    value: true
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+extends:
+  template: v2/OneBranch.Official.CrossPlat.yml@templates # https://aka.ms/obpipelines/templates
+  parameters:
+    featureFlags:
+      EnableLegacyCDPxPAT: true
+    nugetPublishing:
+      feeds:
+        - name: Official
+    cloudvault:
+      enabled: true
+      runmode: stage
+      uploadToPipelineArtifacts: false
+      dependsOn:
+        - build
+        - dockerbuild
+      artifacts:
+        - drop_build_main
+        - drop_dockerbuild_main
+    globalSdl:
+      tsa:
+        enabled: true
+        credscan:
+          suppressionsFile: $(Build.SourcesDirectory)\.config\CredScanSuppressions.json
+      binskim:
+        break: true
+      policheck:
+        break: true
+        suppression:
+          suppressionFile: $(Build.SourcesDirectory)\.config\PoliCheck.Exclusions.xml
+
+    stages:
+      - stage: build
+        jobs:
+          - job: main
+            pool:
+              type: windows
+
+            variables:
+              ob_outputDirectory: '$(OUTPUTROOT)'
+              ob_sdl_binskim_break: true
+              ob_symbolsPublishing_enabled: true
+              ob_sdl_suppression_suppressionFile: $(Build.SourcesDirectory)\.config\sdlsuppression.json
+              ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main')}}:
+                ob_nugetPublishing_enabled: true
+
+              buildTarget: $(Build.SourcesDirectory)\dirs.proj
+              buildStagePrefix: 🥼
+
+            steps:
+              - task: UseDotNet@2
+                displayName: '$(buildStagePrefix) Use Dot Net'
+                continueOnError: true
+                inputs:
+                  packageType: 'sdk'
+                  useGlobalJson: true
+                  performMultiLevelLookup: true
+
+              - task: MSBuild@1
+                displayName: '$(buildStagePrefix) msbuild restore'
+                inputs:
+                  solution: '$(buildTarget)'
+                  msbuildLocationMethod: 'version'
+                  msbuildVersion: 'latest'
+                  platform: 'x64'
+                  configuration: 'release'
+                  msbuildArguments: '/t:Restore'
+                  maximumCpuCount: true
+                  logProjectEvents: true
+                  createLogFile: true
+
+              - task: MSBuild@1
+                displayName: '$(buildStagePrefix) msbuild build'
+                inputs:
+                  solution: '$(buildTarget)'
+                  msbuildLocationMethod: 'version'
+                  msbuildVersion: 'latest'
+                  platform: 'x64'
+                  configuration: 'release'
+                  ${{ if eq(variables['system.debug'], true)}}:
+                    msbuildArguments: '/v:n /nr:false'
+                  ${{ else }}:
+                    msbuildArguments: '/v:n /nr:false $(AdditionalMSBuildArgs)'
+                  maximumCpuCount: true
+                  logProjectEvents: true
+                  createLogFile: true
+
+              - task: UseDotNet@2
+                continueOnError: true
+                inputs:
+                  version: '8.0.x'
+                  performMultiLevelLookup: true
+
+              # Installing msbuild 17.8
+              - template: /SharedComponents/OneBranch/Steps/Prepare.MSBuild.yml@templates
+                parameters:
+                  msBuildVersion: 17.8
+                  dropSourcePath: cloudbuild.tools.msbuild/20231121.1/23850899
+                  msbuildInstallationPath: c:\.vs
+                  includeReferenceAssemblies: 'true'
+                  microsoftSdks:
+                  - 'Azure/.NET SDK/v2.9'
+              
+              - task: MSBuild@1
+                displayName: '$(buildStagePrefix) geneva actions extension msbuild restore'
+                inputs:
+                  solution: '$(Build.SourcesDirectory)\src\GenevaActionsExtension\GenevaActionsExtension.csproj'
+                  msbuildLocationMethod: 'location'
+                  msbuildLocation: '$(MSBuildPath)'
+                  platform: 'x64'
+                  configuration: 'release'
+                  msbuildArguments: '/t:Restore'
+                  maximumCpuCount: true
+                
+              - task: MSBuild@1
+                displayName: '$(buildStagePrefix) geneva actions extension msbuild build without packaging'
+                inputs:
+                  solution: '$(Build.SourcesDirectory)\src\GenevaActionsExtension\GenevaActionsExtension.csproj'
+                  msbuildLocationMethod: 'location'
+                  msbuildLocation: '$(MSBuildPath)'
+                  platform: 'x64'
+                  configuration: 'release'
+                  maximumCpuCount: true
+                  ${{ if eq(variables['system.debug'], true)}}:
+                    msbuildArguments: '/p:SkipPackaging=true /v:n /nr:false'
+                  ${{ else }}:
+                    msbuildArguments: '/p:SkipPackaging=true /v:n /nr:false $(AdditionalMSBuildArgs)'
+
+              - task: PowerShell@2
+                displayName: '$(buildStagePrefix) Package Script'
+                inputs:
+                  targetType: 'inline'
+                  script: '$(Build.SourcesDirectory)/.pipelines/restore.ps1'
+
+              - task: CopyFiles@2
+                displayName: '$(buildStagePrefix) Copy Ev2SGRoot files'
+                inputs:
+                  sourceFolder: '$(Build.SourcesDirectory)\src\Ev2Deployment\ServiceGroupRoot'
+                  contents: '**'
+                  targetFolder: '$(Build.SourcesDirectory)\out\Ev2Deployment\ServiceGroupRoot'
+
+              - task: CopyFiles@2
+                displayName: '$(buildStagePrefix) Copy Ev2 StageMaps files'
+                inputs:
+                  sourceFolder: '$(Build.SourcesDirectory)\src\Ev2Deployment\StageMaps'
+                  contents: '**'
+                  targetFolder: '$(Build.SourcesDirectory)\out\Ev2Deployment\StageMaps'
+
+              - task: CopyFiles@2
+                displayName: '$(buildStagePrefix) Copy Ev2 Scripts files'
+                inputs:
+                  sourceFolder: '$(Build.SourcesDirectory)\src\Ev2Deployment\Scripts'
+                  contents: '**'
+                  targetFolder: '$(Build.SourcesDirectory)\out\Ev2Deployment\Scripts'
+
+              - task: CopyFiles@2
+                displayName: '$(buildStagePrefix) Copy Ev2 Inputs files'
+                inputs:
+                  sourceFolder: '$(Build.SourcesDirectory)\src\Ev2Deployment\Inputs'
+                  contents: '**'
+                  targetFolder: '$(Build.SourcesDirectory)\out\Ev2Deployment\Inputs'
+
+              - task: onebranch.pipeline.signing@1 # https://aka.ms/obpipelines/signing
+                displayName: '$(buildStagePrefix) Sign output'
+                inputs:
+                  command: 'sign'
+                  signing_environment: 'azure-ado'
+                  files_to_sign: '**/*.exe;**/*.dll;**/*.ps1;**/*.psm1'
+                  search_root: '$(Build.SourcesDirectory)\out\'
+              
+              - task: MSBuild@1
+                displayName: 'Build GA packages using signed binaries'
+                inputs:
+                  solution: '$(Build.SourcesDirectory)\src\GenevaActionsExtension\GenevaActionsExtension.csproj'
+                  msbuildLocationMethod: 'location'
+                  msbuildLocation: '$(MSBuildPath)'
+                  platform: 'x64'
+                  configuration: 'release'
+                  msbuildArguments: '/p:BuildProjectReferences=false /t:PackagingGAExtension /v:n /nr:false /flp1:Verbosity=d;LogFile=$(OUTPUTROOT)\logs\packaging_release.log;Encoding=UTF-8 /flp2:logfile=$(OUTPUTROOT)\logs\packaging_release.err;errorsonly /bl:$(OUTPUTROOT)\logs\packaging_release.binlog'
+                  clean: false 
+                  maximumCpuCount: true
+                  logProjectEvents: true
+
+              - task: onebranch.pipeline.signing@1
+                displayName: 'Sign GA packages'
+                inputs:
+                  command: 'sign'
+                  signing_profile: '143360024'
+                  search_root: '$(Build.SourcesDirectory)\out\release-x64'
+                  files_to_sign: '**/*.Package'
+              
+      - stage: dockerbuild
+        dependsOn: build
+        jobs:
+          - job: main
+            pool:
+              type: docker
+              os: linux
+            variables:
+              acr: datalabscanaryecyacr.azurecr.io
+              ob_cloudvault_enabled: false
+            steps:
+              - task: DownloadPipelineArtifact@2
+                displayName: '🔒 Download artifacts'
+                inputs:
+                  targetPath: $(Build.SourcesDirectory)/dst/drop_build_main
+                  artifact: drop_build_main
+
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build garnet server image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'garnetserver'
+                  dockerFileRelPath: drop_build_main/release-x64/GarnetServer/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/GarnetServer
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/garnetserver.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build socat image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'socat'
+                  dockerFileRelPath: drop_build_main/release-x64/Socat/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/Socat
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/socat.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build io service image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'inputoutputservice'
+                  dockerFileRelPath: drop_build_main/release-x64/InputOutputService/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/InputOutputService
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/inputoutputservice.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build resource fetcher proxy image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'resourcefetcherproxyservice'
+                  dockerFileRelPath: drop_build_main/release-x64/ResourceFetcherProxyService/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/ResourceFetcherProxyService
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/resourcefetcherproxyservice.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build resource fetcher image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'resourcefetcherservice'
+                  dockerFileRelPath: drop_build_main/release-x64/ResourceFetcherService/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/ResourceFetcherService
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/resourcefetcherservice.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build abc partner image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'abcpartnersolution'
+                  dockerFileRelPath: drop_build_main/release-x64/ABCPartnerSolutionService/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/ABCPartnerSolutionService
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/abcpartnersolution.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+              
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build idm partner image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'idmpartnersolution'
+                  dockerFileRelPath: drop_build_main/release-x64/IdMappingPartnerSolutionService/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/IdMappingPartnerSolutionService
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/idmpartnersolution.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build resource alias partner image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'raspartnersolution'
+                  dockerFileRelPath: drop_build_main/release-x64/ResourceAliasPartnerSolutionService/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/ResourceAliasPartnerSolutionService
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/raspartnersolution.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build sku partner partial sync image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'skupartialsyncpartnersolution'
+                  dockerFileRelPath: drop_build_main/release-x64/SkuPartnerSolutionService/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/SkuPartnerSolutionService
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/skupartialsyncpartnersolution.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+              
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build admin service image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'adminservice'
+                  dockerFileRelPath: drop_build_main/release-x64/AdminService/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/AdminService
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/adminservice.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+              
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build sku partner full sync image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'skufullsyncpartnersolution'
+                  dockerFileRelPath: drop_build_main/release-x64/SkuPartnerFullSyncSolutionService/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/SkuPartnerFullSyncSolutionService
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/skufullsyncpartnersolution.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+                  
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build sku partner cache ingestion image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'armdatacachepartnersolution'
+                  dockerFileRelPath: drop_build_main/release-x64/ArmDataCacheIngestionPartnerSolutionService/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/ArmDataCacheIngestionPartnerSolutionService
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/armdatacachepartnersolution.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build capability partner image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'cappartnersolution'
+                  dockerFileRelPath: drop_build_main/release-x64/CapabilitiesPartnerSolutionService/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/CapabilitiesPartnerSolutionService
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/cappartnersolution.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build sample partner image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'samplepartnersolution'
+                  dockerFileRelPath: drop_build_main/release-x64/SamplePartnerSolutionService/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/SamplePartnerSolutionService
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/samplepartnersolution.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)
+              
+              - task: onebranch.pipeline.imagebuildinfo@1
+                displayName: build azores partner image
+                inputs:
+                  registry: $(acr)
+                  repositoryName: 'azorespartnersolution'
+                  dockerFileRelPath: drop_build_main/release-x64/AzoresPartnerSolutionService/Dockerfile
+                  dockerFileContextPath: drop_build_main/release-x64/AzoresPartnerSolutionService
+                  enable_network: true
+                  enable_cache: true
+                  compress: true
+                  saveImageToPath: images/azorespartnersolution.tar.gz
+                  buildkit: 1
+                  build_tag: $(Build.BuildNumber)

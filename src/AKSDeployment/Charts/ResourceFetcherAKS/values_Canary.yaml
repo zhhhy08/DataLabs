@@ -1,0 +1,76 @@
+solutionInfo:
+  aksClusterName: rfcanaryecyaks
+  environment: Canary
+  region: eastus2euap
+
+# use cmd `az identity show --resource-group "${RESOURCE_GROUP}" --name "${MI_NAME}" --query 'clientId' -otsv` to get the client-id of the MI
+resourceFetcherServiceAccount: 
+# MI of resource fetcher
+  clientId: 70be9d61-6a01-4034-904b-8b5fcf4e1666  
+
+resourceFetcherService:
+  aadTokenAudience: https://resourcefetcherservice-canary.msazurecloud.onmicrosoft.com
+  armClient:
+    certificateName: aad-rp-canary-arg-first-party-app-cert
+  armAdminClient:
+    certificateName: datalabs-arm-admin-canary-gov-rp-art
+    endpoints: https://westus.admin.management.azure.com
+
+keyVault:
+  name: datalabscanarygblkv
+  clientId: f7627b0a-ec8f-4082-a634-ce59450aa5c6
+
+resourceFetcherConfigMap:
+  partnerNames: "abcsolution"    # this should match with Partner AKS value file's solution name (solutionInfo -> solutionName)
+
+abcsolutionConfigMap: 
+# MI of ABC partner
+  clientIds: 04c3d0a2-2cb5-4e0c-b1ab-66fd0ce9ae9e
+
+capsolutionConfigMap: 
+# MI of CAP partner
+  clientIds: 022206f3-5dbc-458f-89a1-f876aa30d01f
+
+resourceFetcherImage:
+  repository: datalabscanaryacr.azurecr.io/resourcefetcherservice
+
+# AdminService 
+adminServiceImage:
+  repository: datalabscanaryacr.azurecr.io/adminservice
+
+# Monitoring configurations
+monitorInfo:
+  exporterType: GENEVA # default is console exporter
+
+genevaAccounts:
+  datalabs:
+    gcs_environment: DiagnosticsProd
+    gcs_account: ARGDataLabs
+    gcs_region: eastus2euap
+    gcs_namespace: ARGDataLabs
+    gcs_config_version: '1.5'
+    miResourceId: /subscriptions/c66bb4b1-b928-4268-b925-cc62eff17dad/resourceGroups/MC_DataLabsRFRG-eastus2euap_rfcanaryecyaks_eastus2euap/providers/Microsoft.ManagedIdentity/userAssignedIdentities/rfcanaryecyaks-agentpool
+
+    # volumes, will use hostPath
+    mdsdVolumeName: &mdsdVolumeName mdsd-run-vol
+
+mdm:
+  # Leave metric_endpoint commented out for PROD environment. Uncomment it for INT environment.
+  # metricEndpoint: https://global.ppe.microsoftmetrics.com/
+
+  accountInfo:
+    DataLabs:
+      account: ARGDataLabs
+      namespace: ARGDataLabs
+
+
+# objectId of rf aks agentpool MI (kubelet identity)
+  configData: >
+    {
+      "imdsInfo": [
+        {
+          "account": "ARGDataLabs",
+          "objectId": "3b383479-d4d7-427e-84a7-22e421c398b3"
+        }
+      ]
+    }

@@ -1,0 +1,111 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "suffix": {
+            "type": "string"
+        },
+        "storageAccountConfigs": {
+            "type": "object"
+        },
+        "location": {
+            "type": "string"
+        },
+        "cloudName": {
+            "type": "string"
+        },
+        "partnerAcronym": {
+            "type": "string"
+        },
+        "availabilityZonesInRegion": {
+            "type": "int"
+        }
+    },
+    "variables": {
+        "StorageBlobDataOwnerRoleDefId": "b7e6dc6d-f1e8-4753-8033-0f276bb0955b",
+        "IoConnectorResourceId": "[
+            if(equals(parameters('partnerAcronym'),'datalabs'),
+            '',
+        resourceId(subscription().subscriptionId, format('DataLabs{0}RG',parameters('partnerAcronym')), 'Microsoft.ManagedIdentity/userAssignedIdentities', concat(parameters('partnerAcronym'), parameters('cloudName'), 'ioconnectorid'))
+            )]",
+            "regionsHasAzZones": "[greater(parameters('availabilityZonesInRegion'),1)]"
+        },
+        "resources": [
+            {
+                "name": "[concat(copyIndex(), parameters('suffix'))]",
+                "type": "Microsoft.Storage/storageAccounts",
+                "sku": {
+                    "name": "[
+                        if(variables('regionsHasAzZones'),
+                        parameters('storageAccountConfigs').skuName,
+                        if(equals(parameters('storageAccountConfigs').skuName,'Standard_GZRS'),
+                        'Standard_GRS',
+                        if(equals(parameters('storageAccountConfigs').skuName,'Standard_ZRS'),
+                        'Standard_LRS',
+                        parameters('storageAccountConfigs').skuName
+                        )))]",
+                        "tier": "[parameters('storageAccountConfigs').skuTier]"
+                    },
+                    "kind": "[parameters('storageAccountConfigs').kind]",
+                    "apiVersion": "2019-06-01",
+                    "location": "[parameters('location')]",
+                    "properties": {
+                        "supportsHttpsTrafficOnly": true,
+                        "allowBlobPublicAccess": false,
+                        "encryption": {
+                            "services": {
+                                "blob": {
+                                    "keyType": "Account",
+                                    "enabled": true
+                                },
+                                "file": {
+                                    "keyType": "Account",
+                                    "enabled": true
+                                }
+                            },
+                            "keySource": "Microsoft.Storage"
+                        }
+                    },
+                    "copy": {
+                        "name": "storageaccountiterator",
+                        "count": "[parameters('storageAccountConfigs').count]"
+                    }
+                },
+                {
+                    "condition": "[equals(parameters('storageAccountConfigs').createRAForIOConnector,'true')]",
+                    "name": "[guid(concat(copyIndex(), parameters('suffix')), parameters('location'), variables('StorageBlobDataOwnerRoleDefId'),variables('IoConnectorResourceId'))]",
+                    "type": "Microsoft.Authorization/roleAssignments",
+                    "apiVersion": "2022-04-01",
+                    "properties": {
+                        "roleDefinitionId": "[SubscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('StorageBlobDataOwnerRoleDefId'))]",
+                        "principalId": "[if(empty(variables('IoConnectorResourceId')),string('ioconnector id is empty'),reference(variables('IoConnectorResourceId'), '2018-11-30', 'Full').properties.principalId)]",
+                        "principalType": "ServicePrincipal"
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Storage/storageAccounts', concat(copyIndex(), parameters('suffix')))]"
+                    ],
+                    "copy": {
+                        "name": "storageaccountiterator",
+                        "count": "[parameters('storageAccountConfigs').count]"
+                    }
+                },
+                {
+                    "condition": "[equals(parameters('storageAccountConfigs').useDeleteRetentionPolicy,'true')]",
+                    "type": "Microsoft.Storage/storageAccounts/blobServices",
+                    "apiVersion": "2021-04-01",
+                    "name": "[format('{0}/{1}',concat(copyIndex(), parameters('suffix')),'default')]",
+                    "properties": {
+                        "deleteRetentionPolicy": {
+                            "days": "[parameters('storageAccountConfigs').retentionPolicyPeriod]"
+                        }
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Storage/storageAccounts', concat(copyIndex(), parameters('suffix')))]"
+                    ],
+                    "copy": {
+                        "name": "storageaccountiterator",
+                        "count": "[parameters('storageAccountConfigs').count]"
+                    }
+                }
+            ]
+        }

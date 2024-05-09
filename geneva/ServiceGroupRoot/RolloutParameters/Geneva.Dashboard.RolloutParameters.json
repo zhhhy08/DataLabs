@@ -1,0 +1,32 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "extensions":
+  [
+    {
+      "Name": "ManageJarvisDashboards",
+      "Type": "Microsoft.Geneva.Dashboards/ManageJarvisDashboards",
+      "Version": "2020-06-01",
+      "ConnectionProperties": {
+        "MaxExecutionTime": "PT30M",
+        "Authentication": {
+          "Type": "CertificateAuthentication",
+          "Reference": {
+            "Provider": "AzureKeyVault",
+            "Parameters": {
+              "SecretId": "https://datalabsgeneva-gbl-kv.vault.azure.net/secrets/DatalabsGenevaKeyVaultCert"
+            }
+          }
+        }
+      },
+      "payloadProperties": {
+        "configurationPackage": {
+          "Reference": { "Path": "Package\\Dashboards.zip" }
+        },
+        "monitoringAccountName": {
+          "Value": "ARGDataLabs"
+        }
+      }
+    }
+  ]
+}

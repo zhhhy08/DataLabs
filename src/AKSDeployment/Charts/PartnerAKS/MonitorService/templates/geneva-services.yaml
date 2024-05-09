@@ -1,0 +1,145 @@
+# Similar to Charts/ResourceFetcherAKS/MonitorService/templates/geneva-services.yaml
+# Same, but added logic for socat and multiple geneva accounts capabilities
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Values.monitorInfo.name }}
+  namespace: {{ .Values.monitorNameSpace }}
+  labels:
+    app: {{ .Values.monitorInfo.name }}
+spec:
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  minReadySeconds: {{ .Values.monitorInfo.minReadySeconds }}
+  selector:
+    matchLabels:
+      app: {{ .Values.monitorInfo.name }}
+  template:
+    metadata:
+      namespace: {{ .Values.monitorNameSpace }}
+      labels:
+        app: {{ .Values.monitorInfo.name }}
+    spec:
+      hostNetwork: {{ .Values.monitorInfo.hostNetwork }}
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+      {{- $socatMetadata := .Values.socat.diagnosticEndpoints }} # default is external partner
+      {{- range $key, $value := $socatMetadata }}
+        - name: {{ $value.containerName }}
+          image: {{ $.Values.socat.repository }}:{{ $.Values.socat.tag }}
+          imagePullPolicy: Always
+          env:
+          - name: HOST_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP 
+          args:
+          - {{ include "socat.monitorservice.receiving" $value | trim | quote }}
+          - {{ include "socat.monitorservice.sending" $value | trim | quote }}
+          ports:
+          - containerPort: {{ $value.port }}
+            hostPort: {{ $value.port }}
+          volumeMounts:
+          - name: {{ $value.monitorVolumeName }}
+            mountPath: {{ $value.monitorMountPath }}
+        {{- end }}
+        {{- $MDSDMetadata := .Values.genevaAccounts }}
+        {{- range $key, $value := $MDSDMetadata }}
+        # MDSD
+        - name: {{ $.Values.mdsd.containerName }}-{{ $key }}
+          image: {{ $.Values.mdsd.image.repository }}:{{ $.Values.mdsd.image.tag }}
+          imagePullPolicy: Always
+          # Args can be set to override the default command line options for starting mdsd.
+          #
+          # -D : Redirects mdsd logging to stdout
+          # -A : Disable legacy config management
+          # -a : Bind listeners to 0.0.0.0
+          # -p : TCP Port to use for legacy JSON ingestion (0 == dynamic)
+          # -f : TCP Port to use for Fluent ingestion (0 == dynamic)
+          # -i : TCP Port to use for InfluxDB ingestion (0 == dynamic)
+          # -m : enables managed identities
+          args: [ "-D", "-A", "-a", "-p", "0", "-f", "0", "-i", "0", "--use-msi" ]
+          env:
+          # Identity Values for Scoping Conditions in Geneva Account
+          - name: TENANT
+            value: {{ $.Values.solutionInfo.aksClusterName }}
+          - name: ENVIRONMENT
+            value: {{ $.Values.solutionInfo.environment }}
+          - name: REGION
+            value: {{ $.Values.solutionInfo.region }}
+          - name: SCALE_UNIT
+            value: {{ $.Values.solutionInfo.scaleUnit }}
+          - name: ROLE
+            value: {{ $.Values.mdsd.envUnused }}
+          - name: ROLEINSTANCE
+            value: {{ $.Values.mdsd.envUnused }}
+          # GCS and Monitoring Agent Identificiation Requirements
+          - name: MONITORING_TENANT
+            value: {{ $.Values.solutionInfo.aksClusterName }}
+          - name: MONITORING_ROLE
+            value: {{ $value.gcs_account | quote }}
+          - name: MONITORING_ROLE_INSTANCE
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: MONITORING_GCS_ENVIRONMENT
+            value: {{ $value.gcs_environment | quote }}
+          - name: MONITORING_GCS_ACCOUNT
+            value: {{ $value.gcs_account | quote }}
+          - name: MONITORING_GCS_REGION
+            value: {{ $value.gcs_region | quote }}
+          - name: MONITORING_GCS_NAMESPACE
+            value: {{ $value.gcs_namespace | quote }}
+          - name: MONITORING_CONFIG_VERSION
+            value: {{ $value.gcs_config_version | quote }}
+          - name: DOCKER_LOGGING
+            value: {{ $.Values.mdsd.docker_logging | quote }}
+          - name: MONITORING_GCS_AUTH_ID_TYPE
+            value: {{ $value.UserAssignedIdentities | quote }}
+          - name: MONITORING_GCS_AUTH_ID
+            value: {{ $.Values.mdsd.monitoring_gcs_auth_id_miAuthType }}#{{ .miResourceId }}
+          volumeMounts:
+            - name: var-log-geneva-services-vol
+              mountPath: /geneva/geneva_logs
+            - name: {{ $value.mdsdVolumeName }}
+              mountPath: {{ $.Values.mdsd.run_dir_path | quote }}
+        {{- end }}
+        # MDM
+        - name: {{ .Values.mdm.containerName }}
+          image: {{ .Values.mdm.image.repository }}:{{ .Values.mdm.image.tag }}
+          imagePullPolicy: Always
+          env:
+          {{- if .Values.mdm.metricEndpoint }}
+          - name: METRIC_ENDPOINT
+            value: {{ .Values.mdm.metricEndpoint | quote }}
+          {{- end }}
+          - name: MDM_ACCOUNT
+            value: {{ .Values.mdm.accountInfo.DataLabs.account | quote }}
+          - name: MDM_INPUT
+            value: {{ .Values.mdm.mdm_input | quote }}  
+          - name: MDM_LOG_LEVEL
+            value: {{ .Values.mdm.mdm_log_level | quote }}
+          - name: CONFIG_OVERRIDES
+            value: {{ .Values.mdm.configData | quote }}
+          - name: IFXMETRICS_SOCKET_PATH
+            value: {{ .Values.mdm.ifxmetrics_socket_path | quote }}
+          volumeMounts:
+          - name: ifx-path
+            mountPath: {{ .Values.mdm.ifxmetrics_socket_folder_path | quote }}
+      volumes:
+        - name: ifx-path
+          hostPath:
+            path: {{ .Values.mdm.ifxmetrics_socket_folder_hostPath | quote }}
+        - name: {{ .Values.mdsd.hostPathName }}
+          hostPath:
+            path: {{ .Values.mdsd.hostPathPath | quote }}
+        - name: partner-vol
+          emptyDir: {}
+        - name: var-log-geneva-services-vol
+          hostPath:
+            path: /var/log/geneva-services
+        - name: etw-vol
+          emptyDir: {}

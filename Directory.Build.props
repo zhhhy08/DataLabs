@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This root MSBuild file is automatically imported for all projects in the tree by MSBuild 15.0 and
+serves as the central entry point for CBT.
+  You can have a hierarchy of imports but make sure that this file is still imported.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <NoWarn>CS8632</NoWarn>
+    <EnableCentralPackageVersions Condition="'$(EnableCentralPackageVersions)' == ''">true</EnableCentralPackageVersions>
+    <Configuration Condition=" '$(Configuration)'=='' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)'=='' ">x64</Platform>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <EnlistmentRoot>$(MSBuildThisFileDirectory.TrimEnd('\\'))</EnlistmentRoot>
+    <DataLabsRoot>$(EnlistmentRoot)\src\DataLabs</DataLabsRoot>
+  </PropertyGroup>
+
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <!-- During official builds only direct certain output to the output directory. The goal is only file necessary for deployment or running tools are signed/uploaded. -->
+  <PropertyGroup Condition="'$(IsOfficialBuild)' != 'true' Or !$(MSBuildProjectFullPath.ToLower().Contains('\tests\'))">
+    <BinariesBuildTypeArchDirectory>$(EnlistmentRoot)\out\$(Configuration)-$(Platform)</BinariesBuildTypeArchDirectory>
+    <OutputPath >$(BinariesBuildTypeArchDirectory)\$(MSBuildProjectName)</OutputPath>
+  </PropertyGroup>
+
+
+
+  <!-- Produce deterministic assemblies, requirement for ProduceReferenceAssembly -->
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <!-- Speed up incremental builds in VS and support interface-aware caching in CloudBuild -->
+  <PropertyGroup>
+    <ProduceReferenceAssembly Condition="'$(MSBuildProjectExtension)' == '.csproj' And '$(UsingMicrosoftNoTargetsSdk)' != 'true'">true</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Enable optimized NuGet restore -->
+    <RestoreUseStaticGraphEvaluation>false</RestoreUseStaticGraphEvaluation>
+  </PropertyGroup>
+
+  <!--
+    The TelemetryLoggerInstallId property defines where to deploy the MSBuild telemetry logger. This
+    must be kept in sync with Directory.Build.rsp. The install path needs to change for each version
+    to avoid file locks (logger dll will be in use while building).
+  -->
+  <PropertyGroup>
+    <TelemetryLoggerInstallId>1.0.17</TelemetryLoggerInstallId>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ev2schema.azure.net/schemas/2020-04-01/StageMap.json",
+  "name": "Microsoft.Azure.Datalabs.Int",
+  "version": "1.0.0.6",
+  "configuration": {
+    "promotion": {
+      "manual": false,
+      "timeout": "P3D"
+    }
+  },
+  "stages": [
+    {
+      "sequence": 1,
+      "name": "Test_Int_eastus",
+      "regions": [
+        "eastus"
+      ],
+      "stages": [
+        {
+          "sequence": 1,
+          "name": "StampSet1",
+          "stamps": [
+            "1",
+            "2",
+            "4",
+            "5"
+          ]
+        }
+      ]
+    },
+    {
+      "sequence": 2,
+      "name": "Test_Int_eastus2",
+      "regions": [
+        "eastus2"
+      ],
+      "stages": [
+        {
+          "sequence": 1,
+          "name": "StampSet1",
+          "stamps": [
+            "3"
+          ]
+        }
+      ]
+    }
+  ]
+}

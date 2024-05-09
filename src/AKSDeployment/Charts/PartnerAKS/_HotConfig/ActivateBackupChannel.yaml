@@ -1,0 +1,36 @@
+# Usage: 
+# set RESOURCE_GROUP "DataLabsabcRG-eastus"
+# set AKS_NAME "abcinteusaks"
+# Invoke-AzAksRunCommand -ResourceGroupName ${RESOURCE_GROUP} -Name ${AKS_NAME} -Force -Command "kubectl patch configmap solution-io-config -n solution-namespace --type merge --patch-file ActivateBackupChannel.yaml" -CommandContextAttachment "ActivateBackupChannel.yaml"
+# To stop backup input Channel processing to store in case of disaster BackupInputChannelActive should be false, offset values are respected
+# To start backup input Channel processing to store in case of disaster BackupInputChannelActive should be true, offset values are respected.
+# Config accepts offset values, in case of no value provided,starts with the latest timestamp.
+
+# allowalltenants and stopalltenants cannot be both false for any traffic tuner rule unless Included subscriptions, excluded subscriptions or included regions list is filled
+# allowalltenants is first priority, stopalltenants is second priority
+
+# below config is for scenario - cache is enabled for partner so backup channel is always running even outside BCDR scenarios
+
+# to start reading backup channel completely 
+data:
+    BackupInputChannelActive: "true/00:15:00"
+    BackupProviderPartnerTrafficTunerRule:
+        "allowalltenants: true;
+        stopalltenants: false;
+        includedregions:;
+        includedsubscriptions:;
+        excludedsubscriptions:;
+        excludedresourcetypes:;
+        messageretrycutoffcount: 12"
+
+# to stop reading backup channel completely 
+# data:
+# #     BackupInputChannelActive: "false/00:15:00"
+# #     BackupProviderPartnerTrafficTunerRule:
+#         "allowalltenants: false;
+#         stopalltenants: true;
+#         includedregions:;
+#         includedsubscriptions:;
+#         excludedsubscriptions:;
+#         excludedresourcetypes:;
+#         messageretrycutoffcount: 12"

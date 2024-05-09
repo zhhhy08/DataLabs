@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Platforms>x64</Platforms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="MSTest.TestAdapter" />
+    <PackageReference Include="MSTest.TestFramework" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(DataLabsRoot)\Common\Common.Core.csproj" />
+    <ProjectReference Include="$(DataLabsRoot)\PartnerCommon\Common.Partner.csproj" />
+    <ProjectReference Include="$(DataLabsRoot)\ResourceFetcherProxyService\ResourceFetcherProxyService.csproj" />
+    <ProjectReference Include="$(DataLabsRoot)\ResourceFetcherService\ResourceFetcherService.csproj" />
+    <ProjectReference Include="..\Tests.Common.Core\Tests.Common.Core.csproj" />
+  </ItemGroup>
+
+</Project>

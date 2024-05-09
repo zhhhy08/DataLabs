@@ -1,0 +1,383 @@
+{
+  "dmsConfiguration": null,
+  "ev2MetadataInLastDeployment": {
+    "hashOfJsonFile": "00000000-0000-0000-0000-000000000000",
+    "sizeInBytesForJsonFile": 0
+  },
+  "icmConfig": {
+    "connectorId": "7c227986-03ae-43a7-beeb-7654a27c4212",
+    "tenantName": "ARGDataLabs",
+    "url": "https://prod.microsofticm.com/Connector2/ConnectorIncidentManager.svc"
+  },
+  "incidentEnrichmentSettings": {
+    "defaultTemplateName": "Default",
+    "templates": {}
+  },
+  "resourceTypeConfigurations": [
+    {
+      "automationWebhooks": [],
+      "capacity": 0,
+      "failureTimeout": 0,
+      "healthExpressions": [
+        {
+          "$type": "Microsoft.Online.RecoveryService.Contract.Models.AnyFailingWatchdogHealthExpression, Microsoft.Online.RecoveryService.Contract",
+          "forceSeverity": false,
+          "severity": 4,
+          "suppressIncident": false,
+          "type": 2
+        }
+      ],
+      "identifierProperties": [
+        "WarmPathEnvironment",
+        "WarmPathAccount",
+        "WarmPathNamespace",
+        "AgentVersion",
+        "IdentityListMd5Hash"
+      ],
+      "incidentConfiguration": {},
+      "isSystemResource": false,
+      "lastUpdatedBy": "95fbafbf4600808f97e33608f6bcad3c.metricsclient.geneva.core.windows.net",
+      "lastUpdateTime": "2023-06-10T02:03:22+00:00",
+      "metadataProperties": [
+        "Tenant",
+        "Role",
+        "RoleInstance",
+        "GenevaPodName",
+        "IsAutoUpdateDisabled",
+        "ConfigVersion",
+        "BinaryVersion"
+      ],
+      "name": "genevamonitoringagents_d83479a1e87fde0ad69171b688323629",
+      "recoveryRules": [],
+      "shouldEmitHealthMetrics": true,
+      "successTimeout": 0,
+      "tenantName": "ARGDataLabs",
+      "topologyConfiguration": {
+        "dmsTargetResourceName": null,
+        "dmsTargetResourceType": null,
+        "leverageParentHealthStatus": null,
+        "logChildMetrics": false,
+        "parentResourceType": null,
+        "parentResourceTypes": null
+      },
+      "version": 37,
+      "viewConfiguration": {
+        "name": "GenevaMonitoringAgents-d83479a1e87fde0ad69171b688323629",
+        "nodeNames": [
+          "{WarmPathEnvironment}",
+          "{WarmPathAccount}",
+          "{WarmPathNamespace}",
+          "{AgentVersion}",
+          "{Tenant}",
+          "{Role}",
+          "{RoleInstance}",
+          "{GenevaPodName}"
+        ]
+      },
+      "watchdogConfigurations": []
+    },
+    {
+      "automationWebhooks": [],
+      "capacity": 0,
+      "customLinks": [
+        {
+          "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DashboardConfiguration, Microsoft.Online.Metrics.Common",
+          "accountName": "ARGDataLabs",
+          "autoExecute": false,
+          "dimensionsToOverride": [
+            "SourceEnvironment"
+          ],
+          "executionDelay": "00:00:00",
+          "id": "1f2bf918-06fb-407f-b693-ff9b7e8251d7",
+          "lookbackDuration": "06:00:00",
+          "name": null,
+          "namespace": null,
+          "path": [
+            "MonMon",
+            "ME QoS Diagnostics - Basic View"
+          ],
+          "preIncidentQueryTimeout": "00:00:00",
+          "title": "ME QoS Diagnostics Basic (Curated Experience-MeBasicQos2)",
+          "type": "Dashboard"
+        },
+        {
+          "$type": "Microsoft.Online.Metrics.Common.EventConfiguration.DGrepJarvisLink, Microsoft.Online.Metrics.Common",
+          "autoExecute": false,
+          "clientQuery": "where Message != null and Level <= 2\norderby TIMESTAMP asc",
+          "dGrepEndpoint": "https://dgrepv2-frontend-prod.trafficmanager.net/",
+          "endpointAlias": "Stage",
+          "endTime": "{EndTime}",
+          "eventFilters": [
+            {
+              "isScrubbed": false,
+              "monikerRegex": null,
+              "nameRegex": "GenevaMetricsDiagnosticsEvents",
+              "namespaceRegex": "GenevaCommon",
+              "versionRegex": null
+            }
+          ],
+          "eventInfos": null,
+          "executionDelay": "00:00:00",
+          "id": "c873a603-e0dd-4080-b09b-966cc9460929",
+          "identityColumns": {
+            "SourceEnvironment": [
+              "{Monitor.Dimension.SourceEnvironment}"
+            ]
+          },
+          "jarvisPathAndQuery": "?page=logs&be=DGrep&time={EndTime}&offset=-30&offsetUnit=Minutes&ep=Stage&ns=GenevaCommon&en=GenevaMetricsDiagnosticsEvents&serverQuery=where%20ErrorSubtype.containsi(\"ThumbprintsConfigLoader\")%20and%20Tag.containsi(\"ustxptsandbox\")&scopingConditions=[[\"SourceEnvironment\",\"{Monitor.Dimension.SourceEnvironment}\"]]&aggregatesVisible=false&aggregates=[\"Count%20by%20ErrorSubtype\"]&chartsVisible=false&chartEditorVisible=true&chartType=line&chartLayers=[[\"New%20Layer\",\"\"]]&UTC=false&clientQuery=where%20Message%20!%3D%20null%20and%20Level%20<%3D%202%0Aorderby%20TIMESTAMP%20asc",
+          "lookback": "00:30:00",
+          "maxResultRowCount": 15,
+          "maxRowCount": 500000,
+          "mdsEndpoint": "https://stage.diagnostics.monitoring.core.windows.net/",
+          "preIncidentQueryTimeout": "00:00:00",
+          "serverQuery": "where ErrorSubtype.containsi(\"ThumbprintsConfigLoader\") and Tag.containsi(\"ustxptsandbox\")",
+          "serverQuerySimpleConditions": null,
+          "startTime": null,
+          "stepback": "00:00:00",
+          "title": "ME Diag Logs (Curated Experience-MeBasicQos2)",
+          "type": "DGrep",
+          "uxParameters": [
+            {
+              "key": "aggregatesVisible",
+              "value": false
+            },
+            {
+              "key": "aggregates",
+              "value": [
+                "Count by ErrorSubtype"
+              ]
+            },
+            {
+              "key": "chartsVisible",
+              "value": false
+            },
+            {
+              "key": "chartEditorVisible",
+              "value": true
+            },
+            {
+              "key": "chartType",
+              "value": "line"
+            },
+            {
+              "key": "chartLayers",
+              "value": [
+                [
+                  "New Layer",
+                  ""
+                ]
+              ]
+            },
+            {
+              "key": "UTC",
+              "value": false
+            }
+          ]
+        }
+      ],
+      "failureTimeout": 0,
+      "healthExpressions": [
+        {
+          "$type": "Microsoft.Online.RecoveryService.Contract.Models.AnyFailingWatchdogHealthExpression, Microsoft.Online.RecoveryService.Contract",
+          "forceSeverity": false,
+          "severity": 4,
+          "suppressIncident": false,
+          "type": 2
+        }
+      ],
+      "identifierProperties": [
+        "SourceEnvironment"
+      ],
+      "incidentConfiguration": {
+        "environment": "{SourceEnvironment}"
+      },
+      "isSystemResource": false,
+      "lastUpdatedBy": "DYLANHARTONO",
+      "lastUpdateTime": "2023-06-10T02:04:09+00:00",
+      "name": "ME Environment",
+      "recoveryRules": [],
+      "shouldEmitHealthMetrics": true,
+      "successTimeout": 0,
+      "tenantName": "ARGDataLabs",
+      "topologyConfiguration": {
+        "dmsTargetResourceName": null,
+        "dmsTargetResourceType": null,
+        "leverageParentHealthStatus": null,
+        "logChildMetrics": false,
+        "parentResourceType": null,
+        "parentResourceTypes": null
+      },
+      "version": 59,
+      "viewConfiguration": {
+        "name": "Metrics Extension QoS Hierarchy",
+        "nodeNames": [
+          "{SourceEnvironment}"
+        ]
+      },
+      "watchdogConfigurations": []
+    },
+    {
+      "automationWebhooks": [],
+      "capacity": 0,
+      "failureTimeout": 0,
+      "healthExpressions": [
+        {
+          "$type": "Microsoft.Online.RecoveryService.Contract.Models.AnyFailingWatchdogHealthExpression, Microsoft.Online.RecoveryService.Contract",
+          "forceSeverity": false,
+          "severity": 4,
+          "suppressIncident": false,
+          "type": 2
+        }
+      ],
+      "identifierProperties": [
+        "WarmPathEnvironment",
+        "WarmPathAccount",
+        "WarmPathNamespace",
+        "AgentVersion",
+        "IdentityListMd5Hash"
+      ],
+      "incidentConfiguration": {},
+      "isSystemResource": false,
+      "lastUpdatedBy": "95fbafbf4600808f97e33608f6bcad3c.metricsclient.geneva.core.windows.net",
+      "lastUpdateTime": "2023-08-08T18:06:12+00:00",
+      "metadataProperties": [
+        "Tenant",
+        "Role",
+        "RoleInstance",
+        "NodeName",
+        "Environment",
+        "Region",
+        "ScaleUnit",
+        "IsAutoUpdateDisabled",
+        "ConfigVersion",
+        "BinaryVersion"
+      ],
+      "name": "genevamonitoringagents_e78cce51aae2a2ce8b31985a53c28663",
+      "recoveryRules": [],
+      "shouldEmitHealthMetrics": true,
+      "successTimeout": 0,
+      "tenantName": "ARGDataLabs",
+      "topologyConfiguration": {
+        "dmsTargetResourceName": null,
+        "dmsTargetResourceType": null,
+        "leverageParentHealthStatus": null,
+        "logChildMetrics": false,
+        "parentResourceType": null,
+        "parentResourceTypes": null
+      },
+      "version": 35,
+      "viewConfiguration": {
+        "name": "GenevaMonitoringAgents-e78cce51aae2a2ce8b31985a53c28663",
+        "nodeNames": [
+          "{WarmPathEnvironment}",
+          "{WarmPathAccount}",
+          "{WarmPathNamespace}",
+          "{AgentVersion}",
+          "{Tenant}",
+          "{Role}",
+          "{RoleInstance}",
+          "{NodeName}",
+          "{Environment}",
+          "{Region}",
+          "{ScaleUnit}"
+        ]
+      },
+      "watchdogConfigurations": []
+    },
+    {
+      "capacity": 0,
+      "failureTimeout": 0,
+      "healthExpressions": [
+        {
+          "$type": "Microsoft.Online.RecoveryService.Contract.Models.AnyFailingWatchdogHealthExpression, Microsoft.Online.RecoveryService.Contract",
+          "forceSeverity": false,
+          "severity": 4,
+          "suppressIncident": false,
+          "type": 2
+        }
+      ],
+      "identifierProperties": [
+        "scaleUnit",
+        "region",
+        "component",
+        "service"
+      ],
+      "incidentConfiguration": {
+        "dataCenter": "{region}",
+        "environment": "{scaleUnit}",
+        "routingId": "adrocs://Recovery/ARGDataLabs"
+      },
+      "isSystemResource": false,
+      "lastUpdatedBy": "dylanhartono",
+      "lastUpdateTime": "2023-09-15T19:06:40+00:00",
+      "name": "ServiceHealth",
+      "recoveryRules": [],
+      "shouldEmitHealthMetrics": true,
+      "successTimeout": 0,
+      "tenantName": "ARGDataLabs",
+      "version": 11,
+      "viewConfiguration": {
+        "name": "ServiceHealth",
+        "nodeNames": [
+          "{scaleUnit}",
+          "{region}",
+          "{service}",
+          "{component}"
+        ]
+      },
+      "watchdogConfigurations": []
+    },
+    {
+      "capacity": 0,
+      "failureTimeout": 0,
+      "healthExpressions": [
+        {
+          "$type": "Microsoft.Online.RecoveryService.Contract.Models.AnyFailingWatchdogHealthExpression, Microsoft.Online.RecoveryService.Contract",
+          "forceSeverity": false,
+          "severity": 4,
+          "suppressIncident": false,
+          "type": 2
+        }
+      ],
+      "identifierProperties": [
+        "region",
+        "scaleUnit"
+      ],
+      "incidentConfiguration": {
+        "dataCenter": "{region}",
+        "environment": "{scaleUnit}"
+      },
+      "isSystemResource": false,
+      "lastUpdatedBy": "dylanhartono",
+      "lastUpdateTime": "2023-09-13T23:01:03+00:00",
+      "name": "ServiceHealthTemp",
+      "recoveryRules": [],
+      "shouldEmitHealthMetrics": true,
+      "successTimeout": 0,
+      "tenantName": "ARGDataLabs",
+      "version": 13,
+      "viewConfiguration": {
+        "name": "ServiceHealthTemp",
+        "nodeNames": [
+          "{scaleUnit}",
+          "{region}"
+        ]
+      },
+      "watchdogConfigurations": []
+    }
+  ],
+  "serviceBusConfiguration": {
+    "enrichIncidentBeforeSending": false
+  },
+  "tenantName": "ARGDataLabs",
+  "tenantSettings": {
+    "enableSherlockLink": true,
+    "environment": null,
+    "routingId": "adrocs://Recovery/ARGDataLabs",
+    "staleArtifactDeletionTime": "3.00:00:00",
+    "tenantName": "ARGDataLabs",
+    "updateIncidentOnSeverityChange": true,
+    "viewModelPartitionCount": 1
+  },
+  "version": 0
+}

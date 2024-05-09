@@ -1,0 +1,24 @@
+{
+    "$schema": "http://schema.express.azure.com/schemas/2015-01-01-alpha/RolloutParameters.json",
+    "contentVersion": "1.0.0.0",
+    "wait": [
+        {
+            "name": "ManualStep",
+            "properties": {
+                "duration": "__MANUAL_WAIT_DURATION__",
+                "description": "__MANUAL_DESCRIPTION__",
+                "category": "__MANUAL_CATETORY___",
+                "topic": "__MANUAL_TOPIC__",
+                "completeOn": {
+                    "triggerOnAny": [
+                        "manual"
+                    ]
+                },
+                "notification": {
+                    "title": "__MANUAL_NOTIFICATION_TITLE__",
+                    "content": "__MANUAL_NOTIFICATION_CONTENT__"
+                }
+            }
+        }
+    ]
+}

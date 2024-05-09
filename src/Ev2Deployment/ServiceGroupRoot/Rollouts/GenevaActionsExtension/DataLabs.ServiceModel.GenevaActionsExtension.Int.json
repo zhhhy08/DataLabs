@@ -1,0 +1,32 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-04-01/regionAgnosticServiceModel.json",
+    "serviceMetadata": {
+        "serviceIdentifier": "ce93fb1b-91b9-49ae-bc36-1dcf1af57296",
+        "serviceGroup": "Microsoft.Azure.DataLabs.GenevaActionsExtension",
+        "displayName":"Microsoft.Azure.DataLabs.GenevaActionsExtension",
+        "environment": "$config(cloudName)",
+        "tenantId": "$config(cloudTenant)"
+    },
+    "serviceResourceGroupDefinitions": [
+        {
+            "name": "SubscriptionDataLabsResourceGroup",
+            "subscriptionKey": "ARBDataLabsIntSubscription",
+            "azureResourceGroupName": "DataLabsRG",
+            "serviceResourceDefinitions": [
+                {
+                    "name": "AcisServiceResource",
+                    "composedOf": {
+                        "extension": {
+                            "rolloutParametersPath": "Rollouts/GenevaActionsExtension/RolloutParameters/GenevaActionsExtension.Int.json",
+                            "allowedTypes": [
+                                {
+                                    "Type": "Microsoft.Geneva.Actions/PublishExtension"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
